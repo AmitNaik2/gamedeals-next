@@ -119,15 +119,16 @@ export default function App() {
     if (showRefreshIndicator) setIsRefreshing(true);
     
     try {
-      const gamerpowerRes = await fetch("/api/deals").catch(() => null);
+      const gamerpowerRes = await fetch("/api/deals");
+      
+      if (!gamerpowerRes.ok) {
+         throw new Error("Game deals server is temporarily blocking our requests (Error " + gamerpowerRes.status + "). Please try again later.");
+      }
       
       let allDeals: GameDeal[] = [];
-
-      if (gamerpowerRes && gamerpowerRes.ok) {
-        const data = await gamerpowerRes.json();
-        if (data.status !== 0) {
-          allDeals = data.filter((d: any) => d.type === "Game" || d.type === "Early Access");
-        }
+      const data = await gamerpowerRes.json();
+      if (data.status !== 0 && Array.isArray(data)) {
+        allDeals = data.filter((d: any) => d.type === "Game" || d.type === "Early Access");
       }
 
       setDeals(allDeals);
@@ -145,13 +146,15 @@ export default function App() {
   const fetchDlc = async () => {
     setDlcLoading(true);
     try {
-      const dbRes = await fetch("/api/loot").catch(() => null);
-      if (dbRes && dbRes.ok) {
-        const data = await dbRes.json();
-        setDlcDeals(data);
+      const dbRes = await fetch("/api/loot");
+      if (!dbRes.ok) {
+         throw new Error(`Failed to load Free DLC (HTTP ${dbRes.status})`);
       }
+      const data = await dbRes.json();
+      setDlcDeals(data);
     } catch (err: any) {
       console.error(err);
+      setError(err.message || "Failed to load Free DLC. Please try again.");
     } finally {
       setDlcLoading(false);
     }
@@ -160,9 +163,11 @@ export default function App() {
   const fetchPremium = async () => {
     setPremiumLoading(true);
     try {
-      const cheapsharkRes = await fetch("/api/cheapshark-deals").catch(() => null);
-      if (cheapsharkRes && cheapsharkRes.ok) {
-        const csData = await cheapsharkRes.json();
+      const cheapsharkRes = await fetch("/api/cheapshark-deals");
+      if (!cheapsharkRes.ok) {
+         throw new Error(`Failed to load Premium Deals (HTTP ${cheapsharkRes.status})`);
+      }
+      const csData = await cheapsharkRes.json();
         const csDeals: GameDeal[] = csData.map((cs: any) => ({
           id: `cs_${cs.dealID}`,
           title: cs.title,
@@ -186,9 +191,9 @@ export default function App() {
           steamAppID: cs.steamAppID,
         }));
         setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount"));
-      }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setError(err.message || "Failed to load Premium Deals. Please try again.");
     } finally {
       setPremiumLoading(false);
     }
