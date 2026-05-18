@@ -199,38 +199,8 @@ app.use(express.json());
     }
   }
 
-  const igdbQueue: Array<{
-    title: string,
-    resolve: (value: any) => void,
-    reject: (reason?: any) => void
-  }> = [];
-
-  let isProcessingIgdbQueue = false;
   const igdbCache = new Map<string, any>();
   const igdbPending = new Map<string, Promise<any>>();
-
-  async function processIgdbQueue() {
-    if (isProcessingIgdbQueue) return;
-    isProcessingIgdbQueue = true;
-
-    while (igdbQueue.length > 0) {
-      const task = igdbQueue.shift();
-      if (task) {
-        try {
-          const result = await fetchIgdbData(task.title);
-          igdbCache.set(task.title.toLowerCase(), result);
-          task.resolve(result);
-        } catch (err) {
-          task.reject(err);
-        }
-        
-        // Twitch allows 4 IGDB requests/sec. 300ms keeps us under that ceiling.
-        await new Promise(resolve => setTimeout(resolve, IGDB_REQUEST_INTERVAL_MS));
-      }
-    }
-
-    isProcessingIgdbQueue = false;
-  }
 
   async function fetchIgdbData(title: string) {
     const clientId = process.env.TWITCH_CLIENT_ID;
@@ -248,27 +218,36 @@ app.use(express.json());
 
     cleanTitle = cleanTitle.replace(/"/g, '').replace(/:/g, '');
 
-    const response = await fetch("https://api.igdb.com/v4/games", {
-      method: "POST",
-      headers: {
-        "Client-ID": clientId,
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/json",
-      },
-      body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url; limit 10;`
-    });
-    
-    if (!response.ok) throw new Error("Failed to fetch from IGDB");
-    const text = await response.text();
-    let data; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from IGDB"); }
-    
-    if (data && data.length > 0) {
-      const selectedGame = data.find((game: any) => game.name?.toLowerCase() === cleanTitle.toLowerCase()) || data[0];
-      if (selectedGame.cover && selectedGame.cover.url) {
-        selectedGame.background_image = 'https:' + selectedGame.cover.url.replace('t_thumb', 't_1080p');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const response = await fetch("https://api.igdb.com/v4/games", {
+        method: "POST",
+        headers: {
+          "Client-ID": clientId,
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+        },
+        body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url; limit 10;`,
+        signal: controller.signal as any
+      });
+      clearTimeout(timeout);
+      
+      if (!response.ok) throw new Error("Failed to fetch from IGDB");
+      const text = await response.text();
+      let data; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from IGDB"); }
+      
+      if (data && data.length > 0) {
+        const selectedGame = data.find((game: any) => game.name?.toLowerCase() === cleanTitle.toLowerCase()) || data[0];
+        if (selectedGame.cover && selectedGame.cover.url) {
+          selectedGame.background_image = 'https:' + selectedGame.cover.url.replace('t_thumb', 't_1080p');
+        }
+        return selectedGame;
+      } else {
+        return { not_found: true };
       }
-      return selectedGame;
-    } else {
+    } catch(err) {
+      clearTimeout(timeout);
       return { not_found: true };
     }
   }
@@ -293,14 +272,12 @@ app.use(express.json());
         return res.json(await igdbPending.get(titleStr));
       }
 
-      const dataPromise = new Promise((resolve, reject) => {
-        igdbQueue.push({ title: String(title), resolve, reject });
-        processIgdbQueue();
-      });
+      const dataPromise = fetchIgdbData(String(title));
       igdbPending.set(titleStr, dataPromise);
 
       try {
         const data = await dataPromise;
+        igdbCache.set(titleStr, data);
         res.json(data);
       } finally {
         igdbPending.delete(titleStr);
@@ -668,7 +645,8 @@ app.use(express.json());
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     const startVite = async () => {
       try {
-        const { createServer: createViteServer } = await import("vite");
+        const vitePath = "vite";
+        const { createServer: createViteServer } = await import(/* @vite-ignore */ vitePath);
         const vite = await createViteServer({
           server: { middlewareMode: true },
           appType: "spa",
