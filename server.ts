@@ -67,11 +67,15 @@ app.use(express.json());
         ? `https://www.gamerpower.com/api/giveaways?type=${type}&sort-by=date`
         : `https://www.gamerpower.com/api/giveaways?sort-by=date`;
         
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
       const response = await fetch(url, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
+        },
+        signal: controller.signal as any
       });
+      clearTimeout(timeout);
       if (!response.ok) throw new Error("Failed to fetch deals");
       const text = await response.text();
       let data: any; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from GamerPower deals"); }
@@ -103,7 +107,13 @@ app.use(express.json());
       const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" };
       
       let data: any[] = [];
-      const resLoot = await fetch("https://www.gamerpower.com/api/giveaways?type=loot", { headers });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const resLoot = await fetch("https://www.gamerpower.com/api/giveaways?type=loot", { 
+         headers,
+         signal: controller.signal as any
+      });
+      clearTimeout(timeout);
       
       if (resLoot.ok) {
         const text = await resLoot.text();
@@ -138,11 +148,15 @@ app.use(express.json());
   // Proxy the CheapShark API
   app.get("/api/cheapshark-deals", async (req, res) => {
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
       const response = await fetch("https://www.cheapshark.com/api/1.0/deals?storeID=1,2,3,7,8,11,13&sortBy=DealRating&onSale=1", {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        }
+        },
+        signal: controller.signal as any
       });
+      clearTimeout(timeout);
       if (!response.ok) {
         console.error("Cheapshark bad status:", response.status, response.statusText);
         throw new Error("Failed to fetch cheapshark deals");
@@ -554,10 +568,14 @@ app.use(express.json());
     const news: any[] = [];
     let currentId = 0;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
+    
     const [pcGamerRes, rpsRes] = await Promise.allSettled([
-      fetch("https://www.pcgamer.com/news/"),
-      fetch("https://www.rockpapershotgun.com/latest")
+      fetch("https://www.pcgamer.com/news/", { signal: controller.signal as any }),
+      fetch("https://www.rockpapershotgun.com/latest", { signal: controller.signal as any })
     ]);
+    clearTimeout(timeout);
 
     if (pcGamerRes.status === 'fulfilled' && pcGamerRes.value.ok) {
       const html = await pcGamerRes.value.text();
@@ -617,12 +635,14 @@ app.use(express.json());
     return newsRefreshPromise;
   }
 
-  const newsRefreshTimer = setInterval(() => {
-    refreshNewsCache().catch(() => {
-      // Error is logged in refreshNewsCache; keep the scheduler alive.
-    });
-  }, NEWS_REFRESH_INTERVAL_MS);
-  newsRefreshTimer.unref?.();
+  if (!process.env.VERCEL) {
+    const newsRefreshTimer = setInterval(() => {
+      refreshNewsCache().catch(() => {
+        // Error is logged in refreshNewsCache; keep the scheduler alive.
+      });
+    }, NEWS_REFRESH_INTERVAL_MS);
+    newsRefreshTimer.unref?.();
+  }
 
   app.get("/api/news", async (req, res) => {
     try {

@@ -445,7 +445,7 @@ export default function App() {
                <FeaturedDeal deal={deals[0]} />
             )}
 
-            <div className="flex flex-col gap-6">
+            <div className="grid gap-6 sm:grid-cols-1 xl:grid-cols-2">
               <AnimatePresence mode="popLayout">
                 {deals
                   .filter((deal, idx) => {
@@ -509,7 +509,7 @@ export default function App() {
                       <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free DLCs...</p>
                    </div>
                 ) : filteredLootDeals.length > 0 ? (
-                  <div className="flex flex-col gap-6">
+                  <div className="grid gap-6 sm:grid-cols-1 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
                       {filteredLootDeals.map((deal, index) => (
                         <DealCard
@@ -551,7 +551,7 @@ export default function App() {
                       <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Premium Deals...</p>
                    </div>
                 ) : filteredPremiumDeals.length > 0 ? (
-                  <div className="flex flex-col gap-6">
+                  <div className="grid gap-6 sm:grid-cols-1 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
                       {filteredPremiumDeals.map((deal, index) => (
                         <DealCard
