@@ -61,6 +61,31 @@ app.use(express.json());
     }
   }
 
+  async function fetchGamerPower(url: string) {
+    const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" };
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      let response = await fetch(url, { headers, signal: controller.signal as any });
+      clearTimeout(timeout);
+      if (response.ok) {
+        return await response.json();
+      }
+    } catch (err) {
+      // Ignore initial errors to trigger fallback
+    }
+    
+    // Fallback to proxy if GamerPower blocks Vercel IPs or times out
+    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+    const controllerProxy = new AbortController();
+    const timeoutProxy = setTimeout(() => controllerProxy.abort(), 8000);
+    const proxyRes = await fetch(proxyUrl, { signal: controllerProxy.signal as any });
+    clearTimeout(timeoutProxy);
+    
+    if (!proxyRes.ok) throw new Error("Fallback proxy failed");
+    return await proxyRes.json();
+  }
+
   // Proxy the GamerPower API to avoid CORS and format data if needed
   app.get("/api/deals", async (req, res) => {
     try {
@@ -69,18 +94,7 @@ app.use(express.json());
         ? `https://www.gamerpower.com/api/giveaways?type=${type}&sort-by=date`
         : `https://www.gamerpower.com/api/giveaways?sort-by=date`;
         
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
-      const response = await fetch(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        },
-        signal: controller.signal as any
-      });
-      clearTimeout(timeout);
-      if (!response.ok) throw new Error("Failed to fetch deals");
-      const text = await response.text();
-      let data: any; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from GamerPower deals"); }
+      let data = await fetchGamerPower(url);
       
       // Limit to items to avoid taking forever
       if (Array.isArray(data)) {
@@ -91,9 +105,6 @@ app.use(express.json());
           const plats = deal.platforms.toLowerCase();
           return isActiveGiveaway(deal) && trustedPlatforms.some(t => plats.includes(t));
         });
-        
-        // We skip verifyUrl because store anti-bot protections often fail the request and we drop valid deals.
-        // data = verifiedData;
       }
 
       res.json(data);
@@ -106,20 +117,13 @@ app.use(express.json());
   // Proxy the GamerPower API for Loot/Promo codes
   app.get("/api/loot", async (req, res) => {
     try {
-      const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" };
-      
       let data: any[] = [];
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
-      const resLoot = await fetch("https://www.gamerpower.com/api/giveaways?type=loot", { 
-         headers,
-         signal: controller.signal as any
-      });
-      clearTimeout(timeout);
+      const url = "https://www.gamerpower.com/api/giveaways?type=loot";
       
-      if (resLoot.ok) {
-        const text = await resLoot.text();
-        try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from GamerPower loot"); }
+      try {
+        data = await fetchGamerPower(url);
+      } catch (err) {
+         // ignore
       }
       
       const { search } = req.query;
