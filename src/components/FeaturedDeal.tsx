@@ -1,10 +1,11 @@
 import { motion } from "motion/react";
 import { type MouseEvent } from "react";
+import { Link } from "react-router-dom";
 import { type GameDeal } from "../types";
 import { Countdown } from "./Countdown";
 import { ExternalLink, BadgeCheck } from "lucide-react";
 import { useIgdb } from "../hooks/useIgdb";
-import { openExternalUrl } from "../lib/utils";
+import { generateUniqueSummary, generateTags } from "../lib/text-utils";
 
 export function FeaturedDeal({ deal }: { deal: GameDeal }) {
   const gameInfo = useIgdb(deal?.title);
@@ -17,11 +18,10 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
   const liveViewers = 40 + Math.floor((deal.users || 0) / 500) + (deal.title.length % 100);
 
   const bgImage = gameInfo?.background_image || deal.image || deal.thumbnail;
+  const rewrittenSummary = generateUniqueSummary(deal.title, deal.description, deal.type, deal.platforms);
+  const tags = generateTags(deal.title, deal.platforms, deal.type, deal.description);
 
-  const openDeal = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    openExternalUrl(deal.open_giveaway_url, "_self");
-  };
+  const gameUrl = `/game/${deal.id}`;
 
   return (
     <motion.div 
@@ -45,37 +45,34 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
 
       <div className="absolute bottom-8 left-6 sm:left-8 z-20 max-w-full sm:max-w-[80%] pr-6">
         <div className="flex flex-wrap items-center gap-2 mb-3 text-[10px] uppercase font-mono tracking-widest text-[#7C3AED]">
-          <span className="bg-[#7C3AED]/20 px-2 py-0.5 rounded border border-[#7C3AED]/30 flex items-center gap-1">
-             {deal.platforms.split(',')[0]}
-             <BadgeCheck className="w-3 h-3 text-blue-400" />
-          </span>
+          {tags.map((tag, idx) => (
+             <span key={idx} className="bg-[#7C3AED]/20 px-2 py-0.5 rounded border border-[#7C3AED]/30 flex items-center gap-1">
+               {tag}
+             </span>
+          ))}
           <span className="bg-[#7C3AED] text-white px-2 py-0.5 rounded shadow-[0_0_15px_rgba(124,58,237,0.5)]">
              AI SCORE: {dealScore}
           </span>
           <span aria-hidden="true">/</span>
-          <span>{deal.type}</span>
           <span className="text-cyan-400 animate-pulse hidden sm:inline-block">
              / {liveViewers} VIEWING
           </span>
         </div>
-        <a href={deal.open_giveaway_url} onClick={openDeal} target="_self" rel="noreferrer" className="block w-fit">
+        <Link to={gameUrl} className="block w-fit">
           <h2 className="text-3xl sm:text-5xl font-serif italic mb-3 text-white leading-tight hover:text-[#7C3AED] transition-colors">
             {deal.title}
           </h2>
-        </a>
-        <p className="text-xs sm:text-sm text-white/60 mb-6 line-clamp-2 max-w-xl">
-          {deal.description}
+        </Link>
+        <p className="text-xs sm:text-sm text-white/80 mb-6 line-clamp-2 max-w-xl font-medium">
+          {rewrittenSummary}
         </p>
         <div className="flex flex-wrap items-center gap-4">
-          <a
-            href={deal.open_giveaway_url}
-            onClick={openDeal}
-            target="_self"
-            rel="noreferrer"
+          <Link
+            to={gameUrl}
             className="px-6 py-3 bg-white text-black text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#7C3AED] hover:text-white transition-colors flex items-center gap-2 rounded-sm"
           >
-            Claim Now <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+            Claim Now
+          </Link>
           <Countdown endDate={deal.end_date} />
         </div>
       </div>

@@ -1,8 +1,9 @@
 import { motion } from "motion/react";
 import { Tag, Monitor, MonitorSmartphone, Smartphone, Gamepad2, Mail, BadgeCheck, ShieldCheck, Star } from "lucide-react";
 import { type Key, useRef, type MouseEvent } from "react";
+import { Link } from "react-router-dom";
 import { type GameDeal } from "../types";
-import { cn, openExternalUrl } from "../lib/utils";
+import { cn } from "../lib/utils";
 import { getDealRarity } from "../lib/deal-utils";
 
 import { Countdown } from "./Countdown";
@@ -34,10 +35,7 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
     cardRef.current.style.setProperty("--mouse-y", `${y}px`);
   };
 
-  const openDeal = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    openExternalUrl(deal.open_giveaway_url, "_self");
-  };
+  const gameUrl = `/game/${deal.id}`;
 
   const renderPlatformIcon = (platformStr: string) => {
     const pl = platformStr.toLowerCase();
@@ -90,7 +88,7 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
       
       {/* Image Section */}
       <div className="relative w-full aspect-video sm:aspect-[2/1] shrink-0 overflow-hidden bg-black/50 border-b border-white/10">
-        <a href={deal.open_giveaway_url} onClick={openDeal} target="_self" rel="noreferrer" className="block w-full h-full">
+        <Link to={gameUrl} className="block w-full h-full">
           <img
             src={bgImage}
             alt={deal.title}
@@ -98,7 +96,7 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
             loading="lazy"
           />
           <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-t from-black/80 via-transparent to-transparent group-hover:opacity-100"></div>
-        </a>
+        </Link>
       </div>
 
       {/* Content Section */}
@@ -123,6 +121,9 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
           </div>
           
           <div className="flex items-end flex-col">
+            <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-green-500 mb-1 border border-green-500/30 px-1 rounded bg-green-500/10">
+              <BadgeCheck className="w-2.5 h-2.5" /> Official
+            </span>
             {originalPrice !== "$0.00" && (
               <span className="text-[10px] sm:text-[11px] font-mono text-white/40 line-through mb-0.5">
                 {originalPrice}
@@ -134,11 +135,11 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
           </div>
         </div>
 
-        <a href={deal.open_giveaway_url} onClick={openDeal} target="_self" rel="noreferrer" className="inline-block group-hover:text-[#7C3AED] transition-colors mb-2">
+        <Link to={gameUrl} className="inline-block group-hover:text-[#7C3AED] transition-colors mb-2">
           <h3 className="text-lg sm:text-2xl font-bold leading-tight text-white font-serif italic line-clamp-2">
             {deal.title}
           </h3>
-        </a>
+        </Link>
 
         <div className="flex flex-wrap items-center gap-3 mb-6">
            <span className="px-2 py-0.5 rounded bg-[#7C3AED] text-white text-[10px] font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(124,58,237,0.4)]">
@@ -185,15 +186,12 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
             >
               Remind Me
             </button>
-            <a 
-              href={deal.open_giveaway_url}
-              onClick={openDeal}
-              target="_self"
-              rel="noreferrer"
+            <Link 
+              to={gameUrl}
               className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
              >
               Claim Now
-            </a>
+            </Link>
           </div>
         </div>
       </div>

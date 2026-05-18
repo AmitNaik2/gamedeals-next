@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { Trophy, ArrowRight, BadgeCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { type GameDeal } from "../types";
 
 export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewAll?: () => void }) {
@@ -25,23 +26,27 @@ export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewA
       
       <div className="space-y-4 relative z-10">
         {topDeals.map((item, i) => (
-          <motion.div 
+          <Link
+            to={`/game/${item.id}`}
             key={item.id}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex gap-3 items-center justify-between border-b border-white/5 pb-3 last:border-0 last:pb-0"
           >
-            <div>
-              <p className="text-xs font-bold mb-0.5 line-clamp-1 text-white flex items-center gap-1">
-                {item.title} <BadgeCheck className="w-3 h-3 text-blue-400" />
-              </p>
-              <p className="text-[9px] uppercase tracking-widest text-[#7C3AED]">{item.platforms.split(',')[0]}</p>
-            </div>
-            <div className="text-right">
-              <span className="text-[11px] font-bold text-amber-400 block whitespace-nowrap">{item.worth === "N/A" ? "FREE" : item.worth}</span>
-            </div>
-          </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="flex gap-3 items-center justify-between border-b border-white/5 pb-3 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors cursor-pointer"
+            >
+              <div>
+                <p className="text-xs font-bold mb-0.5 line-clamp-1 text-white flex items-center gap-1">
+                  {item.title} <BadgeCheck className="w-3 h-3 text-blue-400" />
+                </p>
+                <p className="text-[9px] uppercase tracking-widest text-[#7C3AED]">{item.platforms.split(',')[0]}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-bold text-amber-400 block whitespace-nowrap">{item.worth === "N/A" ? "FREE" : item.worth}</span>
+              </div>
+            </motion.div>
+          </Link>
         ))}
       </div>
       

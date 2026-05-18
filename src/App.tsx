@@ -1,7 +1,10 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Gamepad2, RefreshCw, AlertCircle, RefreshCcw, CheckCircle2, Search, Filter } from "lucide-react";
+import { Routes, Route, useLocation, useNavigate, Link, Navigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { DealCard } from "./components/DealCard";
+import { GameDetail } from "./components/GameDetail";
 import { EmailModal } from "./components/EmailModal";
 import { type GameDeal } from "./types";
 import { getDealRarity, type RarityLevel } from "./lib/deal-utils";
@@ -116,6 +119,9 @@ function InlineSubscribe() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<"Games" | "DLC" | "Premium">("Games");
   
   const [deals, setDeals] = useState<GameDeal[]>([]); // This will just be Free Games now
@@ -129,9 +135,37 @@ export default function App() {
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
+  
+  // URL-driven state sync
   const [platformSearch, setPlatformSearch] = useState("");
   const [lootSearch, setLootSearch] = useState("");
   const [premiumSearch, setPremiumSearch] = useState("");
+
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/free-steam-games')) {
+      setActiveTab("Games");
+      setPlatformSearch("Steam");
+    } else if (path.includes('/free-epic-games')) {
+      setActiveTab("Games");
+      setPlatformSearch("Epic Games");
+    } else if (path.includes('/free-gog-games')) {
+      setActiveTab("Games");
+      setPlatformSearch("GOG");
+    }
+  }, [location.pathname]);
+
+  const seoTitle = useMemo(() => {
+    const path = location.pathname.toLowerCase();
+    if (path.includes('/free-steam-games')) return "Free Steam Games & Weekends Tracker | GamesDealsHub";
+    if (path.includes('/free-epic-games')) return "Epic Games Store Freebies Tracker | GamesDealsHub";
+    if (path.includes('/free-gog-games')) return "GOG DRM-Free Giveaways Tracker | GamesDealsHub";
+    return "Track Free PC Games Before They Expire | GamesDealsHub";
+  }, [location.pathname]);
+
+  const seoDescription = useMemo(() => {
+    return "Real-time tracker for free PC games, limited-time promotions, Steam free weekends and Epic Games Giveaways. Claim them before they expire!";
+  }, []);
   
   const filteredLootDeals = dlcDeals.filter(deal => 
     deal.title.toLowerCase().includes(lootSearch.toLowerCase()) || 
@@ -307,20 +341,36 @@ export default function App() {
   // UI for loading state
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A0A0B] text-[#7C3AED]">
-        <motion.div
-           animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Gamepad2 className="w-16 h-16 mb-4" />
-        </motion.div>
-        <h2 className="text-xl font-bold font-sans tracking-tight text-[#E0E0E0]">Finding the best deals...</h2>
+      <div className="min-h-screen bg-[#050505] p-4 sm:p-8">
+        <Helmet>
+          <title>{seoTitle}</title>
+          <meta name="description" content={seoDescription} />
+        </Helmet>
+        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+          <div className="w-full h-16 xl:h-20 bg-white/5 rounded-2xl border border-white/10" />
+          <div className="w-full h-[400px] bg-white/5 rounded-3xl border border-white/10" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
+            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
+            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
+            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen font-sans text-white bg-[#050505] selection:bg-[#7C3AED] selection:text-white relative">
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        <link rel="canonical" href={`https://gamesdealshub.com${location.pathname}`} />
+      </Helmet>
       <TopNavbar
         searchValue={platformSearch}
         onSearchChange={handleNavbarSearch}
@@ -332,27 +382,31 @@ export default function App() {
       />
 
       <main className="container px-4 py-8 mx-auto max-w-7xl">
-        <HeroSection 
-          onExploreClick={goFreeGames}
-          onTrendingClick={goTrending}
-        />
+        <Routes>
+          {["/", "/free-steam-games", "/free-epic-games", "/free-gog-games"].map(path => (
+            <Route key={path} path={path} element={
+              <>
+                <HeroSection 
+                  onExploreClick={goFreeGames}
+                  onTrendingClick={goTrending}
+                />
 
-        {/* Error State */}
-        {error && (
-          <div className="flex flex-col items-center justify-center py-12 mb-8 border border-rose-900/50 bg-rose-950/20 rounded-3xl">
-            <AlertCircle className="w-12 h-12 mb-4 text-rose-500" />
-            <h3 className="mb-2 text-lg font-semibold text-rose-400">Failed to load deals</h3>
-            <p className="mb-6 text-rose-500/80">{error}</p>
-            <button 
-              onClick={() => fetchDeals(true)}
-              className="flex items-center gap-2 px-4 py-2 font-medium transition-colors rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30"
-            >
-              <RefreshCcw className="w-4 h-4" /> Try Again
-            </button>
-          </div>
-        )}
+              {/* Error State */}
+              {error && (
+                <div className="flex flex-col items-center justify-center py-12 mb-8 border border-rose-900/50 bg-rose-950/20 rounded-3xl">
+                  <AlertCircle className="w-12 h-12 mb-4 text-rose-500" />
+                  <h3 className="mb-2 text-lg font-semibold text-rose-400">Failed to load deals</h3>
+                  <p className="mb-6 text-rose-500/80">{error}</p>
+                  <button 
+                    onClick={() => fetchDeals(true)}
+                    className="flex items-center gap-2 px-4 py-2 font-medium transition-colors rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500/30"
+                  >
+                    <RefreshCcw className="w-4 h-4" /> Try Again
+                  </button>
+                </div>
+              )}
 
-        <div className="flex flex-col xl:flex-row gap-8 items-start">
+              <div className="flex flex-col xl:flex-row gap-8 items-start">
           {/* Main Content Area */}
           <div className="flex-1 w-full min-w-0">
             
@@ -588,18 +642,46 @@ export default function App() {
             </div>
           </aside>
         </div>
+            </>
+          } />
+          ))}
+          <Route path="/game/:id" element={<GameDetail deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
+        </Routes>
       </main>
 
-      <footer className="h-[60px] px-4 md:px-10 border-t border-white/10 flex items-center justify-between text-[9px] uppercase tracking-[0.2em] font-bold text-white/30 max-w-7xl mx-auto w-full mt-10">
-          <div className="flex gap-6">
-              <button type="button" onClick={openSubscribeModal} className="hover:text-white transition-colors">Discord</button>
-              <button type="button" onClick={() => openExternalUrl("https://x.com/search?q=free%20game%20deals")} className="hover:text-white transition-colors">Twitter / X</button>
-              <button type="button" onClick={() => openExternalUrl("/api/deals")} className="hover:text-white transition-colors">API Access</button>
+      <footer className="mt-20 border-t border-white/10 bg-[#050505]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-12 lg:py-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-[10px] uppercase tracking-widest font-bold text-white/50">
+            <div className="flex flex-col gap-4">
+               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Platform</span>
+               <button type="button" onClick={goHome} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Home</button>
+               <button type="button" onClick={goFreeGames} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">All Free Games</button>
+               <button type="button" onClick={() => {navigate('/free-steam-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Free Steam Games</button>
+               <button type="button" onClick={() => {navigate('/free-epic-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Epic Games Giveaways</button>
+            </div>
+             <div className="flex flex-col gap-4">
+               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Legal</span>
+               <button type="button" onClick={openSubscribeModal} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Terms of Service</button>
+               <button type="button" onClick={openSubscribeModal} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Privacy Policy</button>
+               <button type="button" onClick={openSubscribeModal} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Cookie Policy</button>
+            </div>
+             <div className="flex flex-col gap-4">
+               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Connect</span>
+               <button type="button" onClick={() => openExternalUrl("https://discord.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Discord</button>
+               <button type="button" onClick={() => openExternalUrl("https://github.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">GitHub</button>
+               <button type="button" onClick={openSubscribeModal} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Contact Us</button>
+            </div>
+            <div className="flex flex-col gap-4">
+               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">System</span>
+               <div className="flex items-center gap-2 py-1">
+                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse glow-green"></span>
+                  <span className="text-green-500">API Status: Normal</span>
+               </div>
+               <div className="py-1">Active Deals: <span className="text-white">1,492</span></div>
+               <div className="mt-8 pt-4 border-t border-white/10 opacity-40">© 2026 GamesDealsHub</div>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7C3AED] animate-pulse"></span>
-              <span>System Stable // Live</span>
-          </div>
+        </div>
       </footer>
 
       {/* Modals */}

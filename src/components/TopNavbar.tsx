@@ -1,4 +1,5 @@
 import { Gamepad2, Search, Bell, User, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface TopNavbarProps {
   searchValue: string;
@@ -24,21 +25,25 @@ export function TopNavbar({
       <div className="container px-4 mx-auto max-w-7xl">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           {/* Logo */}
-          <div className="flex items-center gap-3">
+          <Link to="/" onClick={onHomeClick} className="flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2 mr-4 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-mono tracking-widest uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse glow-green"></span>
+              <span className="text-white/70">8,492 Online</span>
+            </div>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7C3AED] to-cyan-500 flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.3)]">
               <Gamepad2 className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/60 hidden sm:block delay-100">
               GameDeals<span className="text-[#7C3AED]">Hub</span>
             </h1>
-          </div>
+          </Link>
 
           {/* Links (Desktop) */}
           <div className="hidden lg:flex items-center gap-6">
-            <button type="button" onClick={onHomeClick} className="text-sm font-bold text-white hover:text-[#7C3AED] transition-colors">Home</button>
-            <button type="button" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Games</button>
-            <button type="button" onClick={onFreeDlcClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free DLC</button>
-            <button type="button" onClick={onTrendingClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Trending</button>
+            <Link to="/" onClick={onHomeClick} className="text-sm font-bold text-white hover:text-[#7C3AED] transition-colors">Home</Link>
+            <Link to="/free-steam-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Steam Games</Link>
+            <Link to="/free-epic-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Epic Games</Link>
+            <Link to="/free-gog-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">GOG Giveaways</Link>
           </div>
 
           {/* Right Side */}

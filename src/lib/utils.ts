@@ -13,8 +13,6 @@ export function openExternalUrl(url: string, target: "_blank" | "_self" = "_blan
     return;
   }
 
-  const openedWindow = window.open(url, "_blank", "noopener,noreferrer");
-  if (!openedWindow) {
-    window.location.assign(url);
-  }
+  // Attempt to open in new tab. Fallback to _self should NOT be done for cross-origin game links!
+  window.open(url, "_blank", "noopener,noreferrer");
 }
