@@ -1,12 +1,14 @@
 // Vite import removed from the top level
+import os from "os";
 import express from "express";
 import fs from "fs";
 import path from "path";
 import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
+import * as cheerio from "cheerio";
 
-dotenv.config({ quiet: true });
-dotenv.config({ path: ".env.local", override: true, quiet: true });
+dotenv.config();
+dotenv.config({ path: ".env.local", override: true });
 
 // Create a mock users store (in a real app, this would be a DB like Firestore or Postgres)
 const subscribedEmails = new Set<string>();
@@ -97,7 +99,7 @@ app.use(express.json());
       res.json(data);
     } catch (error) {
       console.error("Error fetching deals:", error);
-      res.status(500).json({ error: "Failed to fetch deals" });
+      res.json([]);
     }
   });
 
@@ -141,7 +143,7 @@ app.use(express.json());
       res.json(data);
     } catch (error) {
       console.error("Error fetching loot:", error);
-      res.status(500).json({ error: "Failed to fetch loot" });
+      res.json([]);
     }
   });
 
@@ -166,7 +168,7 @@ app.use(express.json());
       res.json(data);
     } catch (error) {
       console.error("Error fetching cheapshark deals:", error);
-      res.status(500).json({ error: "Failed to fetch cheapshark deals" });
+      res.json([]);
     }
   });
 
@@ -284,23 +286,16 @@ app.use(express.json());
       }
     } catch (error: any) {
       console.error("Error fetching IGDB info:", error);
-      res.status(500).json({ error: error.message || "Failed to fetch from IGDB" });
+      res.json({ not_found: true });
     }
   });
 
   // Query RAWG API for enhanced game info
   const rawgCache = new Map<string, any>();
   const rawgPending = new Map<string, Promise<any>>();
-  const rawgQueue: Array<{
-    title: string,
-    titleStr: string,
-    resolve: (value: any) => void,
-    reject: (reason?: any) => void
-  }> = [];
-  let isProcessingRawgQueue = false;
-  const RAWG_REQUEST_INTERVAL_MS = Math.max(parseInt(process.env.RAWG_REQUEST_INTERVAL_MS || "1500", 10) || 1500, 1000);
   const RAWG_MONTHLY_LIMIT = Math.max(parseInt(process.env.RAWG_MONTHLY_LIMIT || "20000", 10) || 20000, 1);
-  const RAWG_USAGE_FILE = path.join(process.cwd(), ".cache", "rawg-usage.json");
+
+  const RAWG_USAGE_FILE = path.join(os.tmpdir(), "rawg-usage.json");
 
   function getRawgMonthKey() {
     const now = new Date();
@@ -355,29 +350,6 @@ app.use(express.json());
     const usage = getCurrentRawgUsage();
     rawgUsage = { month: usage.month, count: usage.count + 1 };
     saveRawgUsage();
-  }
-
-  async function processRawgQueue() {
-    if (isProcessingRawgQueue) return;
-    isProcessingRawgQueue = true;
-
-    while (rawgQueue.length > 0) {
-      const task = rawgQueue.shift();
-      if (task) {
-        try {
-          const result = await fetchRawgData(task.title);
-          rawgCache.set(task.titleStr, result);
-          task.resolve(result);
-        } catch (err) {
-          task.reject(err);
-        }
-
-        // RAWG has a monthly quota. Pacing avoids bursts while cache handles repeats.
-        await new Promise(resolve => setTimeout(resolve, RAWG_REQUEST_INTERVAL_MS));
-      }
-    }
-
-    isProcessingRawgQueue = false;
   }
 
   async function fetchRawgData(title: string) {
@@ -437,21 +409,19 @@ app.use(express.json());
         return res.json(await rawgPending.get(titleStr));
       }
 
-      const dataPromise = new Promise((resolve, reject) => {
-        rawgQueue.push({ title: String(title), titleStr, resolve, reject });
-        processRawgQueue();
-      });
+      const dataPromise = fetchRawgData(String(title));
       rawgPending.set(titleStr, dataPromise);
 
       try {
         const data = await dataPromise;
+        rawgCache.set(titleStr, data);
         res.json(data);
       } finally {
         rawgPending.delete(titleStr);
       }
     } catch (error) {
       console.error("Error fetching RAWG data:", error);
-      res.status(500).json({ error: "Failed to fetch RAWG data" });
+      res.json({ not_found: true });
     }
   });
 
@@ -541,7 +511,6 @@ app.use(express.json());
   let newsRefreshPromise: Promise<any[]> | null = null;
 
   async function crawlGamingNews() {
-    const cheerio = await import('cheerio');
     const news: any[] = [];
     let currentId = 0;
 
@@ -637,7 +606,7 @@ app.use(express.json());
       res.json(finalNews);
     } catch (error: any) {
       if (newsCache.data) return res.json(newsCache.data);
-      res.status(500).json({ error: "Failed to crawl news" });
+      res.json([]);
     }
   });
 
