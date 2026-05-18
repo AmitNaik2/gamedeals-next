@@ -1,7 +1,7 @@
+// Vite import removed from the top level
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
 
@@ -21,13 +21,12 @@ function isActiveGiveaway(item: { end_date?: string; status?: string }) {
   return endDate.getTime() > Date.now();
 }
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
-  app.use(express.json());
+app.use(express.json());
 
-  // Set up Nodemailer transporter
+// Set up Nodemailer transporter
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.ethereal.email",
     port: parseInt(process.env.SMTP_PORT || "587", 10),
@@ -646,13 +645,21 @@ async function startServer() {
   });
 
   // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const startVite = async () => {
+      try {
+        const { createServer: createViteServer } = await import("vite");
+        const vite = await createViteServer({
+          server: { middlewareMode: true },
+          appType: "spa",
+        });
+        app.use(vite.middlewares);
+      } catch (err) {
+        console.error("Failed to map Vite middleware", err);
+      }
+    };
+    startVite();
+  } else if (!process.env.VERCEL) {
     // In production, serve the built static UI
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
@@ -662,12 +669,13 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://0.0.0.0:${PORT}`);
-    refreshNewsCache().catch(() => {
-      // Startup crawl errors are logged by refreshNewsCache and retried on schedule.
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://0.0.0.0:${PORT}`);
+      refreshNewsCache().catch(() => {
+        // Startup crawl errors are logged by refreshNewsCache and retried on schedule.
+      });
     });
-  });
-}
-
-startServer();
+  }
+  
+  export default app;
