@@ -15,6 +15,10 @@ View your app in AI Studio: https://ai.studio/apps/9bacefac-4425-4350-8555-6876c
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Copy [.env.example](.env.example) to `.env.local` and add any API keys you want to enable:
+   - `RAWG_API_KEY` enables `/api/rawg`
+   - `TWITCH_CLIENT_ID` and `TWITCH_CLIENT_SECRET` enable `/api/igdb`
+   - `GEMINI_API_KEY` is available for AI Studio features
+   - Optional quota guards: `IGDB_REQUEST_INTERVAL_MS=300`, `RAWG_MONTHLY_LIMIT=20000`, `RAWG_REQUEST_INTERVAL_MS=1500`
 3. Run the app:
    `npm run dev`
