@@ -1,0 +1,197 @@
+import { motion } from "motion/react";
+import { Tag, Monitor, MonitorSmartphone, Smartphone, Gamepad2, Mail, BadgeCheck, ShieldCheck, Star } from "lucide-react";
+import { type Key, useRef, type MouseEvent } from "react";
+import { type GameDeal } from "../types";
+import { cn } from "../lib/utils";
+import { getDealRarity } from "../lib/deal-utils";
+
+import { Countdown } from "./Countdown";
+import { useIgdb } from "../hooks/useIgdb";
+
+interface DealCardProps {
+  key?: Key;
+  deal: GameDeal;
+  index: number;
+  onShare: (title: string, url: string) => void;
+}
+
+export function DealCard({ deal, index, onShare }: DealCardProps) {
+  const originalPrice = deal.worth === "N/A" ? "$0.00" : deal.worth;
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  // Try to enrich deals
+  const gameInfo = useIgdb(index < 12 ? deal.title : "");
+  const bgImage = gameInfo?.background_image || deal.image || deal.thumbnail;
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    cardRef.current.style.setProperty("--mouse-x", `${x}px`);
+    cardRef.current.style.setProperty("--mouse-y", `${y}px`);
+  };
+
+  const renderPlatformIcon = (platformStr: string) => {
+    const pl = platformStr.toLowerCase();
+    if (pl.includes("pc")) return <Monitor className="w-3.5 h-3.5" />;
+    if (pl.includes("android") || pl.includes("ios")) return <Smartphone className="w-3.5 h-3.5" />;
+    if (pl.includes("ps") || pl.includes("xbox") || pl.includes("switch")) return <Gamepad2 className="w-3.5 h-3.5" />;
+    return <MonitorSmartphone className="w-3.5 h-3.5" />;
+  };
+
+  const platforms = deal.platforms.split(',').map(p => p.trim());
+  const rarity = getDealRarity(deal);
+  
+  // Trust Score Simulation
+  let trustScore = "Official Store";
+  let trustColor = "text-green-400";
+  let trustBg = "bg-green-400/10";
+  let trustBorder = "border-green-400/20";
+  
+  if (deal.users < 1000) {
+    trustScore = "Community Verified";
+    trustColor = "text-blue-400";
+    trustBg = "bg-blue-400/10";
+    trustBorder = "border-blue-400/20";
+  }
+
+  // Simulated Deal Score based on worth and users
+  const priceValue = parseFloat((deal.worth || "0").replace(/[^0-9.]/g, '')) || 0;
+  const rawScore = 6.0 + Math.min(priceValue / 10, 2.0) + Math.min((deal.users || 0) / 10000, 2.0);
+  const dealScore = Math.min(rawScore, 9.9).toFixed(1);
+
+  // Simulated Live Viewers (stable pseudo-random based on id/title length so it doesn't change on re-render)
+  const liveViewers = 12 + Math.floor((deal.users || 0) / 1000) + (deal.title.length % 50);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.05 }}
+      whileHover={{ y: -2 }}
+      className="flex flex-col sm:flex-row overflow-hidden transition-all duration-300 border bg-white/5 border-white/10 rounded-xl hover:bg-white/[0.08] group relative"
+    >
+      <div 
+        className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition duration-300 group-hover:opacity-100"
+        style={{
+          background: "radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(124, 58, 237, 0.1), transparent 40%)"
+        }}
+      />
+      
+      {/* Image Section */}
+      <div className="relative w-full sm:w-64 lg:w-72 aspect-video sm:aspect-auto shrink-0 overflow-hidden bg-black/50 border-b sm:border-b-0 sm:border-r border-white/10">
+        <a href={deal.open_giveaway_url} target="_blank" rel="noreferrer" className="block w-full h-full">
+          <img
+            src={bgImage}
+            alt={deal.title}
+            className="block object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-t from-black/80 via-transparent to-transparent group-hover:opacity-100"></div>
+        </a>
+      </div>
+
+      {/* Content Section */}
+      <div className="flex flex-col flex-grow p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-2 mb-3 text-[9px] font-mono uppercase tracking-widest text-white/40">
+          <span className={cn("px-1.5 py-0.5 rounded border", rarity.bg, rarity.color, rarity.border)}>
+            {rarity.label}
+          </span>
+          <span className={cn("px-1.5 py-0.5 rounded border flex items-center gap-1", trustBg, trustColor, trustBorder)}>
+            <ShieldCheck className="w-2.5 h-2.5" />
+            {trustScore}
+          </span>
+          <span>•</span>
+          {platforms.map((platform, i) => (
+            <span key={i} className="flex items-center gap-1 text-[#7C3AED]">
+              {renderPlatformIcon(platform)}
+              {platform}
+              <BadgeCheck className="w-3 h-3 text-blue-400" />
+            </span>
+          ))}
+        </div>
+
+        <a href={deal.open_giveaway_url} target="_blank" rel="noreferrer" className="inline-block group-hover:text-[#7C3AED] transition-colors mb-2">
+          <h3 className="text-lg sm:text-xl font-bold leading-tight text-white line-clamp-1 font-serif italic">
+            {deal.title}
+          </h3>
+        </a>
+
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+           <span className="px-2 py-0.5 rounded bg-[#7C3AED] text-white text-[10px] font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(124,58,237,0.4)]">
+              AI SCORE: {dealScore}
+           </span>
+           {deal.steamRatingPercent && (
+            <span className="px-2 py-0.5 rounded border border-blue-400/30 text-blue-400 text-[10px] font-bold uppercase tracking-widest">
+              STEAM {deal.steamRatingPercent}%
+            </span>
+           )}
+           {gameInfo?.rating > 0 && (
+            <span className="px-2 py-0.5 rounded border border-amber-400/30 text-amber-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+              <Star className="w-2.5 h-2.5 fill-current" /> {Math.round(gameInfo.rating)}
+            </span>
+           )}
+           <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest">
+              {deal.type || "Special Deal"}
+           </span>
+           <span className="flex items-center gap-1.5 text-[10px] font-mono text-white/50 uppercase tracking-tighter">
+             <Tag className="w-3 h-3 opacity-50" />
+             {deal.users > 0 ? `${deal.users.toLocaleString()} CLAIMS` : "NEW"}
+           </span>
+           <span className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 uppercase tracking-tighter animate-pulse">
+             • {liveViewers} VIEWING NOW
+           </span>
+        </div>
+
+        <div className="mt-auto block">
+          <Countdown endDate={deal.end_date} />
+        </div>
+      </div>
+
+      {/* Pricing & Actions Side Block */}
+      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center p-4 sm:p-5 border-t sm:border-t-0 sm:border-l border-white/10 sm:min-w-[150px] shrink-0 bg-black/20">
+        <div className="flex flex-col items-start sm:items-end mb-0 sm:mb-4">
+          {originalPrice !== "$0.00" && (
+            <span className="text-[10px] sm:text-[11px] font-mono text-white/40 line-through mb-0.5">
+              {originalPrice}
+            </span>
+          )}
+          <span className="text-xl sm:text-2xl font-black text-[#7C3AED] uppercase tracking-tighter">
+            {deal.salePrice ? `$${deal.salePrice}` : "FREE"}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end sm:justify-center gap-2 mt-4 sm:mt-0 w-full sm:w-auto">
+          <button
+            onClick={() => onShare(deal.title, deal.open_giveaway_url)}
+            className="w-8 h-8 rounded border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors group/btn"
+            title="Email Deal"
+          >
+            <Mail className="w-3.5 h-3.5 transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
+          </button>
+          <button 
+             className="h-8 px-3 flex items-center justify-center border border-amber-400/30 text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded hover:bg-amber-400/10 transition-colors"
+             onClick={(e) => {
+               (e.target as HTMLButtonElement).innerText = 'REMINDER SET';
+               setTimeout(() => (e.target as HTMLButtonElement).innerText = 'REMIND ME', 2000);
+             }}
+          >
+            Remind Me
+          </button>
+          <a 
+            href={deal.open_giveaway_url}
+            target="_blank"
+            rel="noreferrer"
+            className="h-8 px-4 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-[10px] font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+           >
+            Claim Now
+          </a>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

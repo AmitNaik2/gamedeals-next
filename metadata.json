@@ -1,0 +1,6 @@
+{
+  "name": "GameDeals",
+  "description": "Animated live free game deals tracker that updates every minute with an email subscription system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
