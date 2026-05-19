@@ -15,9 +15,10 @@ interface DealCardProps {
   index: number;
   onShare: (title: string, url: string) => void;
   onRemind?: (deal: GameDeal) => void;
+  priority?: boolean;
 }
 
-export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
+export function DealCard({ deal, index, onShare, onRemind, priority = false }: DealCardProps) {
   const originalPrice = deal.worth === "N/A" ? "$0.00" : deal.worth;
   const cardRef = useRef<HTMLDivElement>(null);
   
@@ -91,9 +92,13 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
         <Link to={gameUrl} className="block w-full h-full">
           <img
             src={bgImage}
-            alt={deal.title}
+            alt={`Free download of ${deal.title} on ${deal.platforms} - ${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date())}`}
+            width={600}
+            height={337}
             className="block object-cover w-full h-full transition-transform duration-500 group-hover:scale-105 opacity-80 group-hover:opacity-100"
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding={priority ? "sync" : "async"}
           />
           <div className="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-t from-black/80 via-transparent to-transparent group-hover:opacity-100"></div>
         </Link>

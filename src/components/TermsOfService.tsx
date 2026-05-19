@@ -66,7 +66,7 @@ export function TermsOfService() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4 text-white">6. Contact Information</h2>
           <p className="text-white/80 leading-relaxed">
-            If you have any questions or concerns about these Terms, please contact us at: gamedealshub1@gmail.com
+            If you have any questions or concerns about these Terms, please <Link to="/contact" className="text-[#7C3AED] hover:underline">Contact Us</Link>.
           </p>
         </section>
 

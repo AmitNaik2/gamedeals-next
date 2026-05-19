@@ -51,9 +51,14 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6">
-            <Sparkles className="w-3 h-3" /> Updated Daily
-          </span>
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest">
+              <Sparkles className="w-3 h-3" /> Updated Hourly
+            </span>
+            <span className="text-[10px] font-mono text-white/50 uppercase">
+              Last updated: {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', timeZoneName: 'short' }).format(new Date())}
+            </span>
+          </div>
           
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
             Track Free PC Games <br className="hidden sm:block" />

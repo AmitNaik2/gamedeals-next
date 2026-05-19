@@ -111,9 +111,16 @@ export function GameDetail({ deals }: { deals: GameDeal[] }) {
             </div>
           </div>
 
-          <p className="text-white/80 text-sm md:text-base leading-relaxed mb-8">
+          <p className="text-white/80 text-sm md:text-base leading-relaxed mb-6">
             {rewrittenSummary}
           </p>
+
+          <div className="bg-[#7C3AED]/10 border border-[#7C3AED]/20 rounded-xl p-4 mb-8">
+            <h3 className="text-sm font-bold text-white mb-2 tracking-wide">Why You Should Play {deal.title}</h3>
+            <p className="text-white/70 text-sm leading-relaxed">
+              If you usually miss out on expensive games, {deal.title} is a fantastic addition to your library right now. By claiming this deal, you are instantly saving {deal.worth !== "N/A" ? deal.worth : "money"} and securing a top-rated title for free. The {deal.type.toLowerCase()} format makes it a great choice to pick up today.
+            </p>
+          </div>
 
           <a
             href={deal.open_giveaway_url}
@@ -129,7 +136,10 @@ export function GameDetail({ deals }: { deals: GameDeal[] }) {
       
       <div className="grid md:grid-cols-2 gap-8 mt-12 bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8">
           <div>
-            <h3 className="text-xl font-serif italic opacity-90 mb-4 inline-flex items-center gap-2"><Gamepad2 className="w-5 h-5 text-[#7C3AED]" /> Official Instructions</h3>
+            <h2 className="text-xl font-serif italic opacity-90 mb-4 inline-flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-[#7C3AED]" /> 
+              How do I claim the {deal.platforms.split(',')[0]} giveaway?
+            </h2>
             <p className="text-white/60 text-sm leading-relaxed whitespace-pre-wrap bg-black/40 p-5 rounded-2xl border border-white/5">
               {deal.instructions}
             </p>
@@ -138,7 +148,10 @@ export function GameDetail({ deals }: { deals: GameDeal[] }) {
              <h3 className="text-xl font-serif italic opacity-90 mb-4 inline-flex items-center gap-2"><BadgeCheck className="w-5 h-5 text-green-500" /> Offer Details</h3>
              <ul className="space-y-4">
                <li className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                 <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">Offer Ends</span>
+                 <div className="flex flex-col">
+                   <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">Offer Ends</span>
+                   {deal.end_date !== "N/A" && <span className="text-sm font-bold text-white/80">Deal ends: {deal.end_date}</span>}
+                 </div>
                  {deal.end_date !== "N/A" ? <Countdown endDate={deal.end_date} /> : <span className="text-sm font-mono text-rose-400 font-bold">Unknown (Hurry!)</span>}
                </li>
                <li className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">

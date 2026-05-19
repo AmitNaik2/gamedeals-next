@@ -9,6 +9,7 @@ import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { TermsOfService } from "./components/TermsOfService";
 import { AboutUs } from "./components/AboutUs";
 import { ContactUs } from "./components/ContactUs";
+import { ArticleComparison } from "./components/ArticleComparison";
 import { EmailModal } from "./components/EmailModal";
 import { type GameDeal } from "./types";
 import { getDealRarity, type RarityLevel } from "./lib/deal-utils";
@@ -160,15 +161,18 @@ export default function App() {
   }, [location.pathname]);
 
   const seoTitle = useMemo(() => {
+    const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
     const path = location.pathname.toLowerCase();
-    if (path.includes('/free-steam-games')) return "Free Steam Games & Weekends Tracker | GamesDealsHub";
-    if (path.includes('/free-epic-games')) return "Epic Games Store Freebies Tracker | GamesDealsHub";
-    if (path.includes('/free-gog-games')) return "GOG DRM-Free Giveaways Tracker | GamesDealsHub";
-    return "Track Free PC Games Before They Expire | GamesDealsHub";
+    
+    if (path.includes('/free-steam-games')) return `Active Free Steam Games & Keys – ${monthYear} | GamesDealsHub`;
+    if (path.includes('/free-epic-games')) return `Epic Games Giveaways & Freebies Today – ${monthYear} | GamesDealsHub`;
+    if (path.includes('/free-gog-games')) return `GOG DRM-Free Giveaways – ${monthYear} | GamesDealsHub`;
+    return `GamesDealsHub | Active Free PC Games & Giveaways - ${monthYear}`;
   }, [location.pathname]);
 
   const seoDescription = useMemo(() => {
-    return "Real-time tracker for free PC games, limited-time promotions, Steam free weekends and Epic Games Giveaways. Claim them before they expire!";
+    const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
+    return `Get access to 1,492+ active game deals updated every hour. Track and claim free PC games before they expire. Steam, Epic Games, and GOG giveaways for ${monthYear}.`;
   }, []);
   
   const filteredLootDeals = dlcDeals.filter(deal => 
@@ -342,28 +346,8 @@ export default function App() {
     setPlatformSearch(value);
   };
 
-  // UI for loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050505] p-4 sm:p-8">
-        <Helmet>
-          <title>{seoTitle}</title>
-          <meta name="description" content={seoDescription} />
-        </Helmet>
-        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
-          <div className="w-full h-16 xl:h-20 bg-white/5 rounded-2xl border border-white/10" />
-          <div className="w-full h-[400px] bg-white/5 rounded-3xl border border-white/10" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
-            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
-            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
-            <div className="h-48 bg-white/5 rounded-2xl border border-white/10" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+  // Removed top level loading UI
+  
   return (
     <div className="min-h-screen font-sans text-white bg-[#050505] selection:bg-[#7C3AED] selection:text-white relative">
       <Helmet>
@@ -373,7 +357,7 @@ export default function App() {
         <meta property="og:description" content={seoDescription} />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
-        <link rel="canonical" href={`https://gamesdealshub.com${location.pathname}`} />
+        <link rel="canonical" href={`https://www.gamesdealshub.me${location.pathname}`} />
       </Helmet>
       <TopNavbar
         searchValue={platformSearch}
@@ -503,6 +487,12 @@ export default function App() {
                <FeaturedDeal deal={deals[0]} />
             )}
 
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
+                <RefreshCw className="w-8 h-8 animate-spin mb-4" />
+                <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free Games...</p>
+              </div>
+            ) : (
             <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
               <AnimatePresence mode="popLayout">
                 {deals
@@ -531,12 +521,14 @@ export default function App() {
                     key={deal.id}
                     deal={deal}
                     index={index}
+                    priority={index < 4}
                     onShare={openShareModal}
                     onRemind={openSubscribeModal}
                   />
                 ))}
               </AnimatePresence>
             </div>
+            )}
 
             {deals.length === 0 && !loading && !error && (
               <div className="py-20 text-center text-white/50">
@@ -574,6 +566,7 @@ export default function App() {
                           key={deal.id}
                           deal={deal}
                           index={index}
+                          priority={index < 2}
                           onShare={openShareModal}
                           onRemind={openSubscribeModal}
                         />
@@ -616,6 +609,7 @@ export default function App() {
                           key={deal.id}
                           deal={deal}
                           index={index}
+                          priority={index < 2}
                           onShare={openShareModal}
                           onRemind={openSubscribeModal}
                         />
@@ -654,6 +648,7 @@ export default function App() {
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/article/hp-omen-16-vs-lenovo-loq" element={<ArticleComparison />} />
         </Routes>
       </main>
 
@@ -666,6 +661,7 @@ export default function App() {
                <button type="button" onClick={goFreeGames} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">All Free Games</button>
                <button type="button" onClick={() => {navigate('/free-steam-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Free Steam Games</button>
                <button type="button" onClick={() => {navigate('/free-epic-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Epic Games Giveaways</button>
+               <Link to="/article/hp-omen-16-vs-lenovo-loq" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Reviews: Omen vs LOQ</Link>
             </div>
              <div className="flex flex-col gap-4">
                <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Legal</span>
