@@ -24,10 +24,21 @@ export function TopNavbar({
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
   useEffect(() => {
+    // Generate or retrieve a persistent visitorId
+    let visitorId = localStorage.getItem("gg_visitor_id");
+    if (!visitorId) {
+      visitorId = "vis_" + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem("gg_visitor_id", visitorId);
+    }
+
     // Ping to track activity and get online user count
     const pingActivity = async () => {
       try {
-        const res = await fetch('/api/track-activity', { method: 'POST' });
+        const res = await fetch('/api/track-activity', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ visitorId })
+        });
         if (res.ok) {
           const data = await res.json();
           if (data.activeUsers !== undefined) {

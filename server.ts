@@ -618,6 +618,7 @@ app.use(express.json());
   let activeSockets = 0;
   // Fallback for Vercel Serverless (using HTTP endpoint instead of Websockets)
   const activeSessions = new Map<string, { lastSeen: number, platform: string, country: string }>();
+  const totalVisitors = new Set<string>();
 
   // Helper to get platform from Vercel header or user-agent
   const getPlatform = (req: express.Request) => {
@@ -638,12 +639,16 @@ app.use(express.json());
     return 'other';
   };
 
-  app.post("/api/track-activity", (req, res) => {
+  app.post("/api/track-activity", express.json(), (req, res) => {
+    const { visitorId } = req.body || {};
+    
     // Generate a simple session ID based on IP or fall back to connection remoteAddress
-    const sessionId = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
+    const sessionId = visitorId || (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown';
     const platform = getPlatform(req);
     const country = (req.headers['x-vercel-ip-country'] as string) || 'Unknown';
     
+    totalVisitors.add(sessionId);
+
     activeSessions.set(sessionId, {
       lastSeen: Date.now(),
       platform,
@@ -658,7 +663,7 @@ app.use(express.json());
       }
     }
 
-    res.json({ success: true, activeUsers: activeSessions.size });
+    res.json({ success: true, activeUsers: activeSessions.size, totalVisits: totalVisitors.size });
   });
 
   app.post("/api/admin/login", express.json(), (req, res) => {

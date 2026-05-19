@@ -14,6 +14,7 @@ export function Admin({ deals }: AdminProps) {
   const [error, setError] = useState("");
   
   const [activeUsers, setActiveUsers] = useState(0);
+  const [totalVisits, setTotalVisits] = useState(0);
   const [platformStats, setPlatformStats] = useState<Record<string, number>>({ windows: 0, mac: 0, linux: 0, mobile: 0, other: 0 });
 
   useEffect(() => {
@@ -24,6 +25,9 @@ export function Admin({ deals }: AdminProps) {
           if (res.ok) {
             const data = await res.json();
             setActiveUsers(data.activeUsers);
+            if (data.totalVisits !== undefined) {
+              setTotalVisits(data.totalVisits);
+            }
             setPlatformStats(data.platformStats);
           }
         } catch (err) {
@@ -122,14 +126,18 @@ export function Admin({ deals }: AdminProps) {
         </button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl">
           <h3 className="text-white/70 text-sm font-bold uppercase tracking-widest mb-2">Total Deals</h3>
           <p className="text-3xl font-bold text-white">{deals.length}</p>
         </div>
         <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl">
           <h3 className="text-white/70 text-sm font-bold uppercase tracking-widest mb-2">Active Users</h3>
-          <p className="text-3xl font-bold text-white">{activeUsers}</p>
+          <p className="text-3xl font-bold text-white text-green-500">{activeUsers}</p>
+        </div>
+        <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl">
+          <h3 className="text-white/70 text-sm font-bold uppercase tracking-widest mb-2">Total Visits</h3>
+          <p className="text-3xl font-bold text-white text-blue-500">{totalVisits}</p>
         </div>
         <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl">
           <h3 className="text-white/70 text-sm font-bold uppercase tracking-widest mb-2">API Status</h3>
