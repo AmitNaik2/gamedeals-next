@@ -615,32 +615,6 @@ app.use(express.json());
     }
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
-    const startVite = async () => {
-      try {
-        const vitePath = "vite";
-        const { createServer: createViteServer } = await import(/* @vite-ignore */ vitePath);
-        const vite = await createViteServer({
-          server: { middlewareMode: true },
-          appType: "spa",
-        });
-        app.use(vite.middlewares);
-      } catch (err) {
-        console.error("Failed to map Vite middleware", err);
-      }
-    };
-    startVite();
-  } else if (!process.env.VERCEL) {
-    // In production, serve the built static UI
-    const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    // SPA fallback
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
-  }
-
   let activeSockets = 0;
   // Fallback for Vercel Serverless (using HTTP endpoint instead of Websockets)
   const activeSessions = new Map<string, { lastSeen: number, platform: string, country: string }>();
@@ -721,6 +695,32 @@ app.use(express.json());
       source: "Vercel Headers & Active Pings"
     });
   });
+
+  // Vite middleware for development
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const startVite = async () => {
+      try {
+        const vitePath = "vite";
+        const { createServer: createViteServer } = await import(/* @vite-ignore */ vitePath);
+        const vite = await createViteServer({
+          server: { middlewareMode: true },
+          appType: "spa",
+        });
+        app.use(vite.middlewares);
+      } catch (err) {
+        console.error("Failed to map Vite middleware", err);
+      }
+    };
+    startVite();
+  } else if (!process.env.VERCEL) {
+    // In production, serve the built static UI
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    // SPA fallback
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
 
   if (!process.env.VERCEL) {
     const server = app.listen(PORT, "0.0.0.0", () => {
