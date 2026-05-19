@@ -684,6 +684,8 @@ app.use(express.json());
 
     // Local computed stats from activeSessions
     const platformStats = { windows: 0, mac: 0, linux: 0, mobile: 0, other: 0 };
+    const countryStats: Record<string, number> = {};
+
     for (const session of activeSessions.values()) {
         const plat = session.platform;
         if (platformStats[plat as keyof typeof platformStats] !== undefined) {
@@ -691,11 +693,16 @@ app.use(express.json());
         } else {
            platformStats.other++;
         }
+        
+        const country = session.country || 'Unknown';
+        countryStats[country] = (countryStats[country] || 0) + 1;
     }
 
     res.json({
       activeUsers: activeSessions.size,
+      totalVisits: totalVisitors.size,
       platformStats,
+      countryStats,
       hasVercelApi,
       source: "Vercel Headers & Active Pings"
     });

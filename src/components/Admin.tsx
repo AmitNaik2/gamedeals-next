@@ -16,6 +16,7 @@ export function Admin({ deals }: AdminProps) {
   const [activeUsers, setActiveUsers] = useState(0);
   const [totalVisits, setTotalVisits] = useState(0);
   const [platformStats, setPlatformStats] = useState<Record<string, number>>({ windows: 0, mac: 0, linux: 0, mobile: 0, other: 0 });
+  const [countryStats, setCountryStats] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -29,6 +30,9 @@ export function Admin({ deals }: AdminProps) {
               setTotalVisits(data.totalVisits);
             }
             setPlatformStats(data.platformStats);
+            if (data.countryStats !== undefined) {
+              setCountryStats(data.countryStats);
+            }
           }
         } catch (err) {
           console.error("Failed to fetch admin stats", err);
@@ -174,7 +178,35 @@ export function Admin({ deals }: AdminProps) {
         </div>
       </div>
       
-      <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl min-h-[300px]">
+      {/* Vercel Premium Insights */}
+      <div className="bg-gradient-to-r from-[#101014] to-[#1A1A24] border border-indigo-500/30 p-6 rounded-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-4">
+          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]">
+            Vercel Premium
+          </span>
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+          Advanced Edge Analytics
+        </h2>
+        <p className="text-white/60 mb-6 text-sm">Powered by Vercel Edge compute. Track real-time visitor geography.</p>
+        
+        {Object.keys(countryStats).length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {Object.entries(countryStats).map(([country, count]) => (
+              <div key={country} className="bg-black/50 border border-indigo-500/20 p-4 rounded-xl flex flex-col justify-between items-center text-center">
+                <span className="text-sm text-white/70 mb-2 truncate w-full">{country}</span>
+                <span className="text-2xl font-bold text-white">{count}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 bg-black/30 border border-white/5 rounded-xl border-dashed">
+            <p className="text-white/50">Awaiting edge analytics data...</p>
+          </div>
+        )}
+      </div>
+
+      <div className="bg-[#101014] border border-white/10 p-6 rounded-2xl min-h-[150px]">
         <h2 className="text-xl font-bold text-white mb-4">Manage Deals</h2>
         <p className="text-white/60">Administrator controls for managing deals will appear here.</p>
       </div>
