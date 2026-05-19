@@ -7,6 +7,8 @@ import { DealCard } from "./components/DealCard";
 import { GameDetail } from "./components/GameDetail";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { TermsOfService } from "./components/TermsOfService";
+import { AboutUs } from "./components/AboutUs";
+import { ContactUs } from "./components/ContactUs";
 import { EmailModal } from "./components/EmailModal";
 import { type GameDeal } from "./types";
 import { getDealRarity, type RarityLevel } from "./lib/deal-utils";
@@ -650,6 +652,8 @@ export default function App() {
           <Route path="/game/:id" element={<GameDetail deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
         </Routes>
       </main>
 
@@ -673,7 +677,8 @@ export default function App() {
                <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Connect</span>
                <button type="button" onClick={() => openExternalUrl("https://discord.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Discord</button>
                <button type="button" onClick={() => openExternalUrl("https://github.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">GitHub</button>
-               <button type="button" onClick={openSubscribeModal} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Contact Us</button>
+               <Link to="/contact" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Contact Us</Link>
+               <Link to="/about" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">About Us</Link>
             </div>
             <div className="flex flex-col gap-4">
                <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">System</span>

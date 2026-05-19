@@ -53,6 +53,25 @@ export function GameDetail({ deals }: { deals: GameDeal[] }) {
         <meta property="og:description" content={rewrittenSummary} />
         <meta property="og:image" content={deal.image || deal.thumbnail} />
         <meta name="twitter:card" content="summary_large_image" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": deal.title,
+            "image": deal.image || deal.thumbnail,
+            "description": rewrittenSummary,
+            "offers": {
+              "@type": "Offer",
+              "url": `https://gamesdealshub.me/game/${deal.id}`,
+              "priceCurrency": "USD",
+              "price": deal.salePrice || "0.00",
+              "seller": {
+                "@type": "Organization",
+                "name": deal.platforms.split(',')[0]
+              }
+            }
+          })}
+        </script>
       </Helmet>
 
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/50 hover:text-white mb-6 uppercase tracking-widest text-[10px] font-bold transition-colors">

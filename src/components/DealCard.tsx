@@ -140,6 +140,12 @@ export function DealCard({ deal, index, onShare, onRemind }: DealCardProps) {
             {deal.title}
           </h3>
         </Link>
+        
+        {deal.description && (
+          <p className="text-white/60 text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed">
+            {deal.description.replace(/<[^>]*>?/gm, '')}
+          </p>
+        )}
 
         <div className="flex flex-wrap items-center gap-3 mb-6">
            <span className="px-2 py-0.5 rounded bg-[#7C3AED] text-white text-[10px] font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(124,58,237,0.4)]">
