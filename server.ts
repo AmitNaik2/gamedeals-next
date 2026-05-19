@@ -639,7 +639,7 @@ app.use(express.json());
     return 'other';
   };
 
-  app.post("/api/track-activity", express.json(), (req, res) => {
+  app.post("/api/ping", express.json(), (req, res) => {
     const { visitorId } = req.body || {};
     
     // Generate a simple session ID based on IP or fall back to connection remoteAddress
