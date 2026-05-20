@@ -18,26 +18,6 @@
       "destination": "/api/contact"
     },
     {
-      "source": "/api/deals",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/loot",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/cheapshark-deals",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/subscribe",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/api/unsubscribe",
-      "destination": "/api/index"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
