@@ -10,27 +10,23 @@ export default async function handler(req: any, res: any) {
     const desc = "Review the terms and conditions for using GamesDealsHub.";
     const canonical = "https://www.gamesdealshub.me/terms";
 
-    // Replace Title
     html = html.replace(/<title>.*?<\/title>/gi, `<title>${title}</title>`);
     
-    // Replace Meta Titles
     html = html.replace(/<meta\s+(?:name|property)="(?:title|og:title|twitter:title)"\s+content="[^"]*"\s*\/?>/gi, (match) => {
       if (match.includes('og:title')) return `<meta property="og:title" content="${title}" />`;
       if (match.includes('twitter:title')) return `<meta property="twitter:title" content="${title}" />`;
       return `<meta name="title" content="${title}" />`;
     });
 
-    // Replace Meta Descriptions
     html = html.replace(/<meta\s+(?:name|property)="(?:description|og:description|twitter:description)"\s+content="[^"]*"\s*\/?>/gi, (match) => {
       if (match.includes('og:description')) return `<meta property="og:description" content="${desc}" />`;
       if (match.includes('twitter:description')) return `<meta property="twitter:description" content="${desc}" />`;
       return `<meta name="description" content="${desc}" />`;
     });
 
-    // Replace canonical
     html = html.replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>/gi, `<link rel="canonical" href="${canonical}" />`);
 
-    // Add og:image and twitter:image if missing, or replace if existing
+    // Add og:image and twitter:image explicitly to this page
     const extraTags = `
     <meta property="og:image" content="https://www.gamesdealshub.me/og-image.jpg" />
     <meta name="twitter:image" content="https://www.gamesdealshub.me/og-image.jpg" />
