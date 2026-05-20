@@ -89,15 +89,15 @@ export function PrivacyPolicy() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">5. Google AdSense and Personalized Advertising</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">5. Advertising and Cookies</h2>
           <p className="text-white/80 leading-relaxed mb-4">
-            Third party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on a user's prior visits to your website or other websites.
+            Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on a user's prior visits to our website or other websites.
           </p>
           <p className="text-white/80 leading-relaxed mb-4">
-            Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your site and/or other sites on the Internet.
+            Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our site and/or other sites on the Internet.
           </p>
           <p className="text-white/80 leading-relaxed">
-            Users may opt out of personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline">www.aboutads.info</a> or <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline">Ads Settings</a>.
+            You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">Google Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">www.aboutads.info</a>.
           </p>
         </section>
 

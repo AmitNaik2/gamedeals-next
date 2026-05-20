@@ -27,9 +27,9 @@ export function TopNavbar({
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
 
   // Check if we have active deals for each platform
-  const hasSteamDeals = deals.some(deal => deal.platforms.includes("Steam"));
-  const hasEpicDeals = deals.some(deal => deal.platforms.includes("Epic Games"));
-  const hasGogDeals = deals.some(deal => deal.platforms.includes("GOG"));
+  const hasSteamDeals = deals.filter(deal => deal.platforms.includes("Steam")).length >= 3;
+  const hasEpicDeals = deals.filter(deal => deal.platforms.includes("Epic Games")).length >= 3;
+  const hasGogDeals = deals.filter(deal => deal.platforms.includes("GOG")).length >= 3;
 
   useEffect(() => {
     // Generate or retrieve a persistent visitorId

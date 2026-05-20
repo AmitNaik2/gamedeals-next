@@ -20,12 +20,12 @@ export function AboutUs() {
           About Us
         </h1>
         
-        <p className="text-white/70 mb-10">Last Updated: May 19, 2026</p>
+        <p className="text-white/70 mb-10">Last Updated: May 20, 2026</p>
 
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4 text-white">Our Mission</h2>
           <p className="text-white/80 leading-relaxed mb-4">
-            Welcome to GamesDealsHub! We are a community of passionate gamers dedicated to finding the best deals, free games, and giveaways across major platforms like Steam, Epic Games, GOG, and Humble Bundle. We aggregate, verify, and track down real game giveaways so you don't have to waste time scouring the internet.
+            Welcome to GamesDealsHub! We are a community of passionate gamers dedicated to finding the best deals, free games, and giveaways across major platforms like Steam, Epic Games, GOG, and Humble Bundle. GamesDealsHub is a platform dedicated to tracking and verifying the best gaming deals across the web to help the community save money.
           </p>
           <p className="text-white/80 leading-relaxed mb-4">
              Our mission is simple: to ensure no gamer misses out on a great title just because they didn't see the deal in time. We provide an hourly-updated, real-time feed that removes the noise, giving you instant access to 100% free claimable games.
