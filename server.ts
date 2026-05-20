@@ -39,7 +39,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = 3000;
 
 app.use(express.json());
 
@@ -103,7 +103,7 @@ app.use(express.json());
   }
 
   // Proxy the GamerPower API to avoid CORS and format data if needed
-  app.get("/api/deals", async (req, res) => {
+  app.get("/api/giveaways-feed", async (req, res) => {
     try {
       const type = req.query.type as string;
       const url = type 
@@ -151,7 +151,7 @@ app.use(express.json());
   });
 
   // Proxy the GamerPower API for Loot/Promo codes
-  app.get("/api/loot", async (req, res) => {
+  app.get("/api/dlc-feed", async (req, res) => {
     try {
       let data: any[] = [];
       const url = "https://www.gamerpower.com/api/giveaways?type=loot";
@@ -214,7 +214,7 @@ app.use(express.json());
   }
 
   // Proxy the CheapShark API
-  app.get("/api/cheapshark-deals", async (req, res) => {
+  app.get("/api/premium-feed", async (req, res) => {
     try {
       const searchTitle = req.query.title ? (req.query.title as string) : "";
       let data;
@@ -744,7 +744,7 @@ app.use(express.json());
     newsRefreshTimer.unref?.();
   }
 
-  app.get("/api/news", async (req, res) => {
+  app.get("/api/community-updates", async (req, res) => {
     try {
       const forceRefresh = req.query.refresh === "1";
       const hasFreshCache = newsCache.data && Date.now() - newsCache.timestamp < NEWS_REFRESH_INTERVAL_MS;
@@ -788,7 +788,7 @@ app.use(express.json());
     return 'other';
   };
 
-  app.post("/api/ping", (req, res) => {
+  app.post("/api/activity-check", (req, res) => {
     const { visitorId } = req.body || {};
     
     // Generate a simple session ID based on IP or fall back to connection remoteAddress

@@ -42,7 +42,7 @@ export function TopNavbar({
     // Ping to track activity and get online user count
     const pingActivity = async () => {
       try {
-        const res = await fetch('/api/ping', { 
+        const res = await fetch('/api/activity-check', { 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ visitorId })

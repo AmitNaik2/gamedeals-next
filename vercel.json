@@ -18,15 +18,15 @@
       "destination": "/api/contact"
     },
     {
-      "source": "/api/deals",
+      "source": "/api/giveaways-feed",
       "destination": "/api/index"
     },
     {
-      "source": "/api/loot",
+      "source": "/api/dlc-feed",
       "destination": "/api/index"
     },
     {
-      "source": "/api/cheapshark-deals",
+      "source": "/api/premium-feed",
       "destination": "/api/index"
     },
     {

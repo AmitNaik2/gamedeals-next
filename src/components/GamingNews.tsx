@@ -18,10 +18,10 @@ export function GamingNews() {
     let isMounted = true;
 
     const fetchNews = () => {
-      fetch("/api/news")
+      fetch("/api/community-updates")
         .then(async res => {
           const text = await res.text();
-          try { return JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/news"); }
+          try { return JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/community-updates"); }
         })
         .then(data => {
           if (isMounted && Array.isArray(data)) {

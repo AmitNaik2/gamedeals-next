@@ -246,7 +246,7 @@ export default function App() {
     if (showRefreshIndicator) setIsRefreshing(true);
     
     try {
-      const gamerpowerRes = await fetch("/api/deals");
+      const gamerpowerRes = await fetch("/api/giveaways-feed");
       
       if (!gamerpowerRes.ok) {
          throw new Error("Game deals server is temporarily blocking our requests (Error " + gamerpowerRes.status + "). Please try again later.");
@@ -255,7 +255,7 @@ export default function App() {
       let allDeals: GameDeal[] = [];
       const text = await gamerpowerRes.text();
       let data;
-      try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/deals"); }
+      try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/giveaways-feed"); }
       if (data.status !== 0 && Array.isArray(data)) {
         allDeals = data.filter((d: any) => d.type === "Game" || d.type === "Early Access");
       }
@@ -275,13 +275,13 @@ export default function App() {
   const fetchDlc = async () => {
     setDlcLoading(true);
     try {
-      const dbRes = await fetch("/api/loot");
+      const dbRes = await fetch("/api/dlc-feed");
       if (!dbRes.ok) {
          throw new Error(`Failed to load Free DLC (HTTP ${dbRes.status})`);
       }
       const text = await dbRes.text();
       let data;
-      try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/loot"); }
+      try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/dlc-feed"); }
       setDlcDeals(data);
     } catch (err: any) {
       console.error(err);
@@ -295,14 +295,14 @@ export default function App() {
     setPremiumLoading(true);
     setActivePremiumSearch(searchTitle);
     try {
-      const url = searchTitle ? `/api/cheapshark-deals?title=${encodeURIComponent(searchTitle)}` : `/api/cheapshark-deals`;
+      const url = searchTitle ? `/api/premium-feed?title=${encodeURIComponent(searchTitle)}` : `/api/premium-feed`;
       const cheapsharkRes = await fetch(url);
       if (!cheapsharkRes.ok) {
          throw new Error(`Failed to load Premium Deals (HTTP ${cheapsharkRes.status})`);
       }
       const text = await cheapsharkRes.text();
       let csData;
-      try { csData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/cheapshark-deals"); }
+      try { csData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/premium-feed"); }
       
       if (!Array.isArray(csData)) {
           console.warn("Cheapshark returned non-array:", csData);
