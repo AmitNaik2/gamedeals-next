@@ -7,7 +7,8 @@ export function PrivacyPolicy() {
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
       <Helmet>
         <title>Privacy Policy | GamesDealsHub</title>
-        <meta name="description" content="Privacy Policy for GamesDealsHub." />
+        <meta name="description" content="Read our privacy policy to understand how GamesDealsHub handles your data." />
+        <link rel="canonical" href="https://www.gamesdealshub.me/privacy" />
       </Helmet>
 
       <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">

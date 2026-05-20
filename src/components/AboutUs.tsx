@@ -7,7 +7,8 @@ export function AboutUs() {
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
       <Helmet>
         <title>About Us | GamesDealsHub</title>
-        <meta name="description" content="Learn more about GamesDealsHub, the trusted source for the best free PC games and gaming deals." />
+        <meta name="description" content="Learn about GamesDealsHub and our mission to help gamers find free PC games and deals." />
+        <link rel="canonical" href="https://www.gamesdealshub.me/about" />
       </Helmet>
 
       <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">

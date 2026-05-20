@@ -417,6 +417,24 @@ export default function App() {
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
         <link rel="canonical" href={`https://www.gamesdealshub.me${location.pathname}`} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "itemListElement": deals.slice(0, 20).map((deal: any, index: number) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Offer",
+                "name": deal.title,
+                "url": `https://www.gamesdealshub.me/game/${deal.id}`,
+                "priceCurrency": "USD",
+                "price": "0.00",
+                "image": deal.image
+              }
+            }))
+          })}
+        </script>
       </Helmet>
       <TopNavbar
         searchValue={platformSearch}
