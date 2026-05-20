@@ -872,10 +872,68 @@ app.use(express.json());
   } else if (!process.env.VERCEL) {
     // In production, serve the built static UI
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    // SPA fallback
+    
+    // Read the built index.html for rewriting
+    const fs = require("fs");
+    let baseHtml = "";
+    try {
+      baseHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
+    } catch (e) {
+      console.warn("Could not read dist/index.html");
+    }
+
+    // Serve static files but skip for / so we can rewrite meta tags
+    app.use(express.static(distPath, { index: false }));
+    
+    // SPA fallback with basic SSR for meta tags
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      let html = baseHtml;
+      if (!html) {
+        return res.sendFile(path.join(distPath, "index.html"));
+      }
+
+      const pathName = req.path;
+      let title = "GamesDealsHub | Track Free PC Games & Gaming Deals";
+      let desc = "Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, Indie giveaways, GOG freebies, and limited-time premium AAA game promotions.";
+
+      if (pathName === "/about") {
+        title = "About Us | GamesDealsHub";
+        desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
+      } else if (pathName === "/privacy") {
+        title = "Privacy Policy | GamesDealsHub";
+        desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
+      } else if (pathName === "/terms") {
+        title = "Terms of Service | GamesDealsHub";
+        desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
+      } else if (pathName === "/contact") {
+        title = "Contact Us | GamesDealsHub";
+        desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
+      }
+
+      const canonical = `https://www.gamesdealshub.me${pathName === '/' ? '' : pathName}`;
+
+      // Rewrite tags in HTML
+      html = html.replace(
+        /<title>([^<]*)<\/title>/gi,
+        `<title>${title}</title>`
+      );
+      
+      html = html.replace(
+        /<meta (name|property)="(title|og:title|twitter:title)" content="([^"]*)" \/>/gi,
+        `<meta $1="$2" content="${title}" />`
+      );
+
+      html = html.replace(
+        /<meta (name|property)="(description|og:description|twitter:description)" content="([^"]*)" \/>/gi,
+        `<meta $1="$2" content="${desc}" />`
+      );
+
+      html = html.replace(
+        /<link rel="canonical" href="([^"]*)" \/>/gi,
+        `<link rel="canonical" href="${canonical}" />`
+      );
+
+      res.send(html);
     });
   }
 
