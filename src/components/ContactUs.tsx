@@ -74,12 +74,15 @@ export function ContactUs() {
                 <p className="text-sm font-medium">Thank you! Your message has been sent successfully. We'll get back to you soon.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form action="https://formsubmit.co/gamedealshub1@gmail.com" method="POST" className="space-y-4">
+                <input type="hidden" name="_next" value="https://www.gamesdealshub.me/contact" />
+                <input type="hidden" name="_captcha" value="false" />
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-white/70 mb-1">Name</label>
                   <input
                     type="text"
                     id="name"
+                    name="name"
                     required
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#7C3AED] transition-colors"
                     placeholder="Your name"
@@ -90,6 +93,7 @@ export function ContactUs() {
                   <input
                     type="email"
                     id="email"
+                    name="email"
                     required
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#7C3AED] transition-colors"
                     placeholder="your.email@example.com"
@@ -99,6 +103,7 @@ export function ContactUs() {
                   <label htmlFor="message" className="block text-sm font-medium text-white/70 mb-1">Message</label>
                   <textarea
                     id="message"
+                    name="message"
                     required
                     rows={4}
                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#7C3AED] transition-colors resize-none"
@@ -107,17 +112,10 @@ export function ContactUs() {
                 </div>
                 <button
                   type="submit"
-                  disabled={formStatus === "submitting"}
-                  className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70"
+                  className="w-full bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
                 >
-                  {formStatus === "submitting" ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Send Message
-                    </>
-                  )}
+                  <Send className="w-4 h-4" />
+                  Send Message
                 </button>
               </form>
             )}

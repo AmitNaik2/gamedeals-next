@@ -91,7 +91,7 @@ export function PrivacyPolicy() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4 text-white">5. Google AdSense and Personalized Advertising</h2>
           <p className="text-white/80 leading-relaxed mb-4">
-            Third party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.
+            Third party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on a user's prior visits to your website or other websites.
           </p>
           <p className="text-white/80 leading-relaxed mb-4">
             Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your site and/or other sites on the Internet.

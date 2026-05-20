@@ -444,6 +444,7 @@ export default function App() {
         onFreeDlcClick={goFreeDlc}
         onTrendingClick={goTrending}
         onSubscribeClick={openSubscribeModal}
+        deals={deals}
       />
 
       <main className="container px-4 py-8 mx-auto max-w-7xl">

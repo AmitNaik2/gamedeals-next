@@ -142,7 +142,7 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
         
         {deal.description && (
           <p className="text-white/60 text-xs sm:text-sm line-clamp-2 mb-4 leading-relaxed">
-            {deal.description.replace(/<[^>]*>?/gm, '')}
+            <strong className="text-white/80">Editor's Note:</strong> {deal.description.replace(/<[^>]*>?/gm, '')}
           </p>
         )}
 

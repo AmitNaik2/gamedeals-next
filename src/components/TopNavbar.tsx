@@ -1,6 +1,7 @@
 import { Gamepad2, Search, Bell, User, MessageSquare, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { type GameDeal } from "../types";
 
 interface TopNavbarProps {
   searchValue: string;
@@ -10,6 +11,7 @@ interface TopNavbarProps {
   onFreeDlcClick: () => void;
   onTrendingClick: () => void;
   onSubscribeClick: () => void;
+  deals?: GameDeal[];
 }
 
 export function TopNavbar({
@@ -20,8 +22,14 @@ export function TopNavbar({
   onFreeDlcClick,
   onTrendingClick,
   onSubscribeClick,
+  deals = [],
 }: TopNavbarProps) {
   const [onlineUsers, setOnlineUsers] = useState<number>(0);
+
+  // Check if we have active deals for each platform
+  const hasSteamDeals = deals.some(deal => deal.platforms.includes("Steam"));
+  const hasEpicDeals = deals.some(deal => deal.platforms.includes("Epic Games"));
+  const hasGogDeals = deals.some(deal => deal.platforms.includes("GOG"));
 
   useEffect(() => {
     // Generate or retrieve a persistent visitorId
@@ -78,9 +86,9 @@ export function TopNavbar({
           {/* Links (Desktop) */}
           <div className="hidden lg:flex items-center gap-6">
             <Link to="/" onClick={onHomeClick} className="text-sm font-bold text-white hover:text-[#7C3AED] transition-colors">Home</Link>
-            <Link to="/free-steam-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Steam Games</Link>
-            <Link to="/free-epic-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Epic Games</Link>
-            <Link to="/free-gog-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">GOG Giveaways</Link>
+            {hasSteamDeals && <Link to="/free-steam-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Steam Games</Link>}
+            {hasEpicDeals && <Link to="/free-epic-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">Free Epic Games</Link>}
+            {hasGogDeals && <Link to="/free-gog-games" onClick={onFreeGamesClick} className="text-sm font-bold text-white/60 hover:text-white transition-colors">GOG Giveaways</Link>}
           </div>
 
           {/* Right Side */}
