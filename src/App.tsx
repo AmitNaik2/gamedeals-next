@@ -143,6 +143,22 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
   
+  const activeGamesDeals = useMemo(() => {
+    return deals.filter(deal => {
+      // Force hide deals expiring before May 20, 2026
+      if (deal.end_date && deal.end_date !== 'N/A') {
+         const endStr = deal.end_date.includes(' ') && !deal.end_date.includes('Z') && !deal.end_date.includes('GMT') 
+           ? deal.end_date.replace(' ', 'T') + 'Z' 
+           : deal.end_date;
+         const endTime = new Date(endStr).getTime();
+         if (!isNaN(endTime) && endTime < new Date("2026-05-20").getTime()) {
+           return false;
+         }
+      }
+      return true;
+    });
+  }, [deals]);
+
   // URL-driven state sync
   const [platformSearch, setPlatformSearch] = useState("");
   const [lootSearch, setLootSearch] = useState("");
@@ -444,7 +460,7 @@ export default function App() {
         onFreeDlcClick={goFreeDlc}
         onTrendingClick={goTrending}
         onSubscribeClick={openSubscribeModal}
-        deals={deals}
+        deals={activeGamesDeals}
       />
 
       <main className="container px-4 py-8 mx-auto max-w-7xl">
@@ -504,7 +520,7 @@ export default function App() {
                    All
                  </button>
                  
-                 {(['Mythic', 'Legendary', 'Epic', 'Rare', 'Uncommon', 'Common'] as RarityLevel[]).filter(rarity => deals.some(d => getDealRarity(d).label === rarity)).map(rarity => {
+                 {(['Mythic', 'Legendary', 'Epic', 'Rare', 'Uncommon', 'Common'] as RarityLevel[]).filter(rarity => activeGamesDeals.some(d => getDealRarity(d).label === rarity)).map(rarity => {
                     let colors = "";
                     if (rarity === "Mythic") colors = "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 border-pink-500/50 bg-white/5 shadow-[0_0_15px_rgba(236,72,153,0.3)]";
                     if (rarity === "Legendary") colors = "text-amber-400 border-amber-400/50 bg-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]";
@@ -562,8 +578,8 @@ export default function App() {
                  </div>
               </div>
             </div>
-            {deals.length > 0 && selectedRarity === 'All' && !platformSearch && (
-               <FeaturedDeal deal={deals[0]} />
+            {activeGamesDeals.length > 0 && selectedRarity === 'All' && !platformSearch && (
+               <FeaturedDeal deal={activeGamesDeals[0]} />
             )}
 
             {loading ? (
@@ -572,7 +588,7 @@ export default function App() {
                 <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free Games...</p>
               </div>
             ) : (() => {
-              const filteredDeals = deals.filter((deal, idx) => {
+              const filteredDeals = activeGamesDeals.filter((deal, idx) => {
                     // Hide the first item if it's already shown in FeaturedDeal
                     if (selectedRarity === 'All' && !platformSearch && idx === 0) return false;
                     
@@ -788,8 +804,8 @@ export default function App() {
           
           {/* Right Sidebar (Feeds) */}
           <aside className="xl:w-72 shrink-0 xl:sticky xl:top-24 space-y-6 mt-12 xl:mt-0 pt-8 xl:pt-0 border-t xl:border-t-0 border-white/10">
-            <LiveFeed deals={deals} />
-            <UpcomingDrops deals={deals} onViewAll={goFreeGames} />
+            <LiveFeed deals={activeGamesDeals} />
+            <UpcomingDrops deals={activeGamesDeals} onViewAll={goFreeGames} />
             <GamingNews />
             <div className="pt-4 border-t border-white/10 hidden xl:block">
               <InlineSubscribe />

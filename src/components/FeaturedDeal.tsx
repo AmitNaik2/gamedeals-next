@@ -30,6 +30,8 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
           src={bgImage} 
           alt={deal.title} 
           className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
+          loading="eager"
+          fetchPriority="high"
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10"></div>

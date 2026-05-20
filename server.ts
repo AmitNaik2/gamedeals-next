@@ -788,7 +788,7 @@ app.use(express.json());
     return 'other';
   };
 
-  app.post("/api/ping", express.json(), (req, res) => {
+  app.post("/api/ping", (req, res) => {
     const { visitorId } = req.body || {};
     
     // Generate a simple session ID based on IP or fall back to connection remoteAddress
@@ -815,7 +815,7 @@ app.use(express.json());
     res.json({ success: true, activeUsers: activeSessions.size, totalVisits: totalVisitors.size });
   });
 
-  app.post("/api/admin/login", express.json(), (req, res) => {
+  app.post("/api/admin/login", (req, res) => {
     const { email, password } = req.body || {};
     const validEmail = process.env.ADMIN_EMAIL || "amitnaik0023@gmail.com";
     const validPassword = process.env.ADMIN_PASSWORD || "Amit_Naik12";

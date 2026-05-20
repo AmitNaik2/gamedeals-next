@@ -24,7 +24,8 @@ export function Countdown({ endDate }: CountdownProps) {
 
       if (isNaN(difference)) return '';
 
-      if (difference <= 0) {
+      // Add safety check for deals that ended before May 20, 2026
+      if (difference <= 0 || end < new Date("2026-05-20").getTime()) {
         setIsEndingSoon(false);
         return 'Expired';
       }

@@ -97,7 +97,7 @@ export function PrivacyPolicy() {
             Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to our site and/or other sites on the Internet.
           </p>
           <p className="text-white/80 leading-relaxed">
-            You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">Google Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">www.aboutads.info</a>.
+            You may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">Google Ads Settings</a>. Alternatively, you can opt out of a third-party vendor's use of cookies for personalized advertising by visiting the Network Advertising Initiative opt-out page at <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">www.aboutads.info</a> or <a href="https://optout.networkadvertising.org" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline font-bold">optout.networkadvertising.org</a>.
           </p>
         </section>
 
