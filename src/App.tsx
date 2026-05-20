@@ -22,6 +22,7 @@ import { UpcomingDrops } from "./components/UpcomingDrops";
 import { GamingNews } from "./components/GamingNews";
 import { TopNavbar } from "./components/TopNavbar";
 import { HeroSection } from "./components/HeroSection";
+import { SkeletonCard } from "./components/SkeletonCard";
 
 function InlineSubscribe() {
   const [email, setEmail] = useState("");
@@ -253,6 +254,8 @@ export default function App() {
 
   const fetchDeals = async (showRefreshIndicator = false) => {
     if (showRefreshIndicator) setIsRefreshing(true);
+    if (deals.length === 0) setLoading(true);
+    setError(null);
     
     try {
       const gamerpowerRes = await fetch("/api/giveaways-feed");
@@ -592,9 +595,10 @@ export default function App() {
             )}
 
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
-                <RefreshCw className="w-8 h-8 animate-spin mb-4" />
-                <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free Games...</p>
+              <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+                {[...Array(6)].map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))}
               </div>
             ) : (() => {
               const filteredDeals = activeGamesDeals.filter((deal, idx) => {
@@ -693,10 +697,11 @@ export default function App() {
                </div>
              </div>
                 {dlcLoading ? (
-                   <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
-                      <RefreshCw className="w-8 h-8 animate-spin mb-4" />
-                      <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free DLCs...</p>
-                   </div>
+                  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+                    {[...Array(6)].map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))}
+                  </div>
                 ) : filteredLootDeals.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
@@ -768,10 +773,11 @@ export default function App() {
                </div>
              </div>
                 {premiumLoading ? (
-                   <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
-                      <RefreshCw className="w-8 h-8 animate-spin mb-4" />
-                      <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Premium Deals...</p>
-                   </div>
+                  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+                    {[...Array(6)].map((_, i) => (
+                      <SkeletonCard key={i} />
+                    ))}
+                  </div>
                 ) : filteredPremiumDeals.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">

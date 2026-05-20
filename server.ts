@@ -81,7 +81,7 @@ app.use(express.json());
     const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" };
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
+      const timeout = setTimeout(() => controller.abort(), 4000);
       let response = await fetch(url, { headers, signal: controller.signal as any });
       clearTimeout(timeout);
       if (response.ok) {
@@ -94,7 +94,7 @@ app.use(express.json());
     // Fallback to proxy if GamerPower blocks Vercel IPs or times out
     const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
     const controllerProxy = new AbortController();
-    const timeoutProxy = setTimeout(() => controllerProxy.abort(), 8000);
+    const timeoutProxy = setTimeout(() => controllerProxy.abort(), 4500);
     const proxyRes = await fetch(proxyUrl, { signal: controllerProxy.signal as any });
     clearTimeout(timeoutProxy);
     
@@ -120,26 +120,6 @@ app.use(express.json());
           if (!deal.platforms) return false;
           const plats = deal.platforms.toLowerCase();
           return isActiveGiveaway(deal) && trustedPlatforms.some(t => plats.includes(t));
-        });
-        
-        // Real active verification for top 10 deals to discard dead links
-        let verifiedDeals: any[] = [];
-        const topDeals = data.slice(0, 10);
-        await Promise.all(topDeals.map(async (deal) => {
-            const urlToCheck = deal.open_giveaway_url || deal.open_giveaway;
-            if (!urlToCheck) return;
-            const isAlive = await verifyUrl(urlToCheck);
-            if (isAlive) {
-               verifiedDeals.push(deal);
-            }
-        }));
-        
-        // Combine verified top deals with the rest (unverified to save time)
-        // Maintain relative order by sorting back their IDs or just using map
-        const validTopIds = new Set(verifiedDeals.map(d => d.id));
-        data = data.filter((deal: any, idx: number) => {
-           if (idx < 10) return validTopIds.has(deal.id);
-           return true; 
         });
       }
 
