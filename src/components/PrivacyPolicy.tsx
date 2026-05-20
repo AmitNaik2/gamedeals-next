@@ -88,7 +88,20 @@ export function PrivacyPolicy() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">5. Affiliate Links & Promotions</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">5. Google AdSense and Personalized Advertising</h2>
+          <p className="text-white/80 leading-relaxed mb-4">
+            Third party vendors, including Google, use cookies to serve ads based on a user's prior visits to your website or other websites.
+          </p>
+          <p className="text-white/80 leading-relaxed mb-4">
+            Google's use of advertising cookies enables it and its partners to serve ads to your users based on their visit to your site and/or other sites on the Internet.
+          </p>
+          <p className="text-white/80 leading-relaxed">
+            Users may opt out of personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline">www.aboutads.info</a> or <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer" className="text-[#7C3AED] hover:underline">Ads Settings</a>.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">6. Affiliate Links & Promotions</h2>
           <p className="text-white/80 leading-relaxed mb-4">
             Some links on GamesDealsHub may be affiliate links. If users purchase products through these links, the website may earn a commission at no extra cost to the user.
           </p>
@@ -98,35 +111,35 @@ export function PrivacyPolicy() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">6. Data Security</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">7. Data Security</h2>
           <p className="text-white/80 leading-relaxed">
             Reasonable security measures are used to protect collected information. However, no online platform can guarantee complete security.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">7. External Links</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">8. External Links</h2>
           <p className="text-white/80 leading-relaxed">
             GamesDealsHub may contain links to external websites. The website is not responsible for the privacy practices or content of third-party sites.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">8. Children's Privacy</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">9. Children's Privacy</h2>
           <p className="text-white/80 leading-relaxed">
             GamesDealsHub is not intended for children under 13 years of age. Personal information from children is not knowingly collected.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">9. Changes to This Privacy Policy</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">10. Changes to This Privacy Policy</h2>
           <p className="text-white/80 leading-relaxed">
             This Privacy Policy may be updated at any time. Changes will be posted on this page with an updated revision date.
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4 text-white">10. Contact</h2>
+          <h2 className="text-2xl font-bold mb-4 text-white">11. Contact</h2>
           <p className="text-white/80 leading-relaxed mb-4">
             For questions regarding this Privacy Policy, users can contact:
           </p>

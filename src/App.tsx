@@ -4,6 +4,7 @@ import { Gamepad2, RefreshCw, AlertCircle, RefreshCcw, CheckCircle2, Search, Fil
 import { Routes, Route, useLocation, useNavigate, Link, Navigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { DealCard } from "./components/DealCard";
+import { CompareCard } from "./components/CompareCard";
 import { GameDetail } from "./components/GameDetail";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { TermsOfService } from "./components/TermsOfService";
@@ -146,11 +147,33 @@ export default function App() {
   const [platformSearch, setPlatformSearch] = useState("");
   const [lootSearch, setLootSearch] = useState("");
   const [premiumSearch, setPremiumSearch] = useState("");
+  const [activePremiumSearch, setActivePremiumSearch] = useState("");
+
+  // Debounce search effect for premiumSearch
+  useEffect(() => {
+    if (activeTab !== "Premium") return;
+    
+    const search = premiumSearch.trim();
+    const isStore = ['steam', 'epic games', 'gog', 'humble store'].includes(search.toLowerCase());
+    
+    // We only want to trigger server search if it's NOT a store name and it changed
+    if (!isStore && search !== activePremiumSearch) {
+      const handler = setTimeout(() => {
+        fetchPremium(search);
+      }, 600); // 600ms debounce
+      return () => clearTimeout(handler);
+    }
+  }, [premiumSearch, activeTab, activePremiumSearch]);
 
   useEffect(() => {
     const path = location.pathname.toLowerCase();
+    
+    // Auto-fetch anything if we navigated directly to a Game deal
+    if (path.startsWith('/game/cs_') || path.startsWith('/game/rawg_')) {
+      fetchPremium("");
+    }
+    
     if (path.includes('/free-steam-games')) {
-      setActiveTab("Games");
       setPlatformSearch("Steam");
     } else if (path.includes('/free-epic-games')) {
       setActiveTab("Games");
@@ -178,14 +201,26 @@ export default function App() {
     return `Get access to ${dealCountText} active game deals updated every hour. Track and claim free PC games before they expire. Steam, Epic Games, and GOG giveaways for ${monthYear}.`;
   }, [deals.length, dlcDeals.length, premiumDeals.length]);
   
-  const filteredLootDeals = dlcDeals.filter(deal => 
-    deal.title.toLowerCase().includes(lootSearch.toLowerCase()) || 
-    deal.instructions.toLowerCase().includes(lootSearch.toLowerCase())
-  );
+  const filteredLootDeals = dlcDeals.filter(deal => {
+    const search = lootSearch.toLowerCase();
+    if (!search) return true;
+    const matchPlatform = deal.platforms.toLowerCase().includes(search);
+    const matchTitle = deal.title.toLowerCase().includes(search) || deal.instructions.toLowerCase().includes(search);
+    return matchPlatform || matchTitle;
+  });
 
-  const filteredPremiumDeals = premiumDeals.filter(deal => 
-    deal.title.toLowerCase().includes(premiumSearch.toLowerCase())
-  );
+  const filteredPremiumDeals = premiumDeals.filter(deal => {
+    const search = premiumSearch.toLowerCase();
+    // Skip local filtering if the server has provided results for this exact query
+    if (search && search === activePremiumSearch.toLowerCase()) return true;
+    
+    if (!search) return true;
+    const isStoreName = ['steam', 'epic games', 'gog', 'humble store'].includes(search);
+    if (isStoreName) {
+      return deal.platforms.toLowerCase().includes(search);
+    }
+    return deal.title.toLowerCase().includes(search) || deal.platforms.toLowerCase().includes(search);
+  });
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -240,39 +275,60 @@ export default function App() {
     }
   };
 
-  const fetchPremium = async () => {
+  const fetchPremium = async (searchTitle: string = "") => {
     setPremiumLoading(true);
+    setActivePremiumSearch(searchTitle);
     try {
-      const cheapsharkRes = await fetch("/api/cheapshark-deals");
+      const url = searchTitle ? `/api/cheapshark-deals?title=${encodeURIComponent(searchTitle)}` : `/api/cheapshark-deals`;
+      const cheapsharkRes = await fetch(url);
       if (!cheapsharkRes.ok) {
          throw new Error(`Failed to load Premium Deals (HTTP ${cheapsharkRes.status})`);
       }
       const text = await cheapsharkRes.text();
       let csData;
       try { csData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/cheapshark-deals"); }
+      
+      if (!Array.isArray(csData)) {
+          console.warn("Cheapshark returned non-array:", csData);
+          setPremiumDeals([]);
+          return;
+      }
+
+      const STORE_NAMES: Record<string, string> = {
+        "1": "Steam", "2": "GamersGate", "3": "GreenManGaming", "4": "Amazon",
+        "5": "GameStop", "6": "Direct2Drive", "7": "GOG", "8": "Origin",
+        "9": "Get Games", "10": "Shiny Loot", "11": "Humble Store", "12": "Desura",
+        "13": "Uplay", "14": "IndieGameStand", "15": "Fanatical", "16": "Gamesrocket",
+        "17": "Games Republic", "18": "SilaGames", "19": "Playfield", "20": "ImperialGames",
+        "21": "WinGameStore", "22": "FunStockDigital", "23": "GameBillet", "24": "Voidu",
+        "25": "Epic Games", "26": "Razer Game Store", "27": "Gamesplanet", "28": "Gamesload",
+        "29": "2Game", "30": "IndieGala", "31": "Blizzard Shop", "32": "AllYouPlay",
+        "33": "DLGamer", "34": "Noctre", "35": "DreamGame"
+      };
+      
         const csDeals: GameDeal[] = csData.map((cs: any) => ({
           id: `cs_${cs.dealID}`,
           title: cs.title,
-          worth: `$${cs.normalPrice}`,
+          worth: cs.normalPrice === "N/A" ? "N/A" : `$${cs.normalPrice}`,
           thumbnail: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
           image: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
-          description: `Get it now for $${cs.salePrice} (was $${cs.normalPrice}). Steam Rating: ${cs.steamRatingText} (${cs.steamRatingPercent}%)`,
-          instructions: "Available via CheapShark deal.",
-          open_giveaway_url: `https://www.cheapshark.com/redirect?dealID=${cs.dealID}`,
+          description: cs.type === 'Game Info' ? `Overview for ${cs.title}.` : `Get it now for $${cs.salePrice} (was $${cs.normalPrice}). Steam Rating: ${cs.steamRatingText || 'N/A'} (${cs.steamRatingPercent || 0}%)`,
+          instructions: cs.type === 'Game Info' ? `Explore deals for ${cs.title}.` : "Available via digital storefronts.",
+          open_giveaway_url: cs.rawg_url ? cs.rawg_url : `https://www.cheapshark.com/redirect?dealID=${cs.dealID}`,
           published_date: "N/A",
-          type: cs.salePrice === "0.00" ? "Free Game" : "Discount",
-          platforms: "PC",
+          type: cs.type ? cs.type : (cs.salePrice === "0.00" ? "Free Game" : "Discount"),
+          platforms: cs.rawg_platforms || STORE_NAMES[cs.storeID] || "PC",
           end_date: "N/A",
           users: parseInt(cs.steamRatingCount) || 0,
           status: "Active",
           gamerpower_url: "",
           open_giveaway: "",
-          salePrice: cs.salePrice,
-          normalPrice: cs.normalPrice,
+          salePrice: cs.salePrice === "N/A" ? undefined : cs.salePrice,
+          normalPrice: cs.normalPrice === "N/A" ? undefined : cs.normalPrice,
           steamRatingPercent: cs.steamRatingPercent,
           steamAppID: cs.steamAppID,
         }));
-        setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount"));
+        setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount" || d.type === "Price Comparison" || d.type === "Game Info"));
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to load Premium Deals. Please try again.");
@@ -375,6 +431,7 @@ export default function App() {
       <main className="container px-4 py-8 mx-auto max-w-7xl">
         <Routes>
           {["/", "/free-steam-games", "/free-epic-games", "/free-gog-games"].map(path => (
+            // @ts-expect-error key is allowed in React
             <Route key={path} path={path} element={
               <>
                 <HeroSection 
@@ -541,21 +598,43 @@ export default function App() {
             </>
             ) : activeTab === "DLC" ? (
               <>
-                <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col md:flex-row items-center gap-4">
-                  <div className="text-sm text-[#7C3AED] uppercase font-bold tracking-widest pl-2 whitespace-nowrap hidden md:block">
-                    Free DLC
+             {/* Floating Top Bar (Filters) */}
+             <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+               <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
+                  <Filter className="w-4 h-4 text-[#7C3AED] mr-2 shrink-0" />
+                  <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest hidden md:inline-block mr-2 shrink-0">DLC & Loot Filters</span>
+               </div>
+               <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0"></div>
+               <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
+                  <div className="relative flex-1 md:max-w-[300px] shrink-0 min-w-[120px]">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <input 
+                      type="text"
+                      value={lootSearch}
+                      onChange={e => setLootSearch(e.target.value)}
+                      placeholder="Search DLC, loot or platform..."
+                      className="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
+                    />
                   </div>
-                  <div className="relative flex-1 w-full">
-                     <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#7C3AED]" />
-                     <input 
-                       type="text"
-                       value={lootSearch}
-                       onChange={e => setLootSearch(e.target.value)}
-                       placeholder="Search free DLC and loot..."
-                       className="w-full bg-white/5 border border-[#7C3AED]/30 rounded-full py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
-                     />
-                   </div>
-                </div>
+                  {/* Quick platform toggles */}
+                  <div className="flex gap-1 shrink-0">
+                    {['Steam', 'Epic Games', 'Xbox', 'PlayStation'].map(plat => (
+                        <button
+                            key={plat}
+                            onClick={() => setLootSearch(plat === lootSearch ? '' : plat)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
+                                lootSearch.toLowerCase() === plat.toLowerCase()
+                                  ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
+                                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                            )}
+                        >
+                            {plat}
+                        </button>
+                    ))}
+                  </div>
+               </div>
+             </div>
                 {dlcLoading ? (
                    <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
                       <RefreshCw className="w-8 h-8 animate-spin mb-4" />
@@ -584,21 +663,53 @@ export default function App() {
               </>
             ) : activeTab === "Premium" ? (
               <>
-                 <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col md:flex-row items-center gap-4">
-                  <div className="text-sm text-[#7C3AED] uppercase font-bold tracking-widest pl-2 whitespace-nowrap hidden md:block">
-                    Top Deals
+             {/* Floating Top Bar (Filters) */}
+             <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+               <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
+                  <Filter className="w-4 h-4 text-[#7C3AED] mr-2 shrink-0" />
+                  <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest hidden md:inline-block mr-2 shrink-0">Game Price Search</span>
+               </div>
+               <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0"></div>
+               <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
+                  <div className="relative flex-1 md:max-w-[300px] shrink-0 min-w-[120px]">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <input 
+                      type="text"
+                      value={premiumSearch}
+                      onChange={e => setPremiumSearch(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const isStore = ['steam', 'epic games', 'gog', 'humble store'].includes(premiumSearch.toLowerCase());
+                          fetchPremium(isStore ? "" : premiumSearch);
+                        }
+                      }}
+                      placeholder="Search game (Press Enter)..."
+                      className="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
+                    />
                   </div>
-                  <div className="relative flex-1 w-full">
-                     <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#7C3AED]" />
-                     <input 
-                       type="text"
-                       value={premiumSearch}
-                       onChange={e => setPremiumSearch(e.target.value)}
-                       placeholder="Search premium deals..."
-                       className="w-full bg-white/5 border border-[#7C3AED]/30 rounded-full py-2.5 pl-12 pr-4 text-sm focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
-                     />
+                  {/* Quick platform toggles */}
+                  <div className="flex gap-1 shrink-0">
+                    {['Steam', 'Epic Games', 'GOG', 'Humble Store'].map(plat => (
+                        <button
+                            key={plat}
+                            onClick={() => {
+                              const newPlat = plat === premiumSearch ? '' : plat;
+                              setPremiumSearch(newPlat);
+                              fetchPremium("");
+                            }}
+                            className={cn(
+                                "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
+                                premiumSearch.toLowerCase() === plat.toLowerCase()
+                                  ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
+                                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                            )}
+                        >
+                            {plat}
+                        </button>
+                    ))}
                   </div>
-                 </div>
+               </div>
+             </div>
                 {premiumLoading ? (
                    <div className="flex flex-col items-center justify-center py-20 text-[#7C3AED]">
                       <RefreshCw className="w-8 h-8 animate-spin mb-4" />
@@ -607,7 +718,17 @@ export default function App() {
                 ) : filteredPremiumDeals.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
-                      {filteredPremiumDeals.map((deal, index) => (
+                      {Array.from(
+                         filteredPremiumDeals.reduce((acc, deal) => {
+                            const key = deal.title.toLowerCase().trim();
+                            if (!acc.has(key)) acc.set(key, deal);
+                            // Keep normal deal over Game Info if possible
+                            else if (deal.type !== 'Game Info' && acc.get(key)!.type === 'Game Info') {
+                                acc.set(key, deal);
+                            }
+                            return acc;
+                         }, new Map<string, GameDeal>()).values()
+                      ).map((deal: GameDeal, index: number) => (
                         <DealCard
                           key={deal.id}
                           deal={deal}
@@ -646,7 +767,7 @@ export default function App() {
             </>
           } />
           ))}
-          <Route path="/game/:id" element={<GameDetail deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
+          <Route path="/game/:id" element={<GameDetail deals={[...deals, ...dlcDeals, ...premiumDeals]} isLoading={loading || dlcLoading || premiumLoading} />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/about" element={<AboutUs />} />

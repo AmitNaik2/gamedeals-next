@@ -25,6 +25,16 @@ function isActiveGiveaway(item: { end_date?: string; status?: string }) {
 }
 
 const app = express();
+
+// SEO Canonical Redirect: force www
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (host === 'gamesdealshub.me') {
+    return res.redirect(301, 'https://www.gamesdealshub.me' + req.originalUrl);
+  }
+  next();
+});
+
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json());
@@ -40,9 +50,10 @@ app.use(express.json());
   });
 
   async function verifyUrl(url: string): Promise<boolean> {
+    if (!url || typeof url !== 'string' || !url.startsWith('http')) return false;
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
       const res = await fetch(url, {
         method: "HEAD",
         headers: {
@@ -106,6 +117,26 @@ app.use(express.json());
           const plats = deal.platforms.toLowerCase();
           return isActiveGiveaway(deal) && trustedPlatforms.some(t => plats.includes(t));
         });
+        
+        // Real active verification for top 10 deals to discard dead links
+        let verifiedDeals: any[] = [];
+        const topDeals = data.slice(0, 10);
+        await Promise.all(topDeals.map(async (deal) => {
+            const urlToCheck = deal.open_giveaway_url || deal.open_giveaway;
+            if (!urlToCheck) return;
+            const isAlive = await verifyUrl(urlToCheck);
+            if (isAlive) {
+               verifiedDeals.push(deal);
+            }
+        }));
+        
+        // Combine verified top deals with the rest (unverified to save time)
+        // Maintain relative order by sorting back their IDs or just using map
+        const validTopIds = new Set(verifiedDeals.map(d => d.id));
+        data = data.filter((deal: any, idx: number) => {
+           if (idx < 10) return validTopIds.has(deal.id);
+           return true; 
+        });
       }
 
       res.json(data);
@@ -152,24 +183,108 @@ app.use(express.json());
     }
   });
 
-  // Proxy the CheapShark API
-  app.get("/api/cheapshark-deals", async (req, res) => {
+  async function fetchCheapshark(url: string) {
+    const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" };
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 6000);
-      const response = await fetch("https://www.cheapshark.com/api/1.0/deals?storeID=1,2,3,7,8,11,13&sortBy=DealRating&onSale=1", {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        },
-        signal: controller.signal as any
-      });
+      let response = await fetch(url, { headers, signal: controller.signal as any });
       clearTimeout(timeout);
-      if (!response.ok) {
-        console.error("Cheapshark bad status:", response.status, response.statusText);
-        throw new Error("Failed to fetch cheapshark deals");
+      if (response.ok) {
+        const text = await response.text();
+        const json = JSON.parse(text);
+        if (!json.error) return json;
       }
-      const text = await response.text();
-      let data; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from CheapShark"); }
+    } catch (err) {
+      // Fallback
+    }
+
+    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`;
+    const controllerProxy = new AbortController();
+    const timeoutProxy = setTimeout(() => controllerProxy.abort(), 8000);
+    const proxyRes = await fetch(proxyUrl, { signal: controllerProxy.signal as any });
+    clearTimeout(timeoutProxy);
+    
+    if (!proxyRes.ok) throw new Error("Fallback proxy failed");
+    return await proxyRes.json();
+  }
+
+  // Proxy the CheapShark API
+  app.get("/api/cheapshark-deals", async (req, res) => {
+    try {
+      const searchTitle = req.query.title ? (req.query.title as string) : "";
+      let data;
+
+      if (searchTitle) {
+        const url = `https://www.cheapshark.com/api/1.0/games?title=${encodeURIComponent(searchTitle)}&limit=5`;
+        const gamesList = await fetchCheapshark(url);
+        data = [];
+
+        // Fetch RAWG data in parallel
+        const rawgPromise = fetchRawgSearch(searchTitle);
+
+        if (Array.isArray(gamesList)) {
+           // Fetch full game objects in parallel
+           const gamePromises = gamesList.map(g => fetchCheapshark(`https://www.cheapshark.com/api/1.0/games?id=${g.gameID}`));
+           const detailedGames = await Promise.all(gamePromises);
+           
+           detailedGames.forEach((detail, idx) => {
+              if (detail && detail.deals && Array.isArray(detail.deals)) {
+                 const baseInfo = detail.info || gamesList[idx];
+                 detail.deals.forEach((deal: any) => {
+                    data.push({
+                       dealID: deal.dealID,
+                       title: baseInfo.title || gamesList[idx].external,
+                       normalPrice: deal.retailPrice || "0.00",
+                       salePrice: deal.price,
+                       thumb: baseInfo.thumb || gamesList[idx].thumb,
+                       steamAppID: baseInfo.steamAppID || gamesList[idx].steamAppID,
+                       steamRatingText: "N/A",
+                       steamRatingPercent: "0",
+                       steamRatingCount: "0",
+                       storeID: deal.storeID,
+                       type: "Price Comparison"
+                    });
+                 });
+              }
+           });
+        }
+        
+        try {
+            const rawgData = await rawgPromise;
+            if (rawgData && Array.isArray(rawgData.results)) {
+                // Merge rawg data
+                const existingTitles = new Set(data.map((d: any) => d.title.toLowerCase()));
+                rawgData.results.forEach((rg: any) => {
+                    if (!existingTitles.has(rg.name.toLowerCase())) {
+                       existingTitles.add(rg.name.toLowerCase());
+                       data.push({
+                           dealID: `rawg_${rg.id}`,
+                           title: rg.name,
+                           normalPrice: "N/A",
+                           salePrice: "N/A",
+                           thumb: rg.background_image,
+                           steamAppID: "",
+                           steamRatingText: "RAWG",
+                           steamRatingPercent: rg.metacritic || 0,
+                           steamRatingCount: rg.reviews_count || 0,
+                           storeID: "1",
+                           type: "Game Info",
+                           rawg_platforms: (rg.platforms || []).map((p: any) => p.platform.name).join(', '),
+                           rawg_url: `https://rawg.io/games/${rg.slug}`
+                       });
+                    }
+                });
+            }
+        } catch(e) {
+            console.error("RAWG merge failed", e);
+        }
+
+      } else {
+        const url = `https://www.cheapshark.com/api/1.0/deals?sortBy=DealRating&onSale=1`;
+        data = await fetchCheapshark(url);
+      }
+
       res.json(data);
     } catch (error) {
       console.error("Error fetching cheapshark deals:", error);
@@ -389,6 +504,36 @@ app.use(express.json());
     
     return data.results && data.results.length > 0 ? data.results[0] : { not_found: true };
   }
+
+  async function fetchRawgSearch(query: string) {
+    const rawgKey = process.env.RAWG_API_KEY;
+    if (!rawgKey) return { results: [] };
+
+    const usage = getCurrentRawgUsage();
+    if (usage.count >= RAWG_MONTHLY_LIMIT) return rawgLimitReachedResult();
+
+    const encodedTitle = encodeURIComponent(query);
+    const response = await fetch(`https://api.rawg.io/api/games?search=${encodedTitle}&key=${rawgKey}&page_size=10`, {
+      headers: {
+        "User-Agent": "FreeGameTracker/1.0"
+      }
+    });
+    incrementRawgUsage();
+    if (!response.ok) return { results: [] };
+    const data = await response.json();
+    return data;
+  }
+
+  app.get("/api/rawg-search", async (req, res) => {
+    try {
+      const { query } = req.query;
+      if (!query) return res.json([]);
+      const data = await fetchRawgSearch(String(query));
+      res.json(data.results || []);
+    } catch (e) {
+      res.json([]);
+    }
+  });
 
   app.get("/api/rawg", async (req, res) => {
     try {

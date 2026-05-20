@@ -2,22 +2,6 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/ads.txt",
-      "destination": "/ads.txt"
-    },
-    {
-      "source": "/robots.txt",
-      "destination": "/robots.txt"
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap.xml"
-    },
-    {
-      "source": "/google02e930642faa1d0a.html",
-      "destination": "/google02e930642faa1d0a.html"
-    },
-    {
       "source": "/api/(.*)",
       "destination": "/api/index"
     },

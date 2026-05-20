@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Lock, LogOut, Monitor, Smartphone } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { type GameDeal } from "../types";
@@ -45,7 +45,7 @@ export function Admin({ deals }: AdminProps) {
     }
   }, [isLoggedIn]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     try {
       const res = await fetch("/api/admin/login", {
