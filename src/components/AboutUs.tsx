@@ -25,10 +25,20 @@ export function AboutUs() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4 text-white">Our Mission</h2>
           <p className="text-white/80 leading-relaxed mb-4">
-            Welcome to GamesDealsHub! We are a community of passionate gamers dedicated to finding the best deals, free games, and giveaways across major platforms like Steam, Epic Games, and GOG.
+            Welcome to GamesDealsHub! We are a community of passionate gamers dedicated to finding the best deals, free games, and giveaways across major platforms like Steam, Epic Games, GOG, and Humble Bundle. We aggregate, verify, and track down real game giveaways so you don't have to waste time scouring the internet.
           </p>
           <p className="text-white/80 leading-relaxed mb-4">
-            Founded by Amit, our platform was built out of frustration with how difficult it is to keep track of limited-time free game offers. Our mission is to ensure no gamer misses out on a great title just because they didn't see the deal in time.
+             Our mission is simple: to ensure no gamer misses out on a great title just because they didn't see the deal in time. We provide an hourly-updated, real-time feed that removes the noise, giving you instant access to 100% free claimable games.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4 text-white">Who Are We?</h2>
+          <p className="text-white/80 leading-relaxed mb-4">
+            GamesDealsHub was founded by Amit, a lifelong PC gamer and software engineer who grew tired of expired deals and clickbait giveaway links. What started as a personal script to track Steam free weekends has evolved into a comprehensive tracking platform relied upon by thousands of gamers every day.
+          </p>
+          <p className="text-white/80 leading-relaxed mb-4">
+            Our team consists of gaming enthusiasts who actively curate and monitor digital storefront APIs. We combine automated tracking with manual curation to make sure every link on our site points to a legitimate, safe digital storefront.
           </p>
         </section>
 
@@ -38,9 +48,10 @@ export function AboutUs() {
             We prioritize Experience, Expertise, Authoritativeness, and Trust (E-E-A-T) in everything we do:
           </p>
           <ul className="list-disc list-inside text-white/80 leading-relaxed space-y-2 mb-4">
-            <li><strong>Verified Deals:</strong> Every deal we post is manually verified. We do not aggregate sketchy key resellers.</li>
-            <li><strong>Clear Deadlines:</strong> If a deal ends on a specific date, we make it absolutely clear.</li>
-            <li><strong>No Hidden Costs:</strong> We highlight "Free to Keep" vs "Free Weekend" to avoid any confusion.</li>
+            <li><strong>Verified Deals Only:</strong> Every deal we post is manually cross-checked or sourced directly from verified storefront APIs (Steam, Epic, GOG). We strictly prohibit sketchy key resellers and unauthorized third-party marketplaces.</li>
+            <li><strong>Clear Deadlines:</strong> Time is of the essence. Our active countdown timers let you know exactly when a deal expires. We actively purge expired deals to maintain a high-quality user experience.</li>
+            <li><strong>No Hidden Costs:</strong> We clearly distinguish between "Free to Keep" (100% discount) and "Free Weekend" (temporary access) to avoid any confusion or bait-and-switch.</li>
+            <li><strong>Ad-Free Tracking:</strong> We use safe, non-intrusive AdSense placements to keep the servers running without ruining your browsing experience.</li>
           </ul>
         </section>
 

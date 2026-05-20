@@ -18,7 +18,11 @@ function isActiveGiveaway(item: { end_date?: string; status?: string }) {
   if (item.status && item.status.toLowerCase() !== "active") return false;
   if (!item.end_date || item.end_date === "N/A") return true;
 
-  const endDate = new Date(item.end_date.replace(" ", "T"));
+  const endStr = item.end_date.includes(" ") && !item.end_date.includes("Z") && !item.end_date.includes("GMT")
+    ? item.end_date.replace(" ", "T") + "Z"
+    : item.end_date;
+
+  const endDate = new Date(endStr);
   if (Number.isNaN(endDate.getTime())) return true;
 
   return endDate.getTime() > Date.now();

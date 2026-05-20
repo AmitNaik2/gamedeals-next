@@ -570,11 +570,8 @@ export default function App() {
                 <RefreshCw className="w-8 h-8 animate-spin mb-4" />
                 <p className="text-sm font-bold uppercase tracking-widest text-white/50">Loading Free Games...</p>
               </div>
-            ) : (
-            <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-              <AnimatePresence mode="popLayout">
-                {deals
-                  .filter((deal, idx) => {
+            ) : (() => {
+              const filteredDeals = deals.filter((deal, idx) => {
                     // Hide the first item if it's already shown in FeaturedDeal
                     if (selectedRarity === 'All' && !platformSearch && idx === 0) return false;
                     
@@ -593,26 +590,42 @@ export default function App() {
                        }
                     }
                     return matchRarity && matchPlatform;
-                  })
-                  .map((deal, index) => (
-                  <DealCard
-                    key={deal.id}
-                    deal={deal}
-                    index={index}
-                    priority={index < 4}
-                    onShare={openShareModal}
-                    onRemind={openSubscribeModal}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-            )}
+                  });
 
-            {deals.length === 0 && !loading && !error && (
-              <div className="py-20 text-center text-white/50">
-                No active deals found right now. Check back later!
-              </div>
-            )}
+              if (filteredDeals.length === 0 && !error) {
+                return (
+                  <div className="py-16 text-center text-white/50 flex flex-col items-center">
+                    <p className="mb-2 text-lg text-white">No {selectedRarity !== 'All' ? selectedRarity : 'active'} deals found right now.</p>
+                    <p className="text-sm">Check back in an hour or try clearing your filters!</p>
+                    {(selectedRarity !== 'All' || platformSearch !== '') && (
+                      <button 
+                        onClick={() => { setSelectedRarity('All'); setPlatformSearch(''); }}
+                        className="mt-4 px-4 py-2 bg-white/10 hover:bg-white/20 transition-colors uppercase tracking-widest text-[10px] font-bold rounded"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
+                  <AnimatePresence mode="popLayout">
+                    {filteredDeals.map((deal, index) => (
+                      <DealCard
+                        key={deal.id}
+                        deal={deal}
+                        index={index}
+                        priority={index < 4}
+                        onShare={openShareModal}
+                        onRemind={openSubscribeModal}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </div>
+              );
+            })()}
             </>
             ) : activeTab === "DLC" ? (
               <>

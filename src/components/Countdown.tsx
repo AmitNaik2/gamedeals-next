@@ -63,7 +63,7 @@ export function Countdown({ endDate }: CountdownProps) {
       </span>
       {timeLeft !== 'Expired' && (
         <span className="text-[9px] text-white/40 tracking-widest pl-4.5">
-          ENDS: {new Date(endDate.replace(' ', 'T') + 'Z').toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).replace('IST', 'IST')}
+          ENDS: {new Date(endDate.replace(' ', 'T') + 'Z').toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).replace('IST', 'IST')}
         </span>
       )}
     </div>
