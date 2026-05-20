@@ -65,9 +65,15 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-cyan-400 glow-text">Before They Expire</span>
           </h2>
           
-          <p className="text-white/60 text-lg mb-8 max-w-xl">
+          <p className="text-white/60 text-lg mb-6 max-w-xl">
             Steam, Epic Games, GOG, Prime Gaming & more. Don't miss out on premium AAA gaming deals.
           </p>
+
+          <div className="flex flex-wrap items-center gap-4 mb-8 text-white/50 text-sm font-medium">
+            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> Official Store Links Only</span>
+            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> Verified Giveaways</span>
+            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> No Piracy</span>
+          </div>
           
           <div className="flex flex-wrap items-center gap-4">
             <button 

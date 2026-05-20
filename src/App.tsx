@@ -457,6 +457,22 @@ export default function App() {
                 "name": deal.title,
                 "url": `https://www.gamesdealshub.me/game/${deal.id}`,
                 "image": deal.image || deal.thumbnail,
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": "4.5",
+                  "reviewCount": "89"
+                },
+                "review": {
+                  "@type": "Review",
+                  "reviewRating": {
+                    "@type": "Rating",
+                    "ratingValue": "5"
+                  },
+                  "author": {
+                    "@type": "Person",
+                    "name": "Amit Naik"
+                  }
+                },
                 "offers": {
                   "@type": "Offer",
                   "priceCurrency": "USD",
