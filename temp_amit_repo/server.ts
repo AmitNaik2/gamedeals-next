@@ -7,6 +7,8 @@ import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
 import * as cheerio from "cheerio";
 import { Server as SocketIOServer } from "socket.io";
+import { loadSsrTemplate, resolveSsrContext } from "./lib/ssr-handler";
+import { renderHtml } from "./lib/ssr-html";
 
 dotenv.config();
 dotenv.config({ path: ".env.local", override: true });
@@ -1015,149 +1017,26 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
     // In production (including Vercel), serve the built static UI
     const distPath = path.join(process.cwd(), "dist");
     
-    // Read the built index.html for rewriting
-    let baseHtml = "";
-    try {
-      baseHtml = fs.readFileSync(path.join(distPath, "index.html"), "utf-8");
-    } catch (e) {
-      console.warn("Could not read dist/index.html");
-    }
+    const baseHtml = loadSsrTemplate();
 
-    // Serve static files but skip for / so we can rewrite meta tags
+    // Serve static assets; index.html renamed to ssr-template.html in postbuild
     app.use(express.static(distPath, { index: false }));
-    
-    // SPA fallback with basic SSR for meta tags and crawler extraction
+
     app.get("*", async (req, res) => {
-      let html = baseHtml;
-      if (!html) {
-        try {
-          html = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
-        } catch(e) {
-          try {
-            html = fs.readFileSync(path.join(process.cwd(), "dist", "index.html"), "utf-8");
-          } catch(e2) {
-            return res.sendFile(path.join(distPath, "index.html"));
-          }
-        }
+      if (!baseHtml) {
+        res.status(500).send("SSR template missing. Run npm run build.");
+        return;
       }
 
-      const pathName = req.path;
-      let title = "GamesDealsHub | Track Free PC Games & Gaming Deals";
-      let desc = "Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, GOG freebies, and limited-time premium AAA game promotions.";
-      let preRenderedContent = "";
-      let ogImage = "https://www.gamesdealshub.me/og-image.jpg";
-
-      if (pathName === "/about") {
-        title = "About Us | GamesDealsHub";
-        desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
-        preRenderedContent = `<h1>About Us</h1><p>${desc}</p>`;
-      } else if (pathName === "/privacy") {
-        title = "Privacy Policy | GamesDealsHub";
-        desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
-        preRenderedContent = `<h1>Privacy Policy</h1><p>${desc}</p>`;
-      } else if (pathName === "/terms") {
-        title = "Terms of Service | GamesDealsHub";
-        desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
-        preRenderedContent = `<h1>Terms of Service</h1><p>${desc}</p>`;
-      } else if (pathName === "/contact") {
-        title = "Contact Us | GamesDealsHub";
-        desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
-        preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
+      try {
+        const ctx = await resolveSsrContext(req.path);
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
+        res.send(renderHtml(baseHtml, ctx));
+      } catch (e) {
+        console.error("SSR render error:", e);
+        res.status(500).send("Error rendering page.");
       }
-      // Dynamic specific game page
-      else if (pathName.startsWith("/game/")) {
-        const id = pathName.split('/')[2];
-        try {
-          const dl = await fetchGamerPower(`https://www.gamerpower.com/api/giveaway?id=${id}`);
-          if (dl && dl.title) {
-            title = `${dl.title} - Free ${dl.platforms || 'PC'} Game | GamesDealsHub`;
-            desc = dl.description ? dl.description.substring(0, 160) + '...' : desc;
-            ogImage = dl.image || dl.thumbnail || ogImage;
-            
-            preRenderedContent = `
-              <div class="game-deal-container" itemscope itemtype="https://schema.org/Product">
-                <h1 itemprop="name">${dl.title}</h1>
-                <img itemprop="image" src="${dl.image || dl.thumbnail}" alt="${dl.title}" />
-                <p><strong>Platform:</strong> ${dl.platforms}</p>
-                <p><strong>Type:</strong> ${dl.type}</p>
-                <p itemprop="description">${dl.description}</p>
-                <p>${dl.instructions}</p>
-                <a href="${dl.open_giveaway_url}">Claim Now</a>
-              </div>
-            `;
-          }
-        } catch (e) {
-          console.warn("SSR game fetch failed", e);
-        }
-      }
-      // Homepage and Categories
-      else {
-        let apiUrl = "https://www.gamerpower.com/api/giveaways?sort-by=popularity";
-        if (pathName === "/free-steam-games") {
-          title = "Free Steam Games & Weekends | GamesDealsHub";
-          desc = "Find the latest free Steam games, DLCs, and weekend free plays. Claim and keep them forever.";
-          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=steam";
-        } else if (pathName === "/free-epic-games") {
-          title = "Free Epic Games Weekly | GamesDealsHub";
-          desc = "Don't miss the weekly free PC games from the Epic Games Store. Track the latest free Epic games here.";
-          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=epic-games-store";
-        } else if (pathName === "/loot") {
-          title = "Free Game Loot & Promo Codes | GamesDealsHub";
-          apiUrl = "https://www.gamerpower.com/api/giveaways?type=loot";
-        }
-        
-        try {
-           const list = await fetchGamerPower(apiUrl);
-           if (Array.isArray(list)) {
-             preRenderedContent = `<h1 itemprop="name">${title}</h1><ul itemscope itemtype="https://schema.org/ItemList">`;
-             list.slice(0, 20).forEach((item: any, index: number) => {
-                preRenderedContent += `
-                  <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                    <meta itemprop="position" content="${index + 1}" />
-                    <a href="/game/${item.id}" itemprop="url">
-                      <h2 itemprop="name">${item.title}</h2>
-                      <img itemprop="image" src="${item.thumbnail}" alt="${item.title}" loading="lazy" />
-                    </a>
-                    <p>${item.platforms} | ${item.type}</p>
-                    <p itemprop="description">${item.description}</p>
-                  </li>
-                `;
-             });
-             preRenderedContent += `</ul>`;
-           }
-        } catch(e) {
-           console.warn("SSR list fetch failed", e);
-        }
-      }
-
-      const canonical = `https://www.gamesdealshub.me${pathName === '/' ? '' : pathName}`;
-
-      const $ = cheerio.load(html);
-
-      // Apply dynamic meta tags using cheerio
-      $('title').text(title);
-      $('meta[name="title"]').attr('content', title);
-      $('meta[property="og:title"]').attr('content', title);
-      $('meta[property="twitter:title"]').attr('content', title);
-
-      $('meta[name="description"]').attr('content', desc);
-      $('meta[property="og:description"]').attr('content', desc);
-      $('meta[property="twitter:description"]').attr('content', desc);
-
-      $('link[rel="canonical"]').attr('href', canonical);
-      $('meta[property="og:url"]').attr('content', canonical);
-      $('meta[property="twitter:url"]').attr('content', canonical);
-
-      if (ogImage) {
-        $('meta[property="og:image"]').attr('content', ogImage);
-        $('meta[property="twitter:image"]').attr('content', ogImage);
-      }
-
-      if (preRenderedContent) {
-        $('#root').html(preRenderedContent);
-      }
-
-      res.send($.html());
     });
   }
 

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Suppress generic cross-origin Script errors caused by iframe preview restrictions -->
+    <script>
+      window.addEventListener('error', function(e) {
+        if (e.message === 'Script error.' || e.message === 'Script error') {
+          e.stopImmediatePropagation();
+        }
+      }, true);
+      window.onerror = function(message) {
+        if (typeof message === 'string' && message.indexOf('Script error') > -1) {
+          return true;
+        }
+      };
+    </script>
+    <!-- Google Funding Choices -->
+    <script async src="https://fundingchoicesmessages.google.com/i/pub-7564716797174887?ers=1"></script>
+    <script>
+      (function() {
+        function signalGooglefcPresent() {
+          try {
+            if (!window.frames['googlefcPresent']) {
+              if (document.body) {
+                const iframe = document.createElement('iframe');
+                iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;';
+                iframe.style.display = 'none';
+                iframe.name = 'googlefcPresent';
+                document.body.appendChild(iframe);
+              } else {
+                setTimeout(signalGooglefcPresent, 0);
+              }
+            }
+          } catch(e) {}
+        }
+        signalGooglefcPresent();
+      })();
+    </script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7JE07H6RHS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-7JE07H6RHS');
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GamesDealsHub | Track Free PC Games & Gaming Deals</title>
+    
+    <!-- Primary Meta Tags -->
+    <meta name="title" content="GamesDealsHub | Track Free PC Games & Gaming Deals" />
+    <meta name="description" content="Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, and GOG freebies — updated hourly." />
+    <meta name="keywords" content="free games, game deals, steam free weekends, epic games giveaways, gog free games, gaming deals tracker, premium drops, AAA promotions, pc games" />
+    <meta name="author" content="GamesDealsHub" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.gamesdealshub.me/" />
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="GamesDealsHub" />
+    <meta property="og:url" content="https://www.gamesdealshub.me/" />
+    <meta property="og:title" content="GamesDealsHub | Track Free PC Games & Gaming Deals" />
+    <meta property="og:description" content="Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, and GOG freebies — updated hourly." />
+    <meta property="og:image" content="https://www.gamesdealshub.me/og-image.jpg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://www.gamesdealshub.me/" />
+    <meta property="twitter:title" content="GamesDealsHub | Track Free PC Games & Gaming Deals" />
+    <meta property="twitter:description" content="Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, and GOG freebies — updated hourly." />
+    <meta property="twitter:image" content="https://www.gamesdealshub.me/og-image.jpg" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GamesDealsHub",
+      "url": "https://www.gamesdealshub.me/",
+      "description": "Track and claim free PC games before they expire.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.gamesdealshub.me/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7564716797174887" crossorigin="anonymous"></script>
+    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
+  </head>
+  <body>
+    <amp-auto-ads type="adsense" data-ad-client="ca-pub-7564716797174887"></amp-auto-ads>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
