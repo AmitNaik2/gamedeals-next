@@ -152,6 +152,8 @@ export default function App() {
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
+  const [sortOrder, setSortOrder] = useState<"expiry" | "newest">("expiry");
+  const [expiredDeals, setExpiredDeals] = useState<GameDeal[]>([]);
   
   const activeGamesDeals = useMemo(() => {
     return deals.filter(deal => {
@@ -223,9 +225,51 @@ export default function App() {
   const seoDescription = useMemo(() => {
     const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
     const totalDeals = deals.length + dlcDeals.length + premiumDeals.length;
-    const dealCountText = totalDeals > 0 ? totalDeals : "100+";
+    const dealCountText = totalDeals > 0 ? String(totalDeals) : "100+";
+    const path = location.pathname.toLowerCase();
+
+    if (path.includes("/free-steam-games")) {
+      return `Browse ${dealCountText} active free Steam games and free weekends for ${monthYear}. Official Steam store links, expiry timers, and email alerts.`;
+    }
+    if (path.includes("/free-epic-games")) {
+      return `Epic Games Store free games this week (${monthYear}). ${dealCountText} active giveaways with claim links and expiry countdowns.`;
+    }
+    if (path.includes("/free-gog-games")) {
+      return `DRM-free GOG giveaways for ${monthYear}. ${dealCountText} active free titles to keep forever in your GOG library.`;
+    }
+    if (path.includes("/expired")) {
+      return `Archive of recently expired free PC game giveaways on Steam, Epic, and GOG. See what ended and subscribe so you never miss the next drop.`;
+    }
+    if (path.includes("/about")) {
+      return "About GamesDealsHub: how we verify free game deals, which stores we track, and our mission to help gamers save money.";
+    }
+    if (path.includes("/contact")) {
+      return "Contact GamesDealsHub for deal tips, partnerships, advertising, or site feedback. We respond to community messages.";
+    }
+    if (path.includes("/privacy")) {
+      return "GamesDealsHub privacy policy: cookies, Google AdSense, analytics, affiliate links, and your data rights.";
+    }
+    if (path.includes("/terms")) {
+      return "GamesDealsHub terms of service: acceptable use, third-party store links, affiliate disclosure, and warranty disclaimers.";
+    }
     return `Get access to ${dealCountText} active game deals updated every hour. Track and claim free PC games before they expire. Steam, Epic Games, and GOG giveaways for ${monthYear}.`;
-  }, [deals.length, dlcDeals.length, premiumDeals.length]);
+  }, [deals.length, dlcDeals.length, premiumDeals.length, location.pathname]);
+
+  const sortDealsByOrder = (list: GameDeal[]) => {
+    const parseEnd = (endDate?: string) => {
+      if (!endDate || endDate === "N/A") return Number.MAX_SAFE_INTEGER;
+      const endStr =
+        endDate.includes(" ") && !endDate.includes("Z") && !endDate.includes("GMT")
+          ? endDate.replace(" ", "T") + "Z"
+          : endDate;
+      const t = new Date(endStr).getTime();
+      return Number.isNaN(t) ? Number.MAX_SAFE_INTEGER : t;
+    };
+    return [...list].sort((a, b) => {
+      if (sortOrder === "newest") return Number(b.id) - Number(a.id);
+      return parseEnd(a.end_date) - parseEnd(b.end_date);
+    });
+  };
   
   const filteredLootDeals = dlcDeals.filter(deal => {
     const search = lootSearch.toLowerCase();
@@ -368,13 +412,26 @@ export default function App() {
     }
   };
 
+  const fetchExpiredDeals = async () => {
+    try {
+      const res = await fetch("/api/expired-feed");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data)) setExpiredDeals(data);
+    } catch {
+      /* non-critical */
+    }
+  };
+
   // Initial fetch and setup polling
   useEffect(() => {
     fetchDeals();
+    fetchExpiredDeals();
 
     // Auto update every 1 minute (60000 ms)
     const intervalId = setInterval(() => {
       fetchDeals(true);
+      fetchExpiredDeals();
     }, 60000);
 
     return () => clearInterval(intervalId);
@@ -452,39 +509,12 @@ export default function App() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "ItemList",
-            "itemListElement": deals.slice(0, 20).map((deal: any, index: number) => ({
+            itemListElement: activeGamesDeals.slice(0, 20).map((deal, index) => ({
               "@type": "ListItem",
-              "position": index + 1,
-              "item": {
-                "@type": "Product",
-                "name": deal.title,
-                "url": `https://www.gamesdealshub.me/game/${deal.id}`,
-                "image": deal.image || deal.thumbnail,
-                "aggregateRating": {
-                  "@type": "AggregateRating",
-                  "ratingValue": "4.5",
-                  "reviewCount": "89"
-                },
-                "review": {
-                  "@type": "Review",
-                  "reviewRating": {
-                    "@type": "Rating",
-                    "ratingValue": "5"
-                  },
-                  "author": {
-                    "@type": "Person",
-                    "name": "Amit Naik"
-                  }
-                },
-                "offers": {
-                  "@type": "Offer",
-                  "priceCurrency": "USD",
-                  "price": "0.00",
-                  "availability": "https://schema.org/InStock",
-                  "itemCondition": "https://schema.org/NewCondition"
-                }
-              }
-            }))
+              position: index + 1,
+              url: `https://www.gamesdealshub.me/game/${deal.id}`,
+              name: deal.title,
+            })),
           })}
         </script>
       </Helmet>
@@ -585,6 +615,15 @@ export default function App() {
               <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0"></div>
 
               <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 overflow-x-auto hide-scrollbar">
+                 <select
+                   value={sortOrder}
+                   onChange={(e) => setSortOrder(e.target.value as "expiry" | "newest")}
+                   aria-label="Sort deals"
+                   className="bg-white/5 border border-white/10 rounded-full py-1.5 px-3 text-[10px] font-bold uppercase tracking-widest text-white/70 focus:outline-none focus:border-[#7C3AED] shrink-0"
+                 >
+                   <option value="expiry">Ending soon</option>
+                   <option value="newest">Newest first</option>
+                 </select>
                  <div className="relative flex-1 md:max-w-[200px] shrink-0 min-w-[120px]">
                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
                    <input 
@@ -597,7 +636,7 @@ export default function App() {
                  </div>
                  {/* Quick platform toggles */}
                  <div className="flex gap-1 shrink-0">
-                   {['Steam', 'Epic Games', 'Xbox', 'PlayStation'].map(plat => (
+                   {['Steam', 'Epic Games', 'GOG', 'Xbox', 'PlayStation'].map(plat => (
                        <button
                            key={plat}
                            onClick={() => setPlatformSearch(plat === platformSearch ? '' : plat)}
@@ -625,7 +664,8 @@ export default function App() {
                 ))}
               </div>
             ) : (() => {
-              const filteredDeals = activeGamesDeals.filter((deal, idx) => {
+              const filteredDeals = sortDealsByOrder(
+                activeGamesDeals.filter((deal, idx) => {
                     // Hide the first item if it's already shown in FeaturedDeal
                     if (selectedRarity === 'All' && !platformSearch && idx === 0) return false;
                     
@@ -639,12 +679,15 @@ export default function App() {
                           matchPlatform = platformLower.includes('playstation') || platformLower.includes('ps4') || platformLower.includes('ps5');
                        } else if (search === 'epic games') {
                           matchPlatform = platformLower.includes('epic') || platformLower.includes('epic games');
+                       } else if (search === 'gog') {
+                          matchPlatform = platformLower.includes('gog');
                        } else {
                           matchPlatform = platformLower.includes(search) || titleLower.includes(search);
                        }
                     }
                     return matchRarity && matchPlatform;
-                  });
+                  })
+              );
 
               if (filteredDeals.length === 0 && !error) {
                 return (
@@ -681,28 +724,40 @@ export default function App() {
                   </div>
 
                   {/* History Section for Expired Deals */}
-                  {selectedRarity === 'All' && !platformSearch && (
+                  {selectedRarity === 'All' && !platformSearch && expiredDeals.length > 0 && (
                     <div className="mt-16 border-t border-white/10 pt-12">
-                      <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
                         <div>
                           <h3 className="text-2xl font-bold font-serif italic text-white flex items-center gap-2">
                             <span className="text-[#7C3AED]">Past</span> Giveaways
                           </h3>
-                          <p className="text-sm text-white/50">Look at what you missed! Don't let it happen again.</p>
+                          <p className="text-sm text-white/50">Recently expired — <Link to="/expired" className="text-[#7C3AED] hover:underline">view full archive</Link></p>
                         </div>
+                        <p className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                          Updated {lastRefreshed.toLocaleTimeString()}
+                        </p>
                       </div>
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                        {/* Mock historical deals */}
-                        {['Grand Theft Auto V', 'Death Stranding', 'Fallout: New Vegas'].map((title, i) => (
-                          <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center gap-4">
-                            <div className="w-16 h-16 bg-white/10 rounded flex-shrink-0 flex items-center justify-center">
-                              <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest text-center px-1">Expired</span>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                        {expiredDeals.slice(0, 6).map((deal) => (
+                          <Link
+                            key={deal.id}
+                            to={`/game/${deal.id}`}
+                            className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center gap-4 hover:border-[#7C3AED]/40 transition-colors"
+                          >
+                            <img
+                              src={deal.thumbnail || deal.image}
+                              alt={deal.title}
+                              width={64}
+                              height={64}
+                              className="w-16 h-16 rounded object-cover shrink-0 bg-black/40"
+                              loading="lazy"
+                            />
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-white text-sm line-clamp-2">{deal.title}</h4>
+                              <p className="text-[10px] uppercase text-rose-400/90 font-bold tracking-widest mt-1">Expired</p>
+                              <p className="text-[10px] text-white/40 truncate">{deal.platforms.split(",")[0]}</p>
                             </div>
-                            <div>
-                              <h4 className="font-bold text-white text-sm line-clamp-1">{title}</h4>
-                              <p className="text-[10px] uppercase text-[#7C3AED] font-bold tracking-widest mt-1">Epic Games</p>
-                            </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </div>
@@ -889,6 +944,33 @@ export default function App() {
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route
+            path="/expired"
+            element={
+              <div className="py-8">
+                <h2 className="text-3xl font-serif italic text-white mb-2">Expired Giveaways</h2>
+                <p className="text-white/50 text-sm mb-8 max-w-2xl">
+                  These free games have ended. Subscribe for email alerts so you never miss the next Steam, Epic, or GOG drop.
+                </p>
+                <InlineSubscribe />
+                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 mt-10">
+                  {expiredDeals.length === 0 ? (
+                    <p className="text-white/50">Loading expired deals…</p>
+                  ) : (
+                    expiredDeals.map((deal, index) => (
+                      <DealCard
+                        key={deal.id}
+                        deal={deal}
+                        index={index}
+                        onShare={openShareModal}
+                        onRemind={openSubscribeModal}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            }
+          />
           <Route path="/article/hp-omen-16-vs-lenovo-loq" element={<ArticleComparison />} />
           <Route path="/admin" element={<Admin deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
         </Routes>
@@ -924,6 +1006,7 @@ export default function App() {
                   <span className="text-green-500">API Status: Normal</span>
                </div>
                <div className="py-1">Active Deals: <span className="text-white">{deals.length + dlcDeals.length + premiumDeals.length}</span></div>
+               <Link to="/expired" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Expired Archive</Link>
                <div className="mt-8 pt-4 border-t border-white/10 opacity-40">© 2026 GamesDealsHub</div>
             </div>
           </div>
