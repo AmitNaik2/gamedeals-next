@@ -58,9 +58,11 @@ function InlineSubscribe() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white/5 p-6 rounded-2xl border border-white/10 text-left relative overflow-hidden w-full max-w-md mx-auto mt-10">
-      <h4 className="text-lg font-serif italic mb-1 text-white">Never miss a drop.</h4>
-      <p className="text-[11px] text-white/40 mb-4 tracking-tight">Instant email alerts for amazing deals and limited free games.</p>
+    <form onSubmit={handleSubmit} className="bg-[#111827]/80 backdrop-blur-xl border border-[#EC4899]/30 rounded-3xl p-6 text-left relative overflow-hidden w-full max-w-md mx-auto mt-10 shadow-[0_0_20px_rgba(236,72,153,0.1)] group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#EC4899]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
+      
+      <h4 className="text-lg font-orbitron font-bold italic mb-1 text-[#F9FAFB] glow-text">Never miss a drop.</h4>
+      <p className="text-[11px] font-poppins text-[#9CA3AF] mb-4 tracking-tight">Instant email alerts for amazing deals and limited free games.</p>
       
       <AnimatePresence>
         {status === 'success' && (
@@ -70,7 +72,7 @@ function InlineSubscribe() {
             exit={{ opacity: 0 }} 
             className="absolute inset-0 bg-[#0A0A0B]/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center z-10"
           >
-              <span className="text-[#7C3AED] mb-2"><CheckCircle2 className="w-8 h-8" /></span>
+              <span className="text-[#22C55E] mb-2"><CheckCircle2 className="w-8 h-8 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)]" /></span>
               <p className="text-xs text-white font-medium">{message}</p>
           </motion.div>
         )}
@@ -84,9 +86,9 @@ function InlineSubscribe() {
             value="subscribe" 
             checked={action === "subscribe"} 
             onChange={() => setAction("subscribe")}
-            className="accent-[#7C3AED]"
+            className="accent-[#EC4899]"
           />
-          <span className="text-xs text-white/70">Subscribe</span>
+          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Subscribe</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input 
@@ -95,9 +97,9 @@ function InlineSubscribe() {
             value="unsubscribe" 
             checked={action === "unsubscribe"} 
             onChange={() => setAction("unsubscribe")}
-            className="accent-rose-500"
+            className="accent-[#EF4444]"
           />
-          <span className="text-xs text-white/70">Unsubscribe</span>
+          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Unsubscribe</span>
         </label>
       </div>
 
@@ -108,22 +110,22 @@ function InlineSubscribe() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your@email.com" 
           disabled={status === 'loading'}
-          className="w-full bg-black/40 border border-white/10 rounded-lg py-3 pl-4 pr-[100px] text-xs focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30 disabled:opacity-50" 
+          className="w-full bg-[#070B14] border border-white/10 rounded-xl py-3 pl-4 pr-[100px] text-xs focus:outline-none focus:border-[#EC4899] focus:shadow-[0_0_10px_rgba(236,72,153,0.3)] transition-all text-white placeholder:text-[#9CA3AF] disabled:opacity-50" 
         />
         <button 
           type="submit"
           disabled={status === 'loading' || !email}
           className={cn(
-            "absolute right-2 top-2 h-8 px-4 transition-colors text-white text-[10px] font-bold uppercase tracking-widest rounded disabled:opacity-50",
+            "absolute right-2 top-2 h-8 px-4 transition-all text-[#070B14] text-[10px] font-bold uppercase tracking-widest rounded-lg disabled:opacity-50",
             action === "subscribe" 
-              ? "bg-[#7C3AED] hover:bg-white hover:text-black" 
-              : "bg-rose-500 hover:bg-rose-600"
+              ? "bg-[#EC4899] hover:bg-white shadow-[0_0_10px_rgba(236,72,153,0.5)]" 
+              : "bg-[#EF4444] hover:bg-white text-white hover:text-[#070B14]"
           )}
         >
           {status === 'loading' ? '...' : (action === "subscribe" ? 'Join' : 'Leave')}
         </button>
       </div>
-      {status === 'error' && <p className="text-rose-500 text-[10px] mt-2">{message}</p>}
+      {status === 'error' && <p className="text-[#EF4444] text-[10px] mt-2 font-poppins">{message}</p>}
     </form>
   );
 }
@@ -551,33 +553,33 @@ export default function App() {
           <div className="flex-1 w-full min-w-0">
             
             {/* Tabs */}
-            <div id="deals-tabs" className="flex items-center justify-between mb-6 border-b border-white/10 pb-0 overflow-x-auto hide-scrollbar flex-nowrap">
-              <div className="flex items-center space-x-2">
-                 <button onClick={() => setActiveTab("Games")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Games" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free Games</button>
-                 <button onClick={() => setActiveTab("DLC")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "DLC" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free DLC</button>
-                 <button onClick={() => setActiveTab("Premium")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Premium" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Premium Deals</button>
+            <div id="deals-tabs" className="flex items-center justify-between mb-8 pb-0 overflow-x-auto hide-scrollbar flex-nowrap border-b border-white/5">
+              <div className="flex items-center space-x-6">
+                 <button onClick={() => setActiveTab("Games")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-poppins font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Games" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Free Games</button>
+                 <button onClick={() => setActiveTab("DLC")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-poppins font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "DLC" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Free DLC</button>
+                 <button onClick={() => setActiveTab("Premium")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-poppins font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Premium" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Premium Deals</button>
               </div>
-              <div className="hidden md:flex items-center gap-4 text-xs font-mono text-white/40 px-2 tracking-widest uppercase shrink-0">
-                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> {deals.length + dlcDeals.length} Free Games Tracker</span>
-                 <span><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#7C3AED]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
+              <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#9CA3AF] px-2 tracking-widest uppercase shrink-0 pb-4">
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
+                 <span><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
               </div>
             </div>
 
             {activeTab === "Games" ? (
               <>
             {/* Floating Top Bar (Filters) */}
-            <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+            <div className="sticky top-24 z-40 w-full mb-8 bg-[#111827]/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-2 md:p-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
               <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
-                 <Filter className="w-4 h-4 text-[#7C3AED] mr-2 shrink-0" />
-                 <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest hidden md:inline-block mr-2 shrink-0">Filters</span>
+                 <Filter className="w-4 h-4 text-[#06B6D4] mr-2 shrink-0" />
+                 <span className="text-[10px] font-orbitron uppercase font-bold text-[#F9FAFB] tracking-widest hidden md:inline-block mr-2 shrink-0">Filters</span>
                  
                  <button 
                    onClick={() => setSelectedRarity('All')} 
                    className={cn(
-                     "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all shrink-0",
+                     "px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all shrink-0",
                      selectedRarity === 'All'
-                       ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg" 
-                       : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
+                       ? "bg-[#06B6D4] border-[#06B6D4] text-[#070B14] shadow-[0_0_10px_rgba(6,182,212,0.5)]" 
+                       : "bg-white/5 border-white/10 text-[#9CA3AF] hover:text-white"
                    )}
                  >
                    All
@@ -585,22 +587,22 @@ export default function App() {
                  
                  {(['Mythic', 'Legendary', 'Epic', 'Rare', 'Uncommon', 'Common'] as RarityLevel[]).filter(rarity => activeGamesDeals.some(d => getDealRarity(d).label === rarity)).map(rarity => {
                     let colors = "";
-                    if (rarity === "Mythic") colors = "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 border-pink-500/50 bg-white/5 shadow-[0_0_15px_rgba(236,72,153,0.3)]";
-                    if (rarity === "Legendary") colors = "text-amber-400 border-amber-400/50 bg-amber-400/20 shadow-[0_0_15px_rgba(251,191,36,0.2)]";
-                    if (rarity === "Epic") colors = "text-[#7C3AED] border-[#7C3AED]/50 bg-[#7C3AED]/20 shadow-[0_0_15px_rgba(124,58,237,0.2)]";
-                    if (rarity === "Rare") colors = "text-blue-400 border-blue-400/50 bg-blue-400/20 shadow-[0_0_15px_rgba(96,165,250,0.2)]";
-                    if (rarity === "Uncommon") colors = "text-green-400 border-green-400/30 bg-green-400/10";
-                    if (rarity === "Common") colors = "text-white/80 border-white/30 bg-white/10";
+                    if (rarity === "Mythic") colors = "text-[#EC4899] border-[#EC4899]/50 bg-[#EC4899]/10 shadow-[0_0_15px_rgba(236,72,153,0.3)]";
+                    if (rarity === "Legendary") colors = "text-[#F59E0B] border-[#F59E0B]/50 bg-[#F59E0B]/10 shadow-[0_0_15px_rgba(245,158,11,0.2)]";
+                    if (rarity === "Epic") colors = "text-[#8B5CF6] border-[#8B5CF6]/50 bg-[#8B5CF6]/10 shadow-[0_0_15px_rgba(139,92,246,0.2)]";
+                    if (rarity === "Rare") colors = "text-[#06B6D4] border-[#06B6D4]/50 bg-[#06B6D4]/10 shadow-[0_0_15px_rgba(6,182,212,0.2)]";
+                    if (rarity === "Uncommon") colors = "text-[#22C55E] border-[#22C55E]/30 bg-[#22C55E]/10";
+                    if (rarity === "Common") colors = "text-[#9CA3AF] border-white/30 bg-white/10";
                     
                     return (
                       <button 
                         key={rarity}
                         onClick={() => setSelectedRarity(rarity)}
                         className={cn(
-                          "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all shrink-0",
+                          "px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all shrink-0",
                           selectedRarity === rarity 
                             ? colors
-                            : "bg-white/5 border-white/10 text-white/40 hover:bg-white/10"
+                            : "bg-white/5 border-white/10 text-[#9CA3AF] hover:text-white"
                         )}
                       >
                         {rarity}
@@ -613,13 +615,13 @@ export default function App() {
 
               <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 overflow-x-auto hide-scrollbar">
                  <div className="relative flex-1 md:max-w-[200px] shrink-0 min-w-[120px]">
-                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
                    <input 
                      type="text"
                      value={platformSearch}
                      onChange={e => setPlatformSearch(e.target.value)}
                      placeholder="Search game or platform..."
-                     className="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
+                     className="w-full bg-[#070B14] border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#8B5CF6] transition-colors text-white placeholder:text-[#9CA3AF]"
                    />
                  </div>
                  {/* Quick platform toggles */}
@@ -629,10 +631,10 @@ export default function App() {
                            key={plat}
                            onClick={() => setPlatformSearch(plat === 'All' ? '' : plat)}
                            className={cn(
-                               "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
+                               "px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
                                (plat === 'All' && !platformSearch) || (plat !== 'All' && platformSearch.toLowerCase() === plat.toLowerCase())
-                                 ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
-                                 : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                                 ? "bg-[#8B5CF6] border-[#8B5CF6] text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+                                 : "bg-white/5 border-white/10 text-[#9CA3AF] hover:text-white"
                            )}
                        >
                            {plat}
@@ -645,7 +647,7 @@ export default function App() {
                  <select 
                     value={sortOption} 
                     onChange={e => setSortOption(e.target.value)}
-                    className="bg-white/5 border border-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest rounded px-2 py-1.5 focus:outline-none focus:border-[#7C3AED] shrink-0"
+                    className="bg-[#070B14] border border-white/10 text-[#F9FAFB] text-[10px] font-bold uppercase tracking-widest rounded-xl px-2 py-1.5 focus:outline-none focus:border-[#8B5CF6] shrink-0"
                  >
                     <option value="Newest">Newest</option>
                     <option value="Expiring soon">Expiring soon</option>
@@ -729,21 +731,21 @@ export default function App() {
             ) : activeTab === "DLC" ? (
               <>
              {/* Floating Top Bar (Filters) */}
-             <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+             <div className="sticky top-24 z-40 w-full mb-8 bg-[#111827]/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-2 md:p-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
                <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
-                  <Filter className="w-4 h-4 text-[#7C3AED] mr-2 shrink-0" />
-                  <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest hidden md:inline-block mr-2 shrink-0">DLC & Loot Filters</span>
+                  <Filter className="w-4 h-4 text-[#06B6D4] mr-2 shrink-0" />
+                  <span className="text-[10px] uppercase font-orbitron font-bold text-[#F9FAFB] tracking-widest hidden md:inline-block mr-2 shrink-0">DLC & Loot Filters</span>
                </div>
                <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0"></div>
                <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
                   <div className="relative flex-1 md:max-w-[300px] shrink-0 min-w-[120px]">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
                     <input 
                       type="text"
                       value={lootSearch}
                       onChange={e => setLootSearch(e.target.value)}
                       placeholder="Search DLC, loot or platform..."
-                      className="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
+                      className="w-full bg-[#070B14] border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#06B6D4] transition-colors text-white placeholder:text-[#9CA3AF]"
                     />
                   </div>
                   {/* Quick platform toggles */}
@@ -753,10 +755,10 @@ export default function App() {
                             key={plat}
                             onClick={() => setLootSearch(plat === lootSearch ? '' : plat)}
                             className={cn(
-                                "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
+                                "px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
                                 lootSearch.toLowerCase() === plat.toLowerCase()
-                                  ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
-                                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                                  ? "bg-[#06B6D4] border-[#06B6D4] text-[#070B14] shadow-[0_0_10px_rgba(6,182,212,0.5)]"
+                                  : "bg-white/5 border-white/10 text-[#9CA3AF] hover:text-white"
                             )}
                         >
                             {plat}
@@ -795,15 +797,15 @@ export default function App() {
             ) : activeTab === "Premium" ? (
               <>
              {/* Floating Top Bar (Filters) */}
-             <div className="sticky top-24 z-40 w-full mb-8 bg-black/60 backdrop-blur-2xl border border-[#7C3AED]/30 rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+             <div className="sticky top-24 z-40 w-full mb-8 bg-[#111827]/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-2 md:p-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
                <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
-                  <Filter className="w-4 h-4 text-[#7C3AED] mr-2 shrink-0" />
-                  <span className="text-[10px] uppercase font-bold text-white/50 tracking-widest hidden md:inline-block mr-2 shrink-0">Game Price Search</span>
+                  <Filter className="w-4 h-4 text-[#06B6D4] mr-2 shrink-0" />
+                  <span className="text-[10px] uppercase font-orbitron font-bold text-[#F9FAFB] tracking-widest hidden md:inline-block mr-2 shrink-0">Game Price Search</span>
                </div>
                <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0"></div>
                <div className="flex items-center gap-2 w-full xl:w-auto flex-1 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
                   <div className="relative flex-1 md:max-w-[300px] shrink-0 min-w-[120px]">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/40" />
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#9CA3AF]" />
                     <input 
                       type="text"
                       value={premiumSearch}
@@ -815,7 +817,7 @@ export default function App() {
                         }
                       }}
                       placeholder="Search game (Press Enter)..."
-                      className="w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#7C3AED] transition-colors text-white placeholder:text-white/30"
+                      className="w-full bg-[#070B14] border border-white/10 rounded-full py-1.5 pl-8 pr-4 text-[11px] focus:outline-none focus:border-[#8B5CF6] transition-colors text-white placeholder:text-[#9CA3AF]"
                     />
                   </div>
                   {/* Quick platform toggles */}
@@ -829,10 +831,10 @@ export default function App() {
                               fetchPremium("");
                             }}
                             className={cn(
-                                "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
+                                "px-3 py-1.5 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
                                 premiumSearch.toLowerCase() === plat.toLowerCase()
-                                  ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
-                                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
+                                  ? "bg-[#8B5CF6] border-[#8B5CF6] text-white shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+                                  : "bg-white/5 border-white/10 text-[#9CA3AF] hover:text-white"
                             )}
                         >
                             {plat}
@@ -910,38 +912,39 @@ export default function App() {
         </Routes>
       </main>
 
-      <footer className="mt-20 border-t border-white/10 bg-[#050505]">
-        <div className="max-w-7xl mx-auto px-4 md:px-10 py-12 lg:py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-[10px] uppercase tracking-widest font-bold text-white/50">
+      <footer className="mt-20 border-t border-[#8B5CF6]/30 bg-[#070B14]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-12 lg:py-16 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent"></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-[10px] uppercase font-orbitron tracking-widest font-bold text-[#9CA3AF]">
             <div className="flex flex-col gap-4">
-               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Platform</span>
-               <button type="button" onClick={goHome} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Home</button>
-               <button type="button" onClick={goFreeGames} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">All Free Games</button>
-               <button type="button" onClick={() => {navigate('/free-steam-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Free Steam Games</button>
-               <button type="button" onClick={() => {navigate('/free-epic-games')}} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Epic Games Giveaways</button>
+               <span className="text-[#8B5CF6] mb-2 font-black tracking-[0.2em] shadow-[#8B5CF6]/50">Platform</span>
+               <button type="button" onClick={goHome} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Home</button>
+               <button type="button" onClick={goFreeGames} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">All Free Games</button>
+               <button type="button" onClick={() => {navigate('/free-steam-games')}} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Free Steam Games</button>
+               <button type="button" onClick={() => {navigate('/free-epic-games')}} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Epic Games Giveaways</button>
             </div>
              <div className="flex flex-col gap-4">
-               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Legal</span>
-               <Link to="/terms" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Terms of Service</Link>
-               <Link to="/privacy" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Privacy Policy</Link>
-               <Link to="/privacy" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Cookie Policy</Link>
+               <span className="text-[#8B5CF6] mb-2 font-black tracking-[0.2em] shadow-[#8B5CF6]/50">Legal</span>
+               <Link to="/terms" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Terms of Service</Link>
+               <Link to="/privacy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Privacy Policy</Link>
+               <Link to="/privacy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Cookie Policy</Link>
             </div>
              <div className="flex flex-col gap-4">
-               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Connect</span>
-               <button type="button" onClick={() => openExternalUrl("https://discord.gg/gamesdealshub")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Join Discord Server</button>
-               <button type="button" onClick={() => openExternalUrl("https://reddit.com/r/GamesDealsHub")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Reddit Community</button>
-               <button type="button" onClick={() => openExternalUrl("https://github.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">GitHub</button>
-               <Link to="/contact" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Contact Us</Link>
-               <Link to="/about" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">About Us</Link>
+               <span className="text-[#8B5CF6] mb-2 font-black tracking-[0.2em] shadow-[#8B5CF6]/50">Connect</span>
+               <button type="button" onClick={() => openExternalUrl("https://discord.gg/gamesdealshub")} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Join Discord Server</button>
+               <button type="button" onClick={() => openExternalUrl("https://reddit.com/r/GamesDealsHub")} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Reddit Community</button>
+               <button type="button" onClick={() => openExternalUrl("https://github.com")} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">GitHub</button>
+               <Link to="/contact" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Contact Us</Link>
+               <Link to="/about" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">About Us</Link>
             </div>
             <div className="flex flex-col gap-4">
-               <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">System</span>
+               <span className="text-[#8B5CF6] mb-2 font-black tracking-[0.2em] shadow-[#8B5CF6]/50">System</span>
                <div className="flex items-center gap-2 py-1">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse glow-green"></span>
-                  <span className="text-green-500">API Status: Normal</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+                  <span className="text-[#22C55E] drop-shadow-[0_0_5px_rgba(34,197,94,0.4)]">API Status: Default</span>
                </div>
-               <div className="py-1">Active Deals: <span className="text-white">{deals.length + dlcDeals.length + premiumDeals.length}</span></div>
-               <div className="mt-8 pt-4 border-t border-white/10 opacity-40">© 2026 GamesDealsHub</div>
+               <div className="py-1">Active Index: <span className="text-[#F9FAFB] font-mono">{deals.length + dlcDeals.length + premiumDeals.length}</span></div>
+               <div className="mt-8 pt-4 border-t border-white/10 opacity-40 font-mono tracking-tighter">© 2026 GamesDealsHub</div>
             </div>
           </div>
         </div>
@@ -956,21 +959,21 @@ export default function App() {
       />
 
       {!cookieConsent && (
-        <div className="fixed bottom-0 left-0 w-full z-[100] p-4 bg-black/90 border-t border-[#7C3AED]/30 backdrop-blur-md">
+        <div className="fixed bottom-0 left-0 w-full z-[100] p-4 bg-[#111827]/90 border-t border-[#8B5CF6]/30 backdrop-blur-xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-start gap-4 flex-1">
-              <Info className="w-5 h-5 text-[#7C3AED] shrink-0 mt-0.5" />
-              <p className="text-sm text-white/70">
-                We use cookies to ensure you get the best experience on our website, personalize content, and analyze our traffic. By continuing to use our site, you accept our use of cookies.
-                <Link to="/privacy" className="text-[#7C3AED] hover:text-white underline ml-1">Learn more</Link>
+              <Info className="w-5 h-5 text-[#8B5CF6] shrink-0 mt-0.5 drop-shadow-[0_0_5px_rgba(139,92,246,0.5)]" />
+              <p className="text-sm font-poppins text-[#9CA3AF]">
+                System utilizes trace files (cookies) to secure operations, analyze bandwidth, and maintain user preferences. Continued link implies protocol acceptance.
+                <Link to="/privacy" className="text-[#06B6D4] hover:text-[#F9FAFB] hover:underline hover:drop-shadow-[0_0_5px_rgba(6,182,212,0.8)] ml-1 transition-all">Review Protocol</Link>
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <button 
                 onClick={acceptCookies} 
-                className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-6 py-2 rounded-full text-sm font-bold tracking-widest transition-colors uppercase"
+                className="bg-[#06B6D4] hover:bg-[#F9FAFB] text-[#070B14] px-6 py-2.5 rounded-xl text-xs font-orbitron font-bold tracking-widest transition-all uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)]"
               >
-                Accept All
+                Accept Line
               </button>
             </div>
           </div>

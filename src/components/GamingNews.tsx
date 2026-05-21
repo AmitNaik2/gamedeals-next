@@ -45,19 +45,19 @@ export function GamingNews() {
   }, []);
 
   return (
-    <div className="bg-[#0A0A0B] border border-white/10 rounded-2xl p-5 overflow-hidden mt-6 relative group">
-      <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <div className="bg-[#111827]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-5 overflow-hidden mt-6 relative group shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#06B6D4]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
 
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-2">
-          <Newspaper className="w-4 h-4 text-cyan-400" />
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white">Gaming News</h3>
+          <Newspaper className="w-4 h-4 text-[#06B6D4]" />
+          <h3 className="text-[11px] font-orbitron font-bold uppercase tracking-[0.2em] text-[#F9FAFB] glow-text">Gaming News</h3>
         </div>
       </div>
 
-      <div className="space-y-4 relative z-10">
+      <div className="space-y-4 relative z-10 font-poppins">
         {loading ? (
-          <div className="py-4 text-center text-xs text-white/50 animate-pulse">Crawling latest news...</div>
+          <div className="py-4 text-center text-xs text-white/50 animate-pulse font-orbitron tracking-widest uppercase">Crawling latest news...</div>
         ) : news.length > 0 ? (
           news.map((item, i) => (
             <motion.a
@@ -70,21 +70,20 @@ export function GamingNews() {
               transition={{ delay: i * 0.1 }}
               className="group/news cursor-pointer block border-b border-white/5 pb-3 last:border-0 last:pb-0"
             >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[9px] uppercase tracking-widest font-bold text-cyan-400">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-[9px] uppercase tracking-widest font-bold text-[#EC4899] bg-[#EC4899]/10 px-1.5 py-0.5 rounded">
                   {item.type}
                 </span>
-                <span className="text-[9px] text-white/30">/</span>
-                <span className="text-[9px] text-white/30 truncate">{item.time}</span>
+                <span className="text-[9px] text-[#9CA3AF] truncate">{item.time}</span>
               </div>
-              <p className="text-xs font-bold text-white/80 group-hover/news:text-cyan-400 transition-colors line-clamp-2 pr-4 relative">
+              <p className="text-sm font-semibold text-[#F9FAFB] group-hover/news:text-[#06B6D4] transition-colors line-clamp-2 pr-4 relative">
                 {item.title}
-                <ChevronRight className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover/news:opacity-100 group-hover/news:translate-x-0 transition-all text-cyan-400" />
+                <ChevronRight className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 opacity-0 -translate-x-2 group-hover/news:opacity-100 group-hover/news:translate-x-0 transition-all text-[#06B6D4]" />
               </p>
             </motion.a>
           ))
         ) : (
-          <div className="py-2 text-xs text-white/40">No news found right now.</div>
+          <div className="py-2 text-xs text-[#9CA3AF]">No news found right now.</div>
         )}
       </div>
     </div>

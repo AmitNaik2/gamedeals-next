@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
 import { type GameDeal } from "../types";
-import { formatDistanceToNow } from "date-fns";
 import { Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -8,10 +7,12 @@ export function LiveFeed({ deals }: { deals: GameDeal[] }) {
   if (!deals || deals.length === 0) return null;
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 overflow-hidden">
+    <div className="bg-[#111827]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-5 overflow-hidden shadow-[0_0_30px_rgba(139,92,246,0.1)] relative group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#8B5CF6]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
+      
       <div className="flex items-center gap-2 mb-6">
-        <Zap className="w-4 h-4 text-[#7C3AED]" />
-        <h3 className="text-xs font-bold uppercase tracking-widest text-white">Live Activity</h3>
+        <Zap className="w-4 h-4 text-[#06B6D4]" />
+        <h3 className="text-[11px] font-orbitron font-bold uppercase tracking-widest text-[#F9FAFB] glow-text">Live Activity</h3>
       </div>
       
       <div className="space-y-4">
@@ -21,15 +22,15 @@ export function LiveFeed({ deals }: { deals: GameDeal[] }) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex gap-3 items-start border-b border-white/5 pb-4 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors cursor-pointer"
+              className="flex gap-3 items-start border-b border-white/5 pb-4 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-xl transition-all duration-300 cursor-pointer hover:pl-2 group/item"
             >
-              <div className="w-10 h-10 rounded shrink-0 overflow-hidden bg-black/50 border border-white/10">
-                 <img src={deal.thumbnail} alt={deal.title} className="w-full h-full object-cover" />
+              <div className="w-12 h-12 rounded-lg shrink-0 overflow-hidden bg-black/50 border border-white/10 group-hover/item:border-[#06B6D4]/50 transition-colors">
+                 <img src={deal.thumbnail} alt={deal.title} className="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition-opacity" />
               </div>
-              <div>
-                <p className="text-[10px] font-bold text-white mb-1 line-clamp-1">{deal.title}</p>
-                <div className="flex items-center gap-1.5 text-[9px] uppercase tracking-tighter text-[#7C3AED]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+              <div className="flex-1">
+                <p className="text-[11px] font-orbitron font-bold text-white mb-1.5 line-clamp-1 group-hover/item:text-[#8B5CF6] transition-colors">{deal.title}</p>
+                <div className="flex items-center gap-1.5 text-[9px] font-poppins uppercase tracking-widest text-[#06B6D4]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-pulse shadow-[0_0_5px_rgba(6,182,212,0.8)]"></span>
                     New Deal Discovered
                 </div>
               </div>

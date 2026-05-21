@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
-import { Sparkles, TrendingUp } from "lucide-react";
+import { Sparkles, TrendingUp, Gamepad2, PlaySquare, Search } from "lucide-react";
 
-const PARTICLES = Array.from({ length: 15 }, (_, index) => {
+const PARTICLES = Array.from({ length: 40 }, (_, index) => {
   const seed = index + 1;
   return {
     width: (seed * 7) % 4 + 1,
@@ -10,21 +10,26 @@ const PARTICLES = Array.from({ length: 15 }, (_, index) => {
     top: (seed * 53) % 100,
     duration: ((seed * 17) % 30) / 10 + 2,
     delay: ((seed * 13) % 20) / 10,
+    color: index % 3 === 0 ? "bg-cyan-400" : index % 3 === 1 ? "bg-purple-500" : "bg-pink-500"
   };
 });
 
-export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClick?: () => void, onTrendingClick?: () => void }) {
+export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void }) {
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden bg-black border border-white/10 mb-12 min-h-[400px] flex items-center">
+    <div className="relative w-full rounded-3xl overflow-hidden bg-[#070B14] border border-white/5 mb-12 min-h-[500px] flex items-center shadow-[0_0_50px_rgba(139,92,246,0.1)] group">
       {/* Background Gradients & Particles */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#7C3AED]/20 via-black to-cyan-500/10"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#070B14] via-[#111827] to-[#1e1b4b]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent opacity-60"></div>
       
-      {/* Animated Floating Particles Mock */}
+      {/* Grid pattern */}
+      <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)", backgroundSize: "40px 40px" }}></div>
+
+      {/* Animated Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {PARTICLES.map((particle, i) => (
           <motion.div
             key={i}
-            className="absolute bg-white/20 rounded-full blur-[1px]"
+            className={`absolute rounded-full blur-[2px] ${particle.color} opacity-30`}
             style={{
               width: particle.width + "px",
               height: particle.height + "px",
@@ -32,11 +37,13 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
               top: particle.top + "%",
             }}
             animate={{
-              y: [0, -40, 0],
-              opacity: [0.2, 1, 0.2]
+              y: [0, -60, 0],
+              x: [0, (i % 2 === 0 ? 30 : -30), 0],
+              opacity: [0.1, 0.6, 0.1],
+              scale: [1, 1.5, 1]
             }}
             transition={{
-              duration: particle.duration,
+              duration: particle.duration * 2,
               repeat: Infinity,
               ease: "easeInOut",
               delay: particle.delay,
@@ -45,92 +52,69 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
         ))}
       </div>
 
-      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-3xl">
+      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest">
-              <Sparkles className="w-3 h-3" /> Updated Hourly
-            </span>
-            <span className="text-[10px] font-mono text-white/50 uppercase">
-              Last updated: {new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', timeZoneName: 'short' }).format(new Date())}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+              <Sparkles className="w-3.5 h-3.5" /> Premium Gaming Drops
             </span>
           </div>
           
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
-            Track Free PC Games <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-cyan-400 glow-text">Before They Expire</span>
-          </h2>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-orbitron font-bold text-white leading-tight tracking-tight mb-6">
+            Track the Best <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B5CF6] via-[#EC4899] to-[#06B6D4] glow-text filter drop-shadow-[0_0_20px_rgba(139,92,246,0.5)]">PC Game Deals</span> <br className="hidden lg:block"/>
+            & Free Giveaways
+          </h1>
           
-          <p className="text-white/60 text-lg mb-6 max-w-xl">
-            Track the best free games from official stores like Steam, Epic Games, and GOG. Don't miss out on premium AAA giveaways.
+          <p className="text-[#9CA3AF] text-lg sm:text-xl mb-8 max-w-2xl mx-auto lg:mx-0 font-poppins font-light leading-relaxed">
+            Steam discounts, Epic Games giveaways, exclusive promo codes, and verified premium drops updated in real time.
           </p>
-
-          <div className="flex flex-wrap items-center gap-4 mb-8 text-white/50 text-sm font-medium">
-            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> Official Store Links Only</span>
-            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> Verified Giveaways</span>
-            <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> No Piracy</span>
-          </div>
           
-          <div className="flex flex-wrap items-center gap-4 mb-8">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-12">
             <button 
               onClick={onExploreClick}
-              className="px-6 py-3 rounded-full bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-              Explore Deals
+              className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white font-poppins font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform shadow-[0_0_30px_rgba(6,182,212,0.4)] flex items-center gap-2">
+              <Search className="w-5 h-5" /> Browse Deals
+            </button>
+            <button 
+              onClick={onFreeGamesClick || onExploreClick}
+              className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-poppins font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:border-white/30 transition-colors backdrop-blur-md flex items-center gap-2">
+              <Gamepad2 className="w-5 h-5 text-[#22C55E]" /> Free Games
             </button>
             <button 
               onClick={onTrendingClick}
-              className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold uppercase tracking-widest text-xs hover:bg-white/10 transition-colors flex items-center gap-2">
-              <TrendingUp className="w-4 h-4" /> Trending Games
+              className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-poppins font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:border-[#EC4899]/50 transition-colors backdrop-blur-md flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-[#EC4899]" /> Trending
             </button>
           </div>
 
-          <form className="flex w-full max-w-sm items-center gap-2 mb-4" onSubmit={async (e) => { 
-            e.preventDefault(); 
-            const emailInput = (e.target as HTMLFormElement).querySelector('input[type="email"]') as HTMLInputElement;
-            const email = emailInput.value;
-            if(!email) return;
-            try {
-              const res = await fetch('/api/subscribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-              });
-              if(res.ok) {
-                 alert('Subscribed successfully!');
-                 emailInput.value = '';
-              } else {
-                 alert('Failed to subscribe. Please try again.');
-              }
-            } catch(err) {
-              alert('Error subscribing. Try again later.');
-            }
-          }}>
-            <input type="email" placeholder="Enter your email" required className="flex-1 h-10 px-4 rounded border border-white/20 bg-black/50 text-white placeholder:text-white/40 focus:outline-none focus:border-[#7C3AED] transition-colors" />
-            <button type="submit" className="h-10 px-4 rounded bg-[#7C3AED] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#6D28D9] transition-colors">
-              Notify Me
-            </button>
-          </form>
-
-          <div className="flex items-center gap-6 text-sm font-mono text-white/50 border-t border-white/10 pt-6 mt-2">
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-white">450K+</span>
-              <span className="text-[10px] uppercase tracking-widest">Games Claimed</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm font-orbitron text-[#9CA3AF] border-t border-white/5 pt-8 mt-4 glass-panel rounded-2xl p-6 bg-black/20 backdrop-blur-md">
+            <div className="flex flex-col items-center lg:items-start">
+              <span className="text-3xl font-bold font-sans text-white glow-text">5000+</span>
+              <span className="text-[10px] text-[#06B6D4] font-bold uppercase tracking-widest mt-1">Deals Tracked</span>
             </div>
-            <div className="w-px h-8 bg-white/10"></div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold text-white">100+</span>
-              <span className="text-[10px] uppercase tracking-widest">Deals Tracked</span>
+            <div className="hidden sm:block w-px h-12 border-r border-white/5 mx-auto"></div>
+            <div className="flex flex-col items-center lg:items-start pl-0 lg:pl-4 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
+              <span className="text-3xl font-bold font-sans text-white glow-text">Hourly</span>
+              <span className="text-[10px] text-[#8B5CF6] font-bold uppercase tracking-widest mt-1">Real-time Updates</span>
+            </div>
+            <div className="hidden sm:block w-px h-12 border-r border-white/5 mx-auto"></div>
+            <div className="flex flex-col items-center lg:items-start pl-0 lg:pl-4 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
+              <span className="text-3xl font-bold font-sans text-white glow-text">Multi</span>
+              <span className="text-[10px] text-[#EC4899] font-bold uppercase tracking-widest mt-1">Steam + Epic + GOG</span>
             </div>
           </div>
         </motion.div>
       </div>
       
-      {/* Decorative right side graphic (hidden on mobile) */}
-      <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-[#7C3AED]/20 to-transparent pointer-events-none"></div>
+      {/* Decorative right side graphic */}
+      <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none overflow-hidden">
+         <div className="absolute right-[-10%] top-[10%] w-[600px] h-[600px] bg-[#8B5CF6]/20 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten animate-pulse" style={{ animationDuration: '4s' }}></div>
+         <div className="absolute right-[20%] bottom-[-10%] w-[400px] h-[400px] bg-[#06B6D4]/20 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
+      </div>
     </div>
   );
 }

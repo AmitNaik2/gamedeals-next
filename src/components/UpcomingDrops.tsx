@@ -14,13 +14,13 @@ export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewA
   if (!topDeals.length) return null;
 
   return (
-    <div className="bg-[#0A0A0B] border border-white/10 rounded-2xl p-5 overflow-hidden mt-6 relative group">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#7C3AED]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+    <div className="bg-[#111827]/80 backdrop-blur-xl border border-[#F59E0B]/30 rounded-3xl p-5 overflow-hidden mt-6 relative group shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#F59E0B]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
       
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-2">
-          <Trophy className="w-4 h-4 text-[#7C3AED]" />
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white">Top Value Deals</h3>
+          <Trophy className="w-4 h-4 text-[#F59E0B]" />
+          <h3 className="text-[11px] font-orbitron font-bold uppercase tracking-[0.2em] text-[#F9FAFB] glow-text">Top Value Deals</h3>
         </div>
       </div>
       
@@ -34,23 +34,23 @@ export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewA
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className="flex gap-3 items-center justify-between border-b border-white/5 pb-3 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors cursor-pointer"
+              className="flex gap-3 items-center justify-between border-b border-white/5 pb-3 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-xl transition-all duration-300 cursor-pointer hover:px-2 group/item"
             >
               <div>
-                <p className="text-xs font-bold mb-0.5 line-clamp-1 text-white flex items-center gap-1">
-                  {item.title} <BadgeCheck className="w-3 h-3 text-blue-400" />
+                <p className="text-xs font-poppins font-bold mb-1 line-clamp-1 text-white flex items-center gap-1 group-hover/item:text-[#F59E0B] transition-colors">
+                  {item.title} <BadgeCheck className="w-3 h-3 text-[#22C55E]" />
                 </p>
-                <p className="text-[9px] uppercase tracking-widest text-[#7C3AED]">{item.platforms.split(',')[0]}</p>
+                <p className="text-[9px] font-orbitron font-bold uppercase tracking-widest text-[#9CA3AF]">{item.platforms.split(',')[0]}</p>
               </div>
               <div className="text-right">
-                <span className="text-[11px] font-bold text-amber-400 block whitespace-nowrap">{item.worth === "N/A" ? "FREE" : item.worth}</span>
+                <span className="text-[11px] font-mono font-bold text-[#F59E0B] block whitespace-nowrap bg-[#F59E0B]/10 px-2 py-0.5 rounded border border-[#F59E0B]/20">{item.worth === "N/A" ? "FREE" : item.worth}</span>
               </div>
             </motion.div>
           </Link>
         ))}
       </div>
       
-      <button onClick={onViewAll} type="button" className="w-full mt-4 py-2 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-1">
+      <button onClick={onViewAll} type="button" className="w-full mt-4 py-3 border border-[#F59E0B]/30 rounded-xl text-[10px] font-bold uppercase tracking-widest text-[#F59E0B] hover:text-[#070B14] hover:bg-[#F59E0B] transition-all flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(245,158,11,0.2)]">
         View All <ArrowRight className="w-3 h-3" />
       </button>
     </div>

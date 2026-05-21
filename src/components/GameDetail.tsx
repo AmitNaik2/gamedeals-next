@@ -223,38 +223,56 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
         </div>
       </div>
       
-      <div className="grid md:grid-cols-2 gap-8 mt-12 bg-white/5 border border-white/10 rounded-3xl p-6 lg:p-8">
+      <div className="grid md:grid-cols-2 gap-8 mt-12 bg-[#111827]/80 backdrop-blur-xl border border-white/5 rounded-3xl p-6 lg:p-10 shadow-[0_0_30px_rgba(0,0,0,0.3)]">
           <div>
-            <h2 className="text-xl font-serif italic opacity-90 mb-4 inline-flex items-center gap-2">
-              <Gamepad2 className="w-5 h-5 text-[#7C3AED]" /> 
-              {deal.type === 'Game Info' || deal.type === 'Price Comparison' || deal.type === 'Discount' ? `How to get ${deal.title}` : `How do I claim the ${deal.platforms.split(',')[0]} giveaway?`}
+            <h2 className="text-xl font-orbitron font-bold text-[#F9FAFB] glow-text mb-6 inline-flex items-center gap-3">
+              <Gamepad2 className="w-5 h-5 text-[#8B5CF6]" /> 
+              {deal.type === 'Game Info' || deal.type === 'Price Comparison' || deal.type === 'Discount' ? `Execution Protocol: ${deal.title}` : `Acquisition Protocol: ${deal.platforms.split(',')[0]} Sync`}
             </h2>
-            <p className="text-white/60 text-sm leading-relaxed whitespace-pre-wrap bg-black/40 p-5 rounded-2xl border border-white/5">
+            <p className="text-[#9CA3AF] text-sm leading-relaxed whitespace-pre-wrap bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 font-poppins h-full max-h-[400px] overflow-y-auto hidden-scrollbar">
               {deal.instructions}
             </p>
           </div>
           <div>
-             <h3 className="text-xl font-serif italic opacity-90 mb-4 inline-flex items-center gap-2"><BadgeCheck className="w-5 h-5 text-green-500" /> Offer Details</h3>
-             <ul className="space-y-4">
+             <h3 className="text-xl font-orbitron font-bold text-[#F9FAFB] glow-text mb-6 inline-flex items-center gap-3"><BadgeCheck className="w-5 h-5 text-[#06B6D4]" /> System Diagnostics</h3>
+             <ul className="space-y-4 font-poppins">
                {deal.type !== 'Game Info' && deal.type !== 'Price Comparison' && deal.type !== 'Discount' && (
-                 <li className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
+                 <li className="flex justify-between items-center bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 transition-colors hover:border-white/10">
                    <div className="flex flex-col">
-                     <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">Offer Ends</span>
-                     {deal.end_date !== "N/A" && <span className="text-sm font-bold text-white/80">Deal ends: {deal.end_date}</span>}
+                     <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-orbitron font-bold mb-1">Cycle Termination</span>
+                     {deal.end_date !== "N/A" && <span className="text-sm font-bold text-[#F9FAFB]">T-Minus: {deal.end_date}</span>}
                    </div>
-                   {deal.end_date !== "N/A" ? <Countdown endDate={deal.end_date} /> : <span className="text-sm font-mono text-rose-400 font-bold">Unknown (Hurry!)</span>}
+                   {deal.end_date !== "N/A" ? <Countdown endDate={deal.end_date} /> : <span className="text-sm font-mono text-[#EF4444] font-bold drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]">Unknown (Critical Info)</span>}
                  </li>
                )}
-               <li className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                 <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">Rarity Level</span>
-                 <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500">
+               <li className="flex justify-between items-center bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 transition-colors hover:border-white/10">
+                 <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-orbitron font-bold">Loot Tier</span>
+                 <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#EC4899] via-[#F59E0B] to-[#22C55E] uppercase tracking-widest text-[11px] font-orbitron drop-shadow-[0_0_5px_rgba(236,72,153,0.3)]">
                    {getDealRarity(deal).label}
                  </span>
                </li>
-               <li className="flex justify-between items-center bg-black/40 p-4 rounded-xl border border-white/5">
-                 <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">Platforms</span>
-                 <span className="text-sm text-white/80">{deal.platforms}</span>
+               <li className="flex justify-between items-center bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 transition-colors hover:border-white/10">
+                 <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-orbitron font-bold">Compatible Systems</span>
+                 <span className="text-sm text-[#F9FAFB] font-bold">{deal.platforms}</span>
                </li>
+               {deal.users > 0 && (
+                 <li className="flex justify-between items-center bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 transition-colors hover:border-white/10">
+                    <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-orbitron font-bold">Active Syncs</span>
+                    <span className="text-sm text-[#06B6D4] font-bold flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(6,182,212,0.5)]">
+                        <Users className="w-3.5 h-3.5" />
+                        {deal.users.toLocaleString()} Nodes
+                    </span>
+                 </li>
+               )}
+               {deal.steamRatingPercent && (
+                  <li className="flex justify-between items-center bg-[#070B14]/80 p-5 rounded-2xl border border-white/5 transition-colors hover:border-white/10">
+                     <span className="text-[10px] uppercase tracking-widest text-[#9CA3AF] font-orbitron font-bold">Consensus</span>
+                     <span className="text-sm text-[#F59E0B] font-bold flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(245,158,11,0.5)]">
+                         <Star className="w-3.5 h-3.5 fill-current" />
+                         {deal.steamRatingPercent}% Rating
+                     </span>
+                  </li>
+               )}
              </ul>
           </div>
       </div>

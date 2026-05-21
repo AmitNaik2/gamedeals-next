@@ -11,8 +11,6 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
   const gameInfo = useIgdb(deal?.title);
   if (!deal) return null;
 
-  // Removed simulated scores
-  
   const bgImage = gameInfo?.background_image || deal.image || deal.thumbnail;
   const rewrittenSummary = generateUniqueSummary(deal.title, deal.description, deal.type, deal.platforms);
   const tags = generateTags(deal.title, deal.platforms, deal.type, deal.description);
@@ -21,52 +19,56 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative group overflow-hidden rounded-2xl h-[340px] sm:h-[400px] border border-white/10 mb-8"
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="relative group overflow-hidden rounded-3xl h-[400px] sm:h-[450px] border border-white/10 mb-12 shadow-[0_0_40px_rgba(139,92,246,0.15)] bg-[#070B14]"
     >
       <div className="absolute inset-0 z-0">
         <img 
           src={bgImage} 
           alt={deal.title} 
-          className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" 
+          className="w-full h-full object-cover opacity-50 group-hover:scale-110 group-hover:opacity-70 transition-all duration-1000 ease-out" 
           loading="eager"
           fetchPriority="high"
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/60 to-transparent z-10"></div>
       
-      <div className="absolute top-6 left-6 z-20 px-3 py-1 bg-[#7C3AED] text-white text-[10px] font-bold uppercase tracking-widest rounded shadow-lg backdrop-blur-md flex items-center gap-2">
-        Featured Freebie
-        {gameInfo?.rating && <span className="ml-2 pl-2 border-l border-white/30 text-amber-400">STAR {Math.round(gameInfo.rating)}</span>}
+      <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white text-[10px] font-orbitron font-bold uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center gap-2">
+        Featured Drop
+        {gameInfo?.rating && <span className="ml-2 pl-2 border-l border-white/30 text-white flex items-center gap-1">★ {Math.round(gameInfo.rating)}</span>}
       </div>
 
-      <div className="absolute bottom-8 left-6 sm:left-8 z-20 max-w-full sm:max-w-[80%] pr-6">
-        <div className="flex flex-wrap items-center gap-2 mb-3 text-[10px] uppercase font-mono tracking-widest text-[#7C3AED]">
+      <div className="absolute bottom-8 left-6 sm:left-10 z-20 max-w-full sm:max-w-[75%] pr-6 font-poppins">
+        <div className="flex flex-wrap items-center gap-2 mb-4 text-[10px] uppercase font-bold tracking-widest text-[#06B6D4]">
           {tags.map((tag, idx) => (
-             <span key={idx} className="bg-[#7C3AED]/20 px-2 py-0.5 rounded border border-[#7C3AED]/30 flex items-center gap-1">
+             <span key={idx} className="bg-[#06B6D4]/10 px-2 py-1 rounded-md border border-[#06B6D4]/30 backdrop-blur-md">
                {tag}
              </span>
           ))}
         </div>
-        <Link to={gameUrl} className="block w-fit">
-          <h2 className="text-3xl sm:text-5xl font-serif italic mb-3 text-white leading-tight hover:text-[#7C3AED] transition-colors">
+        <Link to={gameUrl} className="block w-fit group/title">
+          <h2 className="text-4xl sm:text-6xl font-orbitron font-black mb-4 text-[#F9FAFB] leading-tight group-hover/title:text-[#8B5CF6] group-hover/title:glow-text transition-all duration-300">
             {deal.title}
           </h2>
         </Link>
-        <p className="text-xs sm:text-sm text-white/80 mb-6 line-clamp-2 max-w-xl font-medium">
+        <p className="text-sm sm:text-base text-[#9CA3AF] mb-8 line-clamp-2 max-w-2xl font-light">
           {rewrittenSummary}
         </p>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-6">
           <Link
             to={gameUrl}
-            className="px-6 py-3 bg-white text-black text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#7C3AED] hover:text-white transition-colors flex items-center gap-2 rounded-sm"
+            className="px-8 py-4 bg-white text-black text-[12px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#06B6D4] hover:text-white transition-all duration-300 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:scale-105"
           >
-            Claim Now
+            Claim Drop
           </Link>
           <Countdown endDate={deal.end_date} />
         </div>
       </div>
+      
+      {/* Decorative Overlays */}
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B5CF6]/20 blur-[100px] pointer-events-none z-10 mix-blend-screen"></div>
+      <div className="absolute bottom-0 right-0 w-64 h-64 bg-[#06B6D4]/20 blur-[100px] pointer-events-none z-10 mix-blend-screen"></div>
     </motion.div>
   );
 }
