@@ -153,11 +153,6 @@ app.use(express.json());
     }
   });
 
-  app.post("/api/subscribe", async (req, res) => {
-    // Dummy response representing a successful subscription
-    return res.status(200).json({ success: true });
-  });
-
   app.post("/api/activity-check", (req, res) => {
     res.json({ activeUsers: Math.floor(Math.random() * 50) + 10 });
   });
