@@ -1,14 +1,21 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "functions": {
-    "api/**/*.ts": {
-      "includeFiles": "dist/**"
+    "api/index.ts": {
+      "includeFiles": "dist/**",
+      "maxDuration": 30
     }
   },
   "rewrites": [
     {
-      "source": "/(assets/.*|ads\\.txt|og-image\\.jpg)",
+      "source": "/(assets/.*|ads\\.txt|og-image\\.jpg|robots\\.txt|google[a-z0-9]+\\.html)",
       "destination": "/$1"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/index"
     },
     {
       "source": "/(.*)",
