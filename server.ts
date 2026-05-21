@@ -84,6 +84,9 @@ app.use(express.json());
 
   async function fetchGamerPower(url: string) {
     const cached = gamerPowerCache.get(url);
+    if (cached && Date.now() - cached.timestamp < 300000) {
+       return cached.data;
+    }
     const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" };
     
     try {
@@ -153,14 +156,6 @@ app.use(express.json());
     }
   });
 
-  app.post("/api/activity-check", (req, res) => {
-    res.json({ activeUsers: Math.floor(Math.random() * 50) + 10 });
-  });
-
-  app.post("/api/contact-submit", (req, res) => {
-    res.json({ success: true });
-  });
-
   // Proxy the GamerPower API for Loot/Promo codes
   app.get("/api/dlc-feed", async (req, res) => {
     try {
@@ -202,6 +197,9 @@ app.use(express.json());
 
   async function fetchCheapshark(url: string) {
     const cached = cheapsharkCache.get(url);
+    if (cached && Date.now() - cached.timestamp < 300000) {
+       return cached.data;
+    }
     const headers = { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" };
     try {
       const controller = new AbortController();
@@ -754,7 +752,7 @@ app.use(express.json());
       });
     }
 
-    return news.sort(() => Math.random() - 0.5).slice(0, 5);
+    return news.slice(0, 5);
   }
 
   async function refreshNewsCache() {
