@@ -31,8 +31,11 @@ export function Archive() {
           });
           setDeals(expiredDeals.slice(0, 100)); // Limit to most recent 100
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(err);
+        if (err.message === 'Failed to fetch') {
+           // Ignored as it might be network disconnect
+        }
       } finally {
         setLoading(false);
       }

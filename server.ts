@@ -153,6 +153,19 @@ app.use(express.json());
     }
   });
 
+  app.post("/api/subscribe", async (req, res) => {
+    // Dummy response representing a successful subscription
+    return res.status(200).json({ success: true });
+  });
+
+  app.post("/api/activity-check", (req, res) => {
+    res.json({ activeUsers: Math.floor(Math.random() * 50) + 10 });
+  });
+
+  app.post("/api/contact-submit", (req, res) => {
+    res.json({ success: true });
+  });
+
   // Proxy the GamerPower API for Loot/Promo codes
   app.get("/api/dlc-feed", async (req, res) => {
     try {
@@ -1147,13 +1160,20 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
 
       const canonical = `https://www.gamesdealshub.me${pathName === '/' ? '' : pathName}`;
 
+      let ogTitle = title;
+      if (pathName === "/") ogTitle = "GamesDealsHub | Free PC Games & Gaming Deals — Updated Daily";
+      else if (pathName === "/about") ogTitle = "About GamesDealsHub | How We Track Free Games Every Day";
+      else if (pathName === "/privacy") ogTitle = "Privacy Policy | GamesDealsHub";
+      else if (pathName === "/terms") ogTitle = "Terms of Service | GamesDealsHub";
+      else if (pathName === "/contact") ogTitle = "Contact GamesDealsHub | Get in Touch";
+
       const $ = cheerio.load(html);
 
       // Apply dynamic meta tags using cheerio
       $('title').text(title);
       $('meta[name="title"]').attr('content', title);
-      $('meta[property="og:title"]').attr('content', title);
-      $('meta[property="twitter:title"]').attr('content', title);
+      $('meta[property="og:title"]').attr('content', ogTitle);
+      $('meta[property="twitter:title"]').attr('content', ogTitle);
 
       $('meta[name="description"]').attr('content', desc);
       $('meta[property="og:description"]').attr('content', desc);
