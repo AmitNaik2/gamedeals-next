@@ -146,6 +146,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"Games" | "DLC" | "Premium">("Games");
   
   const [deals, setDeals] = useState<GameDeal[]>([]); // This will just be Free Games now
+  const [upcomingDeals, setUpcomingDeals] = useState<GameDeal[]>([]);
   const [dlcDeals, setDlcDeals] = useState<GameDeal[]>([]);
   const [premiumDeals, setPremiumDeals] = useState<GameDeal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,6 +158,36 @@ export default function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
   const [sortOption, setSortOption] = useState<string>('Newest');
+
+  const fetchDeals = async (refresh = false) => {
+    try {
+      if (!refresh) setLoading(true);
+      else setIsRefreshing(true);
+      setError(null);
+
+      const [resGames, resUpcoming] = await Promise.all([
+        fetch("/api/giveaways-feed?type=game"),
+        fetch("/api/upcoming-free-games")
+      ]);
+
+      if (!resGames.ok) throw new Error("Failed to load active games");
+      if (!resUpcoming.ok) throw new Error("Failed to load upcoming games");
+
+      const [games, upcoming] = await Promise.all([
+        resGames.json(),
+        resUpcoming.json()
+      ]);
+      
+      setDeals(games || []);
+      setUpcomingDeals(upcoming || []);
+      setLastRefreshed(new Date());
+    } catch (err: any) {
+      setError(err.message === 'Failed to fetch' ? 'Connection lost' : err.message);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
   
   const sortedGamesDeals = useMemo(() => {
     let result = deals.filter(deal => {
@@ -271,39 +302,6 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shareData, setShareData] = useState<{ title: string; url: string } | null>(null);
 
-  const fetchDeals = async (showRefreshIndicator = false) => {
-    if (showRefreshIndicator) setIsRefreshing(true);
-    if (deals.length === 0) setLoading(true);
-    setError(null);
-    
-    try {
-      const gamerpowerRes = await fetch("/api/giveaways-feed");
-      
-      if (!gamerpowerRes.ok) {
-         throw new Error("Game deals server is temporarily blocking our requests (Error " + gamerpowerRes.status + "). Please try again later.");
-      }
-      
-      let allDeals: GameDeal[] = [];
-      const text = await gamerpowerRes.text();
-      let data;
-      try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/giveaways-feed"); }
-      if (data.status !== 0 && Array.isArray(data)) {
-        allDeals = data.filter((d: any) => d.type === "Game" || d.type === "Early Access");
-      }
-
-      setDeals(allDeals);
-      setLastRefreshed(new Date());
-      setError(null);
-    } catch (err: any) {
-      console.error(err);
-      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
-      setError(errorMessage || "Failed to load deals. Please try again.");
-    } finally {
-      if (showRefreshIndicator) setIsRefreshing(false);
-      setLoading(false);
-    }
-  };
-
   const fetchDlc = async () => {
     setDlcLoading(true);
     try {
@@ -316,7 +314,6 @@ export default function App() {
       try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/dlc-feed"); }
       setDlcDeals(data);
     } catch (err: any) {
-      console.error(err);
       const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
       setError(errorMessage || "Failed to load Free DLC. Please try again.");
     } finally {
@@ -379,7 +376,6 @@ export default function App() {
         }));
         setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount" || d.type === "Price Comparison" || d.type === "Game Info"));
     } catch (err: any) {
-      console.error(err);
       const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
       setError(errorMessage || "Failed to load Premium Deals. Please try again.");
     } finally {
@@ -891,7 +887,7 @@ export default function App() {
           {/* Right Sidebar (Feeds) */}
           <aside className="xl:w-72 shrink-0 xl:sticky xl:top-24 space-y-6 mt-12 xl:mt-0 pt-8 xl:pt-0 border-t xl:border-t-0 border-white/10">
             <LiveFeed deals={activeGamesDeals} />
-            <UpcomingDrops deals={activeGamesDeals} onViewAll={goFreeGames} />
+            <UpcomingDrops deals={upcomingDeals} onViewAll={goFreeGames} />
             <GamingNews />
             <div className="pt-4 border-t border-white/10 hidden xl:block">
               <InlineSubscribe />

@@ -17,7 +17,9 @@ export function useRawg(title: string) {
         .then(json => {
           if (json && !json.not_found && !json.error) setData(json);
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+           // Silently fail on network/adblocker errors
+        });
     }, 1000 + Math.random() * 2000); // stagger to prevent burst
 
     return () => clearTimeout(timer);

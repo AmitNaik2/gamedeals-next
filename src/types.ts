@@ -10,6 +10,7 @@ export interface GameDeal {
   published_date: string;
   type: string;
   platforms: string;
+  start_date?: string;
   end_date: string;
   users: number;
   status: string;

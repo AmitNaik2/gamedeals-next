@@ -33,7 +33,9 @@ export function useIgdb(title: string) {
            setData(json);
          }
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+         // Silently fail on network/adblocker errors
+      });
 
     return () => { isMounted = false; };
   }, [title]);
