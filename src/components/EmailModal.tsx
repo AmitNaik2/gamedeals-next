@@ -69,7 +69,8 @@ export function EmailModal({ isOpen, onClose, dealTitle, dealUrl }: EmailModalPr
       }, 3000);
     } catch (err: any) {
       setStatus("error");
-      setMessage(err.message || "Failed to send email. Please try again.");
+      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
+      setMessage(errorMessage || "Failed to send email. Please try again.");
     }
   };
 

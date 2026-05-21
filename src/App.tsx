@@ -277,7 +277,8 @@ export default function App() {
       setError(null);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to load deals. Please try again.");
+      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
+      setError(errorMessage || "Failed to load deals. Please try again.");
     } finally {
       if (showRefreshIndicator) setIsRefreshing(false);
       setLoading(false);
@@ -297,7 +298,8 @@ export default function App() {
       setDlcDeals(data);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to load Free DLC. Please try again.");
+      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
+      setError(errorMessage || "Failed to load Free DLC. Please try again.");
     } finally {
       setDlcLoading(false);
     }
@@ -359,7 +361,8 @@ export default function App() {
         setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount" || d.type === "Price Comparison" || d.type === "Game Info"));
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to load Premium Deals. Please try again.");
+      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
+      setError(errorMessage || "Failed to load Premium Deals. Please try again.");
     } finally {
       setPremiumLoading(false);
     }

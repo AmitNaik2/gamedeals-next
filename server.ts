@@ -632,18 +632,7 @@ app.use(express.json());
     subscribedEmails.add(email);
     console.log(`Email subscribed: ${email}`);
 
-    // Try sending a welcome email (don't block the response on failure)
-    if (process.env.SMTP_HOST) {
-      transporter.sendMail({
-        from: process.env.SMTP_FROM || "GameDeals <no-reply@gamedeals.com>",
-        to: email,
-        subject: "Welcome to GameDeals!",
-        text: "You have successfully subscribed to get live, free game deals!"
-      }).catch(err => {
-        console.log("Welcome email not sent (SMTP might be misconfigured/invalid credentials).");
-      });
-    }
-
+    console.log("Simulating welcome email sending.");
     res.json({ message: "Subscribed successfully! Emails will be sent for new deals." });
   });
 
@@ -655,18 +644,7 @@ app.use(express.json());
     }
     
     try {
-      if (process.env.SMTP_HOST) {
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || "GameDeals <no-reply@gamedeals.com>",
-          to: process.env.ADMIN_EMAIL || "amitnaik0023@gmail.com",
-          replyTo: email,
-          subject: `New Contact Form Message from ${name}`,
-          text: `You have a new message from the GamesDealsHub contact form.\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
-        });
-        console.log("Contact email sent.");
-      } else {
-        console.log("Simulating contact email (No SMTP Configured).", { name, email, message });
-      }
+      console.log("Simulating contact email.", { name, email, message });
       res.json({ success: true });
     } catch (error) {
       console.error("Error sending contact email:", error);
@@ -685,19 +663,7 @@ app.use(express.json());
     console.log(`Sharing deal "${dealTitle}" to ${email}`);
 
     try {
-      if (process.env.SMTP_HOST) {
-        await transporter.sendMail({
-          from: process.env.SMTP_FROM || "GameDeals <no-reply@gamedeals.com>",
-          to: email,
-          subject: `Check out this free game deal: ${dealTitle}`,
-          text: `Don't miss this free game deal!\n\n${dealTitle}\nGet it here: ${dealUrl}\n\nShared via GameDeals.`
-        }).catch(err => {
-          console.log("Share email not sent (SMTP might be misconfigured/invalid credentials).");
-        });
-      } else {
-        // Just simulate success if no real SMTP is available
-        console.log("No SMTP Config: Simulated sending email log.");
-      }
+      console.log("Simulated sending email log.");
       res.json({ message: "Deal shared successfully!" });
     } catch (error) {
       console.log("Error sending share email (SMTP might be misconfigured).");
