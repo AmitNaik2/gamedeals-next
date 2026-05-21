@@ -48,11 +48,10 @@ app.use(express.json());
 
 // Set up Nodemailer transporter
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.ethereal.email",
-    port: parseInt(process.env.SMTP_PORT || "587", 10),
+    service: "gmail",
     auth: {
-      user: process.env.SMTP_USER || "test_user",
-      pass: process.env.SMTP_PASS || "test_pass",
+      user: process.env.SMTP_USER || "gamedealshub1@gmail.com",
+      pass: process.env.SMTP_PASS || "Amit_Naik12",
     },
   });
 
@@ -632,7 +631,18 @@ app.use(express.json());
     subscribedEmails.add(email);
     console.log(`Email subscribed: ${email}`);
 
-    console.log("Simulating welcome email sending.");
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
+        to: email,
+        subject: "Welcome to GameDeals!",
+        text: "You have successfully subscribed to get live, free game deals!"
+      });
+      console.log("Welcome email sent.");
+    } catch (err) {
+      console.error("Welcome email not sent:", err);
+    }
+    
     res.json({ message: "Subscribed successfully! Emails will be sent for new deals." });
   });
 
@@ -644,7 +654,14 @@ app.use(express.json());
     }
     
     try {
-      console.log("Simulating contact email.", { name, email, message });
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
+        to: process.env.ADMIN_EMAIL || "amitnaik0023@gmail.com",
+        replyTo: email,
+        subject: `New Contact Form Message from ${name}`,
+        text: `You have a new message from the GamesDealsHub contact form.\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+      });
+      console.log("Contact email sent.");
       res.json({ success: true });
     } catch (error) {
       console.error("Error sending contact email:", error);
@@ -663,11 +680,17 @@ app.use(express.json());
     console.log(`Sharing deal "${dealTitle}" to ${email}`);
 
     try {
-      console.log("Simulated sending email log.");
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
+        to: email,
+        subject: `Check out this free game deal: ${dealTitle}`,
+        text: `Don't miss this free game deal!\n\n${dealTitle}\nGet it here: ${dealUrl}\n\nShared via GameDeals.`
+      });
+      console.log("Share email sent.");
       res.json({ message: "Deal shared successfully!" });
     } catch (error) {
-      console.log("Error sending share email (SMTP might be misconfigured).");
-      res.json({ message: "Deal shared successfully! (Simulated)" });
+      console.error("Error sending share email:", error);
+      res.status(500).json({ error: "Failed to send share email" });
     }
   });
 
