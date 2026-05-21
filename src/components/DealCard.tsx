@@ -47,8 +47,6 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
   };
 
   const platforms = deal.platforms.split(',').map(p => p.trim());
-  const primaryStore = platforms[0] || "Store";
-  const claimUrl = deal.open_giveaway_url || gameUrl;
   const rarity = getDealRarity(deal);
   
   // Trust Score Simulation
@@ -202,27 +200,12 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
             >
               Remind Me
             </button>
-            {deal.open_giveaway_url ? (
-              <a
-                href={deal.open_giveaway_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
-              >
-                {deal.type === "Game Info"
-                  ? "Get Info"
-                  : deal.salePrice
-                    ? `View on ${primaryStore}`
-                    : `Claim free on ${primaryStore}`}
-              </a>
-            ) : (
-              <Link
-                to={claimUrl}
-                className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
-              >
-                {deal.type === "Game Info" ? "Get Info" : deal.salePrice ? "View Deal" : "Claim Free"}
-              </Link>
-            )}
+            <Link 
+              to={gameUrl}
+              className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
+             >
+              {deal.type === 'Game Info' ? "Get Info" : (deal.salePrice ? "View Deal" : "Claim Free")}
+            </Link>
           </div>
         </div>
       </div>

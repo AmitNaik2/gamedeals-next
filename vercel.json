@@ -1,46 +1,18 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "build": {
-    "env": {
-      "NODE_OPTIONS": "--max-old-space-size=6144"
-    }
-  },
   "functions": {
-    "api/index.ts": {
-      "includeFiles": "dist/**",
-      "maxDuration": 30
+    "api/**/*.ts": {
+      "includeFiles": "dist/**"
     }
   },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index"
-    },
-    {
-      "source": "/(assets/.*|ads\\.txt|og-image\\.jpg|robots\\.txt|google[a-z0-9]+\\.html)",
+      "source": "/(assets/.*|ads\\.txt|og-image\\.jpg)",
       "destination": "/$1"
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/index"
     },
     {
       "source": "/(.*)",
       "destination": "/api/index"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, s-maxage=3600, stale-while-revalidate=86400"
-        }
-      ]
     }
   ]
 }

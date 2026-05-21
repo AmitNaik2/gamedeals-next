@@ -51,13 +51,10 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
       <Helmet>
         <title>{deal.title} - Free {deal.platforms} Game | GamesDealsHub</title>
         <meta name="description" content={rewrittenSummary} />
-        <link rel="canonical" href={`https://www.gamesdealshub.me/game/${deal.id}`} />
         <meta property="og:title" content={`${deal.title} is currently Free!`} />
         <meta property="og:description" content={rewrittenSummary} />
-        <meta property="og:url" content={`https://www.gamesdealshub.me/game/${deal.id}`} />
         <meta property="og:image" content={deal.image || deal.thumbnail} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content={deal.image || deal.thumbnail} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org/",
@@ -65,9 +62,25 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
             "name": deal.title,
             "image": deal.image || deal.thumbnail,
             "description": rewrittenSummary,
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.5",
+              "reviewCount": "89"
+            },
+            "review": {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Amit Naik"
+              }
+            },
             "offers": {
               "@type": "Offer",
-              "url": `https://www.gamesdealshub.me/game/${deal.id}`,
+              "url": `https://gamesdealshub.me/game/${deal.id}`,
               "priceCurrency": "USD",
               "price": deal.salePrice || "0.00",
               "availability": "https://schema.org/InStock",

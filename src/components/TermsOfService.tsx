@@ -7,13 +7,9 @@ export function TermsOfService() {
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
       <Helmet>
         <title>Terms of Service | GamesDealsHub</title>
-        <meta name="description" content="GamesDealsHub terms of service: acceptable use, third-party store links, affiliate disclosure, and warranty disclaimers." />
+        <meta name="description" content="Review the terms and conditions for using GamesDealsHub." />
         <link rel="canonical" href="https://www.gamesdealshub.me/terms" />
-        <meta property="og:url" content="https://www.gamesdealshub.me/terms" />
-        <meta property="og:description" content="GamesDealsHub terms of service: acceptable use, third-party store links, affiliate disclosure, and warranty disclaimers." />
         <meta property="og:image" content="https://www.gamesdealshub.me/og-image.jpg" />
-        <meta name="twitter:url" content="https://www.gamesdealshub.me/terms" />
-        <meta name="twitter:description" content="GamesDealsHub terms of service: acceptable use, third-party store links, affiliate disclosure, and warranty disclaimers." />
         <meta name="twitter:image" content="https://www.gamesdealshub.me/og-image.jpg" />
       </Helmet>
 

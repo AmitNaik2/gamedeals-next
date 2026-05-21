@@ -15,10 +15,6 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
-    build: {
-      chunkSizeWarningLimit: 700,
-      reportCompressedSize: false,
-    },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify-file watching is disabled to prevent flickering during agent edits.

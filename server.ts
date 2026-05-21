@@ -153,23 +153,6 @@ app.use(express.json());
     }
   });
 
-  app.get("/api/expired-feed", async (_req, res) => {
-    try {
-      const data = await fetchGamerPower("https://www.gamerpower.com/api/giveaways?sort-by=date");
-      if (!Array.isArray(data)) {
-        res.json([]);
-        return;
-      }
-      const expired = data
-        .filter((deal: { end_date?: string; status?: string }) => !isActiveGiveaway(deal))
-        .slice(0, 24);
-      res.json(expired);
-    } catch (error) {
-      console.error("Error fetching expired deals:", error);
-      res.json([]);
-    }
-  });
-
   // Proxy the GamerPower API for Loot/Promo codes
   app.get("/api/dlc-feed", async (req, res) => {
     try {
@@ -955,16 +938,6 @@ app.use(express.json());
     <loc>https://www.gamesdealshub.me/free-epic-games</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.gamesdealshub.me/free-gog-games</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://www.gamesdealshub.me/expired</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.6</priority>
   </url>`;
       
       if (Array.isArray(data)) {
@@ -1049,19 +1022,19 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
 
       if (pathName === "/about") {
         title = "About Us | GamesDealsHub";
-        desc = "Learn how GamesDealsHub finds and tracks free PC game deals from Epic Games, Steam, and GOG every day.";
+        desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
         preRenderedContent = `<h1>About Us</h1><p>${desc}</p>`;
       } else if (pathName === "/privacy") {
         title = "Privacy Policy | GamesDealsHub";
-        desc = "Read the GamesDealsHub privacy policy — how we collect, use, and protect your data.";
+        desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
         preRenderedContent = `<h1>Privacy Policy</h1><p>${desc}</p>`;
       } else if (pathName === "/terms") {
         title = "Terms of Service | GamesDealsHub";
-        desc = "GamesDealsHub terms of service — rules for using our free game deals tracker.";
+        desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
         preRenderedContent = `<h1>Terms of Service</h1><p>${desc}</p>`;
       } else if (pathName === "/contact") {
         title = "Contact Us | GamesDealsHub";
-        desc = "Get in touch with the GamesDealsHub team. Report a missing deal or send us feedback.";
+        desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
         preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
       }
       // Dynamic specific game page
@@ -1101,15 +1074,9 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
           title = "Free Epic Games Weekly | GamesDealsHub";
           desc = "Don't miss the weekly free PC games from the Epic Games Store. Track the latest free Epic games here.";
           apiUrl = "https://www.gamerpower.com/api/giveaways?platform=epic-games-store";
-        } else if (pathName === "/free-gog-games") {
-          title = "DRM-Free GOG Games | GamesDealsHub";
-          desc = "DRM-free GOG giveaways. Active free titles to keep forever in your GOG library.";
-          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=gog";
         } else if (pathName === "/loot") {
           title = "Free Game Loot & Promo Codes | GamesDealsHub";
           apiUrl = "https://www.gamerpower.com/api/giveaways?type=loot";
-        } else if (pathName === "/") {
-          desc = "Track and claim free PC games before they expire. Updated daily with Epic, Steam, and GOG freebies.";
         }
         
         try {
@@ -1157,42 +1124,6 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
       if (ogImage) {
         $('meta[property="og:image"]').attr('content', ogImage);
         $('meta[property="twitter:image"]').attr('content', ogImage);
-      }
-
-      // Add Structured Data (JSON-LD)
-      let schemaJson = "";
-      if (pathName.startsWith("/game/")) {
-        schemaJson = JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Product",
-          "name": title,
-          "image": ogImage,
-          "description": desc,
-          "offers": {
-            "@type": "Offer",
-            "price": "0.00",
-            "priceCurrency": "USD",
-            "availability": "https://schema.org/InStock"
-          }
-        });
-      } else {
-        schemaJson = JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "GamesDealsHub",
-          "url": canonical,
-          "description": desc,
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://www.gamesdealshub.me/?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
-        });
-      }
-      
-      if (schemaJson) {
-        $('script[type="application/ld+json"]').remove();
-        $('head').append(`<script type="application/ld+json">\n${schemaJson}\n</script>`);
       }
 
       if (preRenderedContent) {
