@@ -204,7 +204,7 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
               to={gameUrl}
               className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
              >
-              {deal.type === 'Game Info' ? "Get Info" : (deal.salePrice ? "View Deal" : "Claim Free")}
+              {deal.type === 'Game Info' ? "Get Info" : (deal.platforms.toLowerCase().includes('epic') ? "Claim on Epic" : deal.platforms.toLowerCase().includes('steam') ? "Get on Steam" : deal.platforms.toLowerCase().includes('gog') ? "Grab on GOG" : "Claim Free")}
             </Link>
           </div>
         </div>

@@ -1037,6 +1037,10 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
         title = "Contact Us | GamesDealsHub";
         desc = "Get in touch with the GamesDealsHub team. Report a missing deal or send us feedback.";
         preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
+      } else if (pathName === "/archive") {
+        title = "Expired Game Giveaways Archive | GamesDealsHub";
+        desc = "View the history of expired free PC game giveaways on Steam, Epic Games, and GOG. See what games were given away for free.";
+        preRenderedContent = `<h1>Giveaway Archive</h1><p>${desc}</p>`;
       }
       // Dynamic specific game page
       else if (pathName.startsWith("/game/")) {

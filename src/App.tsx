@@ -12,6 +12,7 @@ import { AboutUs } from "./components/AboutUs";
 import { ContactUs } from "./components/ContactUs";
 import { ArticleComparison } from "./components/ArticleComparison";
 import { Admin } from "./components/Admin";
+import { Archive } from "./components/Archive";
 import { EmailModal } from "./components/EmailModal";
 import { type GameDeal } from "./types";
 import { getDealRarity, type RarityLevel } from "./lib/deal-utils";
@@ -23,6 +24,7 @@ import { GamingNews } from "./components/GamingNews";
 import { TopNavbar } from "./components/TopNavbar";
 import { HeroSection } from "./components/HeroSection";
 import { SkeletonCard } from "./components/SkeletonCard";
+import { EmailSubscription } from "./components/EmailSubscription";
 
 function InlineSubscribe() {
   const [email, setEmail] = useState("");
@@ -152,10 +154,10 @@ export default function App() {
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
+  const [sortOption, setSortOption] = useState<string>('Newest');
   
-  const activeGamesDeals = useMemo(() => {
-    return deals.filter(deal => {
-      // Force hide deals expiring before May 20, 2026
+  const sortedGamesDeals = useMemo(() => {
+    let result = deals.filter(deal => {
       if (deal.end_date && deal.end_date !== 'N/A') {
          const endStr = deal.end_date.includes(' ') && !deal.end_date.includes('Z') && !deal.end_date.includes('GMT') 
            ? deal.end_date.replace(' ', 'T') + 'Z' 
@@ -167,7 +169,20 @@ export default function App() {
       }
       return true;
     });
-  }, [deals]);
+
+    if (sortOption === 'Alphabetical') {
+       result.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === 'Expiring soon') {
+       result.sort((a, b) => {
+         if (a.end_date === 'N/A') return 1;
+         if (b.end_date === 'N/A') return -1;
+         return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
+       });
+    }
+
+    return result;
+  }, [deals, sortOption]);
+  const activeGamesDeals = sortedGamesDeals;
 
   // URL-driven state sync
   const [platformSearch, setPlatformSearch] = useState("");
@@ -536,10 +551,16 @@ export default function App() {
           <div className="flex-1 w-full min-w-0">
             
             {/* Tabs */}
-            <div id="deals-tabs" className="flex items-center space-x-2 mb-6 border-b border-white/10 pb-0 overflow-x-auto hide-scrollbar flex-nowrap">
-               <button onClick={() => setActiveTab("Games")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Games" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free Games</button>
-               <button onClick={() => setActiveTab("DLC")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "DLC" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free DLC</button>
-               <button onClick={() => setActiveTab("Premium")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Premium" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Premium Deals</button>
+            <div id="deals-tabs" className="flex items-center justify-between mb-6 border-b border-white/10 pb-0 overflow-x-auto hide-scrollbar flex-nowrap">
+              <div className="flex items-center space-x-2">
+                 <button onClick={() => setActiveTab("Games")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Games" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free Games</button>
+                 <button onClick={() => setActiveTab("DLC")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "DLC" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Free DLC</button>
+                 <button onClick={() => setActiveTab("Premium")} className={cn("whitespace-nowrap px-6 py-3 text-[11px] md:text-xs font-bold uppercase tracking-widest transition-colors border-b-2", activeTab === "Premium" ? "text-white border-[#7C3AED] bg-white/5" : "text-white/40 border-transparent hover:text-white/80 hover:bg-white/5")}>Premium Deals</button>
+              </div>
+              <div className="hidden md:flex items-center gap-4 text-xs font-mono text-white/40 px-2 tracking-widest uppercase shrink-0">
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> {deals.length + dlcDeals.length} Free Games Tracker</span>
+                 <span><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#7C3AED]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
+              </div>
             </div>
 
             {activeTab === "Games" ? (
@@ -603,13 +624,13 @@ export default function App() {
                  </div>
                  {/* Quick platform toggles */}
                  <div className="flex gap-1 shrink-0">
-                   {['Steam', 'Epic Games', 'Xbox', 'PlayStation'].map(plat => (
+                   {['All', 'Epic Games', 'Steam', 'GOG', 'Prime Gaming', 'Ubisoft Connect'].map(plat => (
                        <button
                            key={plat}
-                           onClick={() => setPlatformSearch(plat === platformSearch ? '' : plat)}
+                           onClick={() => setPlatformSearch(plat === 'All' ? '' : plat)}
                            className={cn(
                                "px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-colors shrink-0",
-                               platformSearch.toLowerCase() === plat.toLowerCase()
+                               (plat === 'All' && !platformSearch) || (plat !== 'All' && platformSearch.toLowerCase() === plat.toLowerCase())
                                  ? "bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg"
                                  : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10"
                            )}
@@ -618,11 +639,25 @@ export default function App() {
                        </button>
                    ))}
                  </div>
+                 
+                 <div className="hidden xl:block h-6 w-px bg-white/10 shrink-0 mx-2"></div>
+                 
+                 <select 
+                    value={sortOption} 
+                    onChange={e => setSortOption(e.target.value)}
+                    className="bg-white/5 border border-white/10 text-white/70 text-[10px] font-bold uppercase tracking-widest rounded px-2 py-1.5 focus:outline-none focus:border-[#7C3AED] shrink-0"
+                 >
+                    <option value="Newest">Newest</option>
+                    <option value="Expiring soon">Expiring soon</option>
+                    <option value="Alphabetical">Alphabetical</option>
+                 </select>
               </div>
             </div>
             {activeGamesDeals.length > 0 && selectedRarity === 'All' && !platformSearch && (
                <FeaturedDeal deal={activeGamesDeals[0]} />
             )}
+            
+            <EmailSubscription />
 
             {loading ? (
               <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
@@ -897,6 +932,7 @@ export default function App() {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/article/hp-omen-16-vs-lenovo-loq" element={<ArticleComparison />} />
           <Route path="/admin" element={<Admin deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
+          <Route path="/archive" element={<Archive />} />
         </Routes>
       </main>
 
@@ -918,7 +954,8 @@ export default function App() {
             </div>
              <div className="flex flex-col gap-4">
                <span className="text-[#7C3AED] mb-2 font-black tracking-[0.2em]">Connect</span>
-               <button type="button" onClick={() => openExternalUrl("https://discord.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Discord</button>
+               <button type="button" onClick={() => openExternalUrl("https://discord.gg/gamesdealshub")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Join Discord Server</button>
+               <button type="button" onClick={() => openExternalUrl("https://reddit.com/r/GamesDealsHub")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Reddit Community</button>
                <button type="button" onClick={() => openExternalUrl("https://github.com")} className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">GitHub</button>
                <Link to="/contact" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">Contact Us</Link>
                <Link to="/about" className="text-left py-1 hover:text-white hover:translate-x-1 transition-all">About Us</Link>
