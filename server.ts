@@ -1128,10 +1128,102 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
     });
   }
 
+  // Deal Notifier Subsystem
+  const knownDealIds = new Set<string>();
+
+  async function checkAndNotifyDeals() {
+    if (subscribedEmails.size === 0) return; // No one subscribed
+
+    try {
+      const url = "https://www.gamerpower.com/api/giveaways?sort-by=date";
+      let data = await fetchGamerPower(url);
+      if (!Array.isArray(data)) return;
+
+      const trustedPlatforms = ['steam', 'epic', 'xbox', 'playstation', 'ps4', 'ps5', 'origin', 'battle.net', 'ubisoft', 'ea', 'gog', 'pc', 'itch.io', 'nintendo'];
+      data = data.filter((deal: any) => {
+        if (!deal.platforms) return false;
+        const plats = deal.platforms.toLowerCase();
+        return isActiveGiveaway(deal) && trustedPlatforms.some(t => plats.includes(t));
+      }).slice(0, 10); // Check latest 10 deals
+
+      const newDeals = data.filter((deal: any) => !knownDealIds.has(deal.id.toString()));
+
+      if (newDeals.length > 0 && knownDealIds.size > 0) {
+        for (const deal of newDeals) {
+          knownDealIds.add(deal.id.toString());
+          
+          const emails = Array.from(subscribedEmails);
+          for (const email of emails) {
+            try {
+              await transporter.sendMail({
+                from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
+                to: email,
+                subject: `New Free Game: ${deal.title}!`,
+                text: `A new free game deal is available!\n\n${deal.title}\n${deal.description}\n\nGet it here: ${deal.open_giveaway_url || deal.gamerpower_url}`
+              });
+              console.log(`Sent new deal notification to ${email} for ${deal.title}`);
+            } catch (err) {
+              console.error(`Failed to send deal notification to ${email}:`, err);
+            }
+          }
+        }
+      } else if (newDeals.length > 0) {
+        // First run: just populate the set to prevent spamming old deals to new server session
+        for (const deal of newDeals) {
+          knownDealIds.add(deal.id.toString());
+        }
+      }
+    } catch (err) {
+      console.error("Error in checkAndNotifyDeals:", err);
+    }
+  }
+
+  // API to manually trigger test deal for debug purposes
+  app.post("/api/admin/trigger-test-deal", async (req, res) => {
+    let targetEmails = Array.from(subscribedEmails);
+    
+    if (targetEmails.length === 0) {
+      // If no one is subscribed, we'll try to just send to the admin for testing
+      targetEmails = ["ujjwal53107@gmail.com"];
+    }
+
+    try {
+      for (const tMail of targetEmails) {
+        await transporter.sendMail({
+          from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
+          to: tMail,
+          subject: `TEST: New Free Game: Epic Adventure!`,
+          text: `A new free game deal is available! (This is a test notification)\n\nEpic Adventure\nAn amazing game that is temporarily free.\n\nGet it here: https://example.com/test-deal`
+        });
+        console.log(`Sent TEST deal notification to ${tMail}`);
+      }
+      res.json({ success: true, message: "Test deal sent." });
+    } catch (err: any) {
+      console.error("Failed to send test deal:", err);
+      res.status(500).json({ error: "Failed to send test deal", details: err.message });
+    }
+  });
+
+  app.post("/api/admin/trigger-deal-check", async (req, res) => {
+    // For test purposes, we can force send
+    checkAndNotifyDeals();
+    res.json({ success: true, message: "Deal check triggered." });
+  });
+
   if (!process.env.VERCEL) {
     const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`Server running on http://0.0.0.0:${PORT}`);
       refreshNewsCache().catch(() => {});
+      
+      // Auto run deal checks every 15 minutes
+      const dealsTimer = setInterval(() => {
+         checkAndNotifyDeals().catch(() => {});
+      }, 15 * 60 * 1000);
+      dealsTimer.unref?.();
+      
+      setTimeout(() => {
+        checkAndNotifyDeals().catch(() => {});
+      }, 5000); // 5 secs after start
     });
   }
   
