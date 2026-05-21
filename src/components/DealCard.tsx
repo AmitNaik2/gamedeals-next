@@ -98,6 +98,25 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
         </Link>
       </div>
 
+      {/* Structured Data */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "name": deal.title,
+          "image": bgImage,
+          "description": deal.description || `Free ${deal.title} game deal.`,
+          "offers": {
+            "@type": "Offer",
+            "url": `https://www.gamesdealshub.me${gameUrl}`,
+            "priceCurrency": "USD",
+            "price": deal.salePrice || "0.00",
+            "priceValidUntil": deal.end_date !== "N/A" ? deal.end_date : undefined,
+            "availability": "https://schema.org/InStock"
+          }
+        })}
+      </script>
+
       {/* Content Section */}
       <div className="flex flex-col p-4 sm:p-5 flex-grow">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-3">
@@ -185,7 +204,7 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
               to={gameUrl}
               className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#7C3AED] to-cyan-500 text-white text-xs font-bold uppercase tracking-widest rounded hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(124,58,237,0.4)]"
              >
-              {deal.type === 'Game Info' ? "Get Info" : (deal.salePrice ? "View Deal" : (platforms.length > 0 ? `Claim on ${platforms[0]}` : "Claim Now"))}
+              {deal.type === 'Game Info' ? "Get Info" : (deal.salePrice ? "View Deal" : "Claim Free")}
             </Link>
           </div>
         </div>

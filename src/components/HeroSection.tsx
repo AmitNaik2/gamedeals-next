@@ -66,7 +66,7 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
           </h2>
           
           <p className="text-white/60 text-lg mb-6 max-w-xl">
-            Steam, Epic Games, GOG, Prime Gaming & more. Don't miss out on premium AAA gaming deals.
+            Track the best free games from official stores like Steam, Epic Games, and GOG. Don't miss out on premium AAA giveaways.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8 text-white/50 text-sm font-medium">
@@ -75,7 +75,7 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
             <span className="flex items-center gap-1.5"><span className="text-emerald-400">✓</span> No Piracy</span>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4 mb-8">
             <button 
               onClick={onExploreClick}
               className="px-6 py-3 rounded-full bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.3)]">
@@ -86,6 +86,25 @@ export function HeroSection({ onExploreClick, onTrendingClick }: { onExploreClic
               className="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white font-bold uppercase tracking-widest text-xs hover:bg-white/10 transition-colors flex items-center gap-2">
               <TrendingUp className="w-4 h-4" /> Trending Games
             </button>
+          </div>
+
+          <form className="flex w-full max-w-sm items-center gap-2 mb-4" onSubmit={(e) => { e.preventDefault(); alert('Subscribed successfully!'); }}>
+            <input type="email" placeholder="Enter your email" required className="flex-1 h-10 px-4 rounded border border-white/20 bg-black/50 text-white placeholder:text-white/40 focus:outline-none focus:border-[#7C3AED] transition-colors" />
+            <button type="submit" className="h-10 px-4 rounded bg-[#7C3AED] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#6D28D9] transition-colors">
+              Notify Me
+            </button>
+          </form>
+
+          <div className="flex items-center gap-6 text-sm font-mono text-white/50 border-t border-white/10 pt-6 mt-2">
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-white">450K+</span>
+              <span className="text-[10px] uppercase tracking-widest">Games Claimed</span>
+            </div>
+            <div className="w-px h-8 bg-white/10"></div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-white">100+</span>
+              <span className="text-[10px] uppercase tracking-widest">Deals Tracked</span>
+            </div>
           </div>
         </motion.div>
       </div>

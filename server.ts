@@ -917,30 +917,26 @@ app.use(express.json());
   <url>
     <loc>https://www.gamesdealshub.me/</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>daily</changefreq>
+    <changefreq>hourly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.gamesdealshub.me/about</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.gamesdealshub.me/privacy</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.gamesdealshub.me/terms</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.gamesdealshub.me/contact</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -956,7 +952,7 @@ app.use(express.json());
   </url>`;
       
       if (Array.isArray(data)) {
-        data.slice(0, 50).forEach((deal: any) => {
+        data.slice(0, 100).forEach((deal: any) => {
           xml += `
   <url>
     <loc>https://www.gamesdealshub.me/game/${deal.id}</loc>
@@ -972,6 +968,15 @@ app.use(express.json());
       console.error("Error generating sitemap:", error);
       res.status(500).end();
     }
+  });
+
+  app.get("/robots.txt", (req, res) => {
+    res.header("Content-Type", "text/plain");
+    res.send(`User-agent: *
+Allow: /
+
+Sitemap: https://www.gamesdealshub.me/sitemap.xml
+`);
   });
 
   // Vite middleware for development
@@ -1005,8 +1010,8 @@ app.use(express.json());
     // Serve static files but skip for / so we can rewrite meta tags
     app.use(express.static(distPath, { index: false }));
     
-    // SPA fallback with basic SSR for meta tags
-    app.get("*", (req, res) => {
+    // SPA fallback with basic SSR for meta tags and crawler extraction
+    app.get("*", async (req, res) => {
       let html = baseHtml;
       if (!html) {
         return res.sendFile(path.join(distPath, "index.html"));
@@ -1015,19 +1020,88 @@ app.use(express.json());
       const pathName = req.path;
       let title = "GamesDealsHub | Track Free PC Games & Gaming Deals";
       let desc = "Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, GOG freebies, and limited-time premium AAA game promotions.";
+      let preRenderedContent = "";
 
       if (pathName === "/about") {
         title = "About Us | GamesDealsHub";
         desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
+        preRenderedContent = `<h1>About Us</h1><p>${desc}</p>`;
       } else if (pathName === "/privacy") {
         title = "Privacy Policy | GamesDealsHub";
         desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
+        preRenderedContent = `<h1>Privacy Policy</h1><p>${desc}</p>`;
       } else if (pathName === "/terms") {
         title = "Terms of Service | GamesDealsHub";
         desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
+        preRenderedContent = `<h1>Terms of Service</h1><p>${desc}</p>`;
       } else if (pathName === "/contact") {
         title = "Contact Us | GamesDealsHub";
         desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
+        preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
+      }
+      // Dynamic specific game page
+      else if (pathName.startsWith("/game/")) {
+        const id = pathName.split('/')[2];
+        try {
+          const dl = await fetchGamerPower(`https://www.gamerpower.com/api/giveaway?id=${id}`);
+          if (dl && dl.title) {
+            title = `${dl.title} - Free ${dl.platforms || 'PC'} Game | GamesDealsHub`;
+            desc = dl.description ? dl.description.substring(0, 160) + '...' : desc;
+            
+            preRenderedContent = `
+              <div class="game-deal-container" itemscope itemtype="https://schema.org/Product">
+                <h1 itemprop="name">${dl.title}</h1>
+                <img itemprop="image" src="${dl.image || dl.thumbnail}" alt="${dl.title}" />
+                <p><strong>Platform:</strong> ${dl.platforms}</p>
+                <p><strong>Type:</strong> ${dl.type}</p>
+                <p itemprop="description">${dl.description}</p>
+                <p>${dl.instructions}</p>
+                <a href="${dl.open_giveaway_url}">Claim Now</a>
+              </div>
+            `;
+            html = html.replace(/<meta property="og:image" content="[^"]*" \/>/gi, `<meta property="og:image" content="${dl.image || dl.thumbnail}" />`);
+          }
+        } catch (e) {
+          console.warn("SSR game fetch failed", e);
+        }
+      }
+      // Homepage and Categories
+      else {
+        let apiUrl = "https://www.gamerpower.com/api/giveaways?sort-by=popularity";
+        if (pathName === "/free-steam-games") {
+          title = "Free Steam Games & Weekends | GamesDealsHub";
+          desc = "Find the latest free Steam games, DLCs, and weekend free plays. Claim and keep them forever.";
+          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=steam";
+        } else if (pathName === "/free-epic-games") {
+          title = "Free Epic Games Weekly | GamesDealsHub";
+          desc = "Don't miss the weekly free PC games from the Epic Games Store. Track the latest free Epic games here.";
+          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=epic-games-store";
+        } else if (pathName === "/loot") {
+          title = "Free Game Loot & Promo Codes | GamesDealsHub";
+          apiUrl = "https://www.gamerpower.com/api/giveaways?type=loot";
+        }
+        
+        try {
+           const list = await fetchGamerPower(apiUrl);
+           if (Array.isArray(list)) {
+             preRenderedContent = `<h1>${title}</h1><ul>`;
+             list.slice(0, 20).forEach((item: any) => {
+                preRenderedContent += `
+                  <li>
+                    <a href="/game/${item.id}">
+                      <h2>${item.title}</h2>
+                      <img src="${item.thumbnail}" alt="${item.title}" loading="lazy" />
+                    </a>
+                    <p>${item.platforms} | ${item.type}</p>
+                    <p>${item.description}</p>
+                  </li>
+                `;
+             });
+             preRenderedContent += `</ul>`;
+           }
+        } catch(e) {
+           console.warn("SSR list fetch failed", e);
+        }
       }
 
       const canonical = `https://www.gamesdealshub.me${pathName === '/' ? '' : pathName}`;
@@ -1052,6 +1126,13 @@ app.use(express.json());
         /<link rel="canonical" href="([^"]*)" \/>/gi,
         `<link rel="canonical" href="${canonical}" />`
       );
+      
+      if (preRenderedContent) {
+        html = html.replace(
+          /<!-- Fallback content for SEO bots that do not execute JavaScript -->/gi,
+          `${preRenderedContent}\n<!-- Fallback content for SEO bots that do not execute JavaScript -->`
+        );
+      }
 
       res.send(html);
     });

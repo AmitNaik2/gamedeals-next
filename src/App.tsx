@@ -661,19 +661,49 @@ export default function App() {
               }
 
               return (
-                <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-                  <AnimatePresence mode="popLayout">
-                    {filteredDeals.map((deal, index) => (
-                      <DealCard
-                        key={deal.id}
-                        deal={deal}
-                        index={index}
-                        priority={index < 4}
-                        onShare={openShareModal}
-                        onRemind={openSubscribeModal}
-                      />
-                    ))}
-                  </AnimatePresence>
+                <div>
+                  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 mb-12">
+                    <AnimatePresence mode="popLayout">
+                      {filteredDeals.map((deal, index) => (
+                        <DealCard
+                          key={deal.id}
+                          deal={deal}
+                          index={index}
+                          priority={index < 4}
+                          onShare={openShareModal}
+                          onRemind={openSubscribeModal}
+                        />
+                      ))}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* History Section for Expired Deals */}
+                  {selectedRarity === 'All' && !platformSearch && (
+                    <div className="mt-16 border-t border-white/10 pt-12">
+                      <div className="flex items-center justify-between mb-8">
+                        <div>
+                          <h3 className="text-2xl font-bold font-serif italic text-white flex items-center gap-2">
+                            <span className="text-[#7C3AED]">Past</span> Giveaways
+                          </h3>
+                          <p className="text-sm text-white/50">Look at what you missed! Don't let it happen again.</p>
+                        </div>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                        {/* Mock historical deals */}
+                        {['Grand Theft Auto V', 'Death Stranding', 'Fallout: New Vegas'].map((title, i) => (
+                          <div key={i} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center gap-4">
+                            <div className="w-16 h-16 bg-white/10 rounded flex-shrink-0 flex items-center justify-center">
+                              <span className="text-[10px] uppercase font-bold text-white/40 tracking-widest text-center px-1">Expired</span>
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-white text-sm line-clamp-1">{title}</h4>
+                              <p className="text-[10px] uppercase text-[#7C3AED] font-bold tracking-widest mt-1">Epic Games</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })()}
