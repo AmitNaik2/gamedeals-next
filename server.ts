@@ -1016,25 +1016,26 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
 
       const pathName = req.path;
       let title = "GamesDealsHub | Track Free PC Games & Gaming Deals";
-      let desc = "Track and claim free PC games before they expire. Find Steam free weekends, Epic Games giveaways, GOG freebies, and limited-time premium AAA game promotions.";
+      let desc = "Track and claim free PC games before they expire. Updated daily with Epic, Steam, and GOG freebies.";
       let preRenderedContent = "";
       let ogImage = "https://www.gamesdealshub.me/og-image.jpg";
+      let jsonLd: any = null;
 
       if (pathName === "/about") {
         title = "About Us | GamesDealsHub";
-        desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
+        desc = "Learn how GamesDealsHub finds and tracks free PC game deals from Epic Games, Steam, and GOG every day.";
         preRenderedContent = `<h1>About Us</h1><p>${desc}</p>`;
       } else if (pathName === "/privacy") {
         title = "Privacy Policy | GamesDealsHub";
-        desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
+        desc = "Read the GamesDealsHub privacy policy — how we collect, use, and protect your data.";
         preRenderedContent = `<h1>Privacy Policy</h1><p>${desc}</p>`;
       } else if (pathName === "/terms") {
         title = "Terms of Service | GamesDealsHub";
-        desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
+        desc = "GamesDealsHub terms of service — rules for using our free game deals tracker.";
         preRenderedContent = `<h1>Terms of Service</h1><p>${desc}</p>`;
       } else if (pathName === "/contact") {
         title = "Contact Us | GamesDealsHub";
-        desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
+        desc = "Get in touch with the GamesDealsHub team. Report a missing deal or send us feedback.";
         preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
       }
       // Dynamic specific game page
@@ -1058,6 +1059,18 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
                 <a href="${dl.open_giveaway_url}">Claim Now</a>
               </div>
             `;
+            jsonLd = {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": dl.title,
+              "image": dl.image || dl.thumbnail,
+              "description": dl.description,
+              "offers": {
+                "@type": "Offer",
+                "priceCurrency": "USD",
+                "price": "0.00"
+              }
+            };
           }
         } catch (e) {
           console.warn("SSR game fetch failed", e);
@@ -1083,6 +1096,13 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
            const list = await fetchGamerPower(apiUrl);
            if (Array.isArray(list)) {
              preRenderedContent = `<h1 itemprop="name">${title}</h1><ul itemscope itemtype="https://schema.org/ItemList">`;
+             
+             jsonLd = {
+               "@context": "https://schema.org",
+               "@type": "ItemList",
+               "itemListElement": [] as any[]
+             };
+
              list.slice(0, 20).forEach((item: any, index: number) => {
                 preRenderedContent += `
                   <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
@@ -1095,6 +1115,24 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
                     <p itemprop="description">${item.description}</p>
                   </li>
                 `;
+                
+                jsonLd.itemListElement.push({
+                  "@type": "ListItem",
+                  "position": index + 1,
+                  "item": {
+                    "@type": "Product",
+                    "name": item.title,
+                    "url": `https://www.gamesdealshub.me/game/${item.id}`,
+                    "image": item.image || item.thumbnail,
+                    "offers": {
+                      "@type": "Offer",
+                      "priceCurrency": "USD",
+                      "price": "0.00",
+                      "availability": "https://schema.org/InStock",
+                      "itemCondition": "https://schema.org/NewCondition"
+                    }
+                  }
+                });
              });
              preRenderedContent += `</ul>`;
            }
@@ -1124,6 +1162,30 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
       if (ogImage) {
         $('meta[property="og:image"]').attr('content', ogImage);
         $('meta[property="twitter:image"]').attr('content', ogImage);
+      }
+
+      if (jsonLd) {
+        // Find existing script or append new one
+        const existingScript = $('script[type="application/ld+json"]');
+        if (existingScript.length > 0) {
+          existingScript.html(JSON.stringify(jsonLd));
+        } else {
+          $('head').append(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`);
+        }
+      } else if (pathName === '/about' || pathName === '/privacy' || pathName === '/terms' || pathName === '/contact' || pathName === '/') {
+          const webSiteLd = {
+             "@context": "https://schema.org",
+             "@type": "WebSite",
+             "name": "GamesDealsHub",
+             "url": "https://www.gamesdealshub.me/",
+             "description": "Track and claim free PC games before they expire."
+          };
+          const existingScript = $('script[type="application/ld+json"]');
+          if (existingScript.length > 0) {
+            existingScript.html(JSON.stringify(webSiteLd));
+          } else {
+            $('head').append(`<script type="application/ld+json">${JSON.stringify(webSiteLd)}</script>`);
+          }
       }
 
       if (preRenderedContent) {

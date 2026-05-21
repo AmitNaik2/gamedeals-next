@@ -1,3 +1,4 @@
+// @ts-ignore
 import appModule from '../dist/server.cjs';
 
 export const config = {

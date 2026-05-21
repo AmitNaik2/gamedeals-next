@@ -221,11 +221,13 @@ export default function App() {
   }, [location.pathname]);
 
   const seoDescription = useMemo(() => {
-    const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date());
-    const totalDeals = deals.length + dlcDeals.length + premiumDeals.length;
-    const dealCountText = totalDeals > 0 ? totalDeals : "100+";
-    return `Get access to ${dealCountText} active game deals updated every hour. Track and claim free PC games before they expire. Steam, Epic Games, and GOG giveaways for ${monthYear}.`;
-  }, [deals.length, dlcDeals.length, premiumDeals.length]);
+    const path = location.pathname.toLowerCase();
+    if (path === '/about') return "Learn how GamesDealsHub finds and tracks free PC game deals from Epic Games, Steam, and GOG every day.";
+    if (path === '/privacy') return "Read the GamesDealsHub privacy policy — how we collect, use, and protect your data.";
+    if (path === '/terms') return "GamesDealsHub terms of service — rules for using our free game deals tracker.";
+    if (path === '/contact') return "Get in touch with the GamesDealsHub team. Report a missing deal or send us feedback.";
+    return "Track and claim free PC games before they expire. Updated daily with Epic, Steam, and GOG freebies.";
+  }, [location.pathname]);
   
   const filteredLootDeals = dlcDeals.filter(deal => {
     const search = lootSearch.toLowerCase();
@@ -445,9 +447,13 @@ export default function App() {
         <meta name="description" content={seoDescription} />
         <meta property="og:title" content={seoTitle} />
         <meta property="og:description" content={seoDescription} />
+        <meta property="og:url" content={`https://www.gamesdealshub.me${location.pathname === '/' ? '' : location.pathname}`} />
+        <meta property="og:image" content="https://www.gamesdealshub.me/og-image.jpg" />
         <meta name="twitter:title" content={seoTitle} />
         <meta name="twitter:description" content={seoDescription} />
-        <link rel="canonical" href={`https://www.gamesdealshub.me${location.pathname}`} />
+        <meta name="twitter:url" content={`https://www.gamesdealshub.me${location.pathname === '/' ? '' : location.pathname}`} />
+        <meta name="twitter:image" content="https://www.gamesdealshub.me/og-image.jpg" />
+        <link rel="canonical" href={`https://www.gamesdealshub.me${location.pathname === '/' ? '' : location.pathname}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
