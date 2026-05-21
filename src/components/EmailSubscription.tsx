@@ -34,7 +34,7 @@ export function EmailSubscription() {
   }
 
   return (
-    <div className="w-full bg-[#111827]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-4 sm:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group shadow-[0_0_30px_rgba(6,182,212,0.15)]">
+    <div className="w-full bg-[#0F172A]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-4 sm:p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group shadow-[0_0_30px_rgba(6,182,212,0.15)]">
       <div className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] bg-[#06B6D4]/10 blur-[60px] rounded-full pointer-events-none"></div>
       
       <div className="flex items-center gap-4 z-10 w-full md:w-auto">
@@ -53,10 +53,10 @@ export function EmailSubscription() {
           placeholder="Enter your email" 
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="bg-[#070B14] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#F9FAFB] focus:outline-none focus:border-[#06B6D4] focus:shadow-[0_0_15px_rgba(6,182,212,0.3)] min-w-[200px] transition-all placeholder:text-[#9CA3AF]"
+          className="bg-[#050816] border border-white/10 rounded-xl px-4 py-3 text-sm text-[#F9FAFB] focus:outline-none focus:border-[#06B6D4] focus:shadow-[0_0_15px_rgba(6,182,212,0.3)] min-w-[200px] transition-all placeholder:text-[#9CA3AF]"
           required
         />
-        <button type="submit" className="bg-[#06B6D4] hover:bg-[#F9FAFB] text-[#070B14] rounded-xl px-5 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+        <button type="submit" className="bg-[#06B6D4] hover:bg-[#F9FAFB] text-[#050816] rounded-xl px-5 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.4)]">
           Subscribe <ArrowRight className="w-4 h-4" />
         </button>
       </form>

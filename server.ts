@@ -670,31 +670,41 @@ app.use(express.json());
 
   // Handle newsletter subscription
   app.post("/api/subscribe", async (req, res) => {
-    const { email } = req.body;
+    const { email, action, game } = req.body;
     if (!email || !email.includes('@')) {
       return res.status(400).json({ error: "Invalid email" });
     }
 
-    if (subscribedEmails.has(email)) {
+    if (subscribedEmails.has(email) && action !== "track") {
       return res.status(400).json({ error: "Email already subscribed" });
     }
 
     subscribedEmails.add(email);
-    console.log(`Email subscribed: ${email}`);
+    console.log(`Email subscribed: ${email} for action: ${action} | game: ${game}`);
+
+    let subject = "Welcome to GamesDealsHub Intelliegence Network!";
+    let text = "You have successfully subscribed to get live, free game intel!";
+    let messageStr = "Subscribed successfully! Intel will be relayed.";
+
+    if (action === "track" && game) {
+       subject = `Price Tracking Active: ${game}`;
+       text = `You are now tracking price drops for ${game}. We will relay signals when an anomaly or 100% OFF drop occurs.`;
+       messageStr = `Asset Tracking Initiated for ${game}.`;
+    }
 
     try {
       await transporter.sendMail({
         from: process.env.SMTP_FROM || "GameDeals <gamedealshub1@gmail.com>",
         to: email,
-        subject: "Welcome to GameDeals!",
-        text: "You have successfully subscribed to get live, free game deals!"
+        subject,
+        text
       });
       console.log("Welcome email sent.");
     } catch (err) {
       console.error("Welcome email not sent:", err);
     }
     
-    res.json({ message: "Subscribed successfully! Emails will be sent for new deals." });
+    res.json({ message: messageStr });
   });
 
   // Handle contact form submission

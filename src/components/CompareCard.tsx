@@ -21,7 +21,7 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
   });
 
   return (
-    <div className="flex flex-col overflow-hidden transition-all duration-300 border bg-[#111827]/80 backdrop-blur-md border-[#8B5CF6]/30 rounded-[24px] sm:rounded-3xl group relative shadow-[0_0_30px_rgba(139,92,246,0.1)]">
+    <div className="flex flex-col overflow-hidden transition-all duration-300 border bg-[#0F172A]/80 backdrop-blur-md border-[#8B5CF6]/30 rounded-[24px] sm:rounded-3xl group relative shadow-[0_0_30px_rgba(139,92,246,0.1)]">
       {/* Header with image */}
       <div className="relative w-full aspect-[16/9] sm:aspect-[2.5/1] shrink-0 overflow-hidden bg-black/50 border-b border-[#8B5CF6]/20">
         <Link to={gameUrl} className="block w-full h-full">
@@ -30,7 +30,7 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
             alt={title} 
             className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent" />
           <h3 className="absolute bottom-4 left-4 right-4 text-2xl md:text-3xl font-orbitron font-bold text-[#F9FAFB] z-10 leading-tight line-clamp-2 glow-text group-hover:text-[#06B6D4] transition-colors">
             {title}
           </h3>
@@ -59,7 +59,7 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
               <div className="flex flex-col items-start gap-1">
                 <span className="font-poppins font-bold text-sm sm:text-base text-[#F9FAFB] group-hover:text-[#06B6D4] transition-colors">{deal.platforms}</span>
                 {isBestResult && (
-                  <span className="text-[9px] font-orbitron uppercase tracking-widest font-bold bg-[#8B5CF6] text-[#070B14] px-1.5 py-0.5 rounded-md shadow-[0_0_10px_rgba(139,92,246,0.5)]">
+                  <span className="text-[9px] font-orbitron uppercase tracking-widest font-bold bg-[#8B5CF6] text-[#050816] px-1.5 py-0.5 rounded-md shadow-[0_0_10px_rgba(139,92,246,0.5)]">
                     Best Deal
                   </span>
                 )}
@@ -90,7 +90,7 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
                   className={cn(
                     "w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all shrink-0",
                     isBestResult 
-                      ? "bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-[#070B14] hover:opacity-90 shadow-[0_0_15px_rgba(139,92,246,0.5)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)]" 
+                      ? "bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-[#050816] hover:opacity-90 shadow-[0_0_15px_rgba(139,92,246,0.5)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)]" 
                       : "bg-white/5 text-[#9CA3AF] hover:bg-white/10 hover:text-white"
                   )}
                 >

@@ -5,7 +5,7 @@ export function SkeletonCard() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="group relative bg-[#111827]/80 backdrop-blur-md rounded-[24px] sm:rounded-3xl overflow-hidden border border-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col h-full animate-pulse"
+      className="group relative bg-[#0F172A]/80 backdrop-blur-md rounded-[24px] sm:rounded-3xl overflow-hidden border border-white/5 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col h-full animate-pulse"
     >
       <div className="relative aspect-[16/9] bg-white/5 border-b border-white/5" />
       <div className="flex flex-col flex-grow p-4 sm:p-5 relative">

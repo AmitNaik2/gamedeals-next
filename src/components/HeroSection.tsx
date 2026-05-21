@@ -1,120 +1,155 @@
-import { motion } from "motion/react";
-import { Sparkles, TrendingUp, Gamepad2, PlaySquare, Search } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Shield, PlaySquare, Radar, Crosshair, Terminal, Activity } from "lucide-react";
+import { cn } from "../lib/utils";
 
-const PARTICLES = Array.from({ length: 40 }, (_, index) => {
-  const seed = index + 1;
-  return {
-    width: (seed * 7) % 4 + 1,
-    height: (seed * 11) % 4 + 1,
-    left: (seed * 37) % 100,
-    top: (seed * 53) % 100,
-    duration: ((seed * 17) % 30) / 10 + 2,
-    delay: ((seed * 13) % 20) / 10,
-    color: index % 3 === 0 ? "bg-cyan-400" : index % 3 === 1 ? "bg-purple-500" : "bg-pink-500"
-  };
-});
+const FEED_MESSAGES = [
+  "GLOBAL_LINK: ACTIVE",
+  "PRICE_SCAN: RUNNING",
+  "EPIC_VAULT_DECRYPTION: 84%",
+  "MARKET_ANOMALY_DETECTED",
+  "STEALTH_MODE: ENGAGED",
+  "HISTORICAL_LOW_FOUND",
+  "STEAM_API_SYNC: COMPLETE"
+];
 
 export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void }) {
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex((prev) => (prev + 1) % FEED_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden bg-[#070B14] border border-white/5 mb-12 min-h-[500px] flex items-center shadow-[0_0_50px_rgba(139,92,246,0.1)] group">
-      {/* Background Gradients & Particles */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-[#070B14] via-[#111827] to-[#1e1b4b]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent opacity-60"></div>
+    <div className="relative w-full rounded-3xl overflow-hidden bg-[#050816] border border-[#06B6D4]/20 mb-12 min-h-[550px] flex items-center shadow-[0_0_50px_rgba(6,182,212,0.1)] group">
+      {/* Background Cyberpunk Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#050816] via-[#0F172A] to-[#1e1b4b]"></div>
       
-      {/* Grid pattern */}
-      <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)", backgroundSize: "40px 40px" }}></div>
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjEiIGZpbGw9InJnYmEoMjU1LDExLDQzLDAuMDUpIi8+PC9zdmc+')] opacity-50 z-0"></div>
 
-      {/* Animated Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {PARTICLES.map((particle, i) => (
-          <motion.div
-            key={i}
-            className={`absolute rounded-full blur-[2px] ${particle.color} opacity-30`}
-            style={{
-              width: particle.width + "px",
-              height: particle.height + "px",
-              left: particle.left + "%",
-              top: particle.top + "%",
-            }}
-            animate={{
-              y: [0, -60, 0],
-              x: [0, (i % 2 === 0 ? 30 : -30), 0],
-              opacity: [0.1, 0.6, 0.1],
-              scale: [1, 1.5, 1]
-            }}
-            transition={{
-              duration: particle.duration * 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: particle.delay,
-            }}
-          />
-        ))}
-      </div>
+      {/* Radar Sweep Arc */}
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] rounded-full border border-[#8B5CF6]/10 border-t-[#8B5CF6]/40 border-r-[#06B6D4]/40 animate-[spin_10s_linear_infinite] opacity-50 pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] rounded-full border border-[#06B6D4]/10 border-b-[#06B6D4]/40 border-l-[#8B5CF6]/40 animate-[spin_7s_linear_infinite_reverse] opacity-50 pointer-events-none z-0"></div>
 
-      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-4xl mx-auto text-center lg:text-left lg:mx-0">
+      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-5xl mx-auto text-center lg:text-left lg:mx-0 w-full flex flex-col lg:flex-row items-center gap-10">
+        
+        {/* Left Side: Content */}
         <motion.div
+          className="flex-1"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-xs font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-              <Sparkles className="w-3.5 h-3.5" /> Premium Gaming Drops
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#EF4444]/10 border border-[#EF4444]/50 text-[#EF4444] text-[10px] font-orbitron font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+              <Activity className="w-3.5 h-3.5 animate-pulse" /> Live Market Surveillance
             </span>
           </div>
           
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-orbitron font-bold text-white leading-tight tracking-tight mb-6">
-            Track the Best <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B5CF6] via-[#EC4899] to-[#06B6D4] glow-text filter drop-shadow-[0_0_20px_rgba(139,92,246,0.5)]">PC Game Deals</span> <br className="hidden lg:block"/>
-            & Free Giveaways
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-orbitron font-black text-[#F8FAFC] leading-[1.1] tracking-tighter mb-6 uppercase">
+            Track Free PC Games & <br className="hidden lg:block"/>
+            Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06B6D4] via-[#8B5CF6] to-[#EC4899] glow-text drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">Deal Intel</span>
           </h1>
           
-          <p className="text-[#9CA3AF] text-lg sm:text-xl mb-8 max-w-2xl mx-auto lg:mx-0 font-poppins font-light leading-relaxed">
-            Steam discounts, Epic Games giveaways, exclusive promo codes, and verified premium drops updated in real time.
+          <p className="text-[#94A3B8] text-base sm:text-lg mb-8 max-w-2xl mx-auto lg:mx-0 font-poppins leading-relaxed border-l-4 border-[#06B6D4]/50 pl-4 bg-[#050816]/40 p-2 rounded-r-lg">
+            Real-time surveillance of Steam, Epic Games, GOG, Humble Bundle, Fanatical, and upcoming gaming price anomalies.
           </p>
           
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-12">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-10">
             <button 
               onClick={onExploreClick}
-              className="px-8 py-4 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white font-poppins font-bold uppercase tracking-widest text-sm hover:scale-105 transition-transform shadow-[0_0_30px_rgba(6,182,212,0.4)] flex items-center gap-2">
-              <Search className="w-5 h-5" /> Browse Deals
+              className="px-6 py-3 rounded-sm relative overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6] text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs hover:bg-[#8B5CF6] hover:text-[#050816] transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2 group">
+              <span className="absolute inset-0 w-1/4 h-full bg-white/20 -skew-x-12 -translate-x-[150%] group-hover:animate-[wave_1s_ease-in-out_infinite]"></span>
+              <Crosshair className="w-4 h-4" /> Access Intel
             </button>
             <button 
-              onClick={onFreeGamesClick || onExploreClick}
-              className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-poppins font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:border-white/30 transition-colors backdrop-blur-md flex items-center gap-2">
-              <Gamepad2 className="w-5 h-5 text-[#22C55E]" /> Free Games
+              onClick={onFreeGamesClick}
+              className="px-6 py-3 rounded-sm bg-[#06B6D4]/10 border border-[#06B6D4]/50 text-[#06B6D4] hover:bg-[#06B6D4] hover:text-[#050816] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+              <Radar className="w-4 h-4" /> Scan Free Games
             </button>
             <button 
               onClick={onTrendingClick}
-              className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-poppins font-bold uppercase tracking-widest text-sm hover:bg-white/10 hover:border-[#EC4899]/50 transition-colors backdrop-blur-md flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-[#EC4899]" /> Trending
+              className="px-6 py-3 rounded-sm bg-transparent border border-[#94A3B8]/30 hover:border-[#F8FAFC] text-[#94A3B8] hover:text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#8B5CF6]" /> View Upcoming Drops
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm font-orbitron text-[#9CA3AF] border-t border-white/5 pt-8 mt-4 glass-panel rounded-2xl p-6 bg-black/20 backdrop-blur-md">
-            <div className="flex flex-col items-center lg:items-start">
-              <span className="text-3xl font-bold font-sans text-white glow-text">5000+</span>
-              <span className="text-[10px] text-[#06B6D4] font-bold uppercase tracking-widest mt-1">Deals Tracked</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">15+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Sync'd</span>
             </div>
-            <div className="hidden sm:block w-px h-12 border-r border-white/5 mx-auto"></div>
-            <div className="flex flex-col items-center lg:items-start pl-0 lg:pl-4 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
-              <span className="text-3xl font-bold font-sans text-white glow-text">Hourly</span>
-              <span className="text-[10px] text-[#8B5CF6] font-bold uppercase tracking-widest mt-1">Real-time Updates</span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">90M+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Historical Price Nodes</span>
             </div>
-            <div className="hidden sm:block w-px h-12 border-r border-white/5 mx-auto"></div>
-            <div className="flex flex-col items-center lg:items-start pl-0 lg:pl-4 border-t sm:border-t-0 border-white/5 pt-4 sm:pt-0">
-              <span className="text-3xl font-bold font-sans text-white glow-text">Multi</span>
-              <span className="text-[10px] text-[#EC4899] font-bold uppercase tracking-widest mt-1">Steam + Epic + GOG</span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">24/7</span>
+              <span className="uppercase tracking-widest mt-1 text-[#8B5CF6] opacity-90">Market Surveillance</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">99.8%</span>
+              <span className="uppercase tracking-widest mt-1 text-[#22C55E] opacity-90">Extraction Efficiency</span>
             </div>
           </div>
         </motion.div>
+
+        {/* Right Side: Telemetry / Live Feed */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="hidden lg:flex w-full max-w-[320px] flex-col items-stretch justify-center relative"
+        >
+          <div className="relative bg-[#0F172A]/80 border border-[#06B6D4]/30 rounded-xl p-5 overflow-hidden backdrop-blur-xl shadow-[0_0_30px_rgba(6,182,212,0.15)] group font-mono text-xs">
+             <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10 text-[#94A3B8]">
+                <div className="flex items-center gap-2">
+                   <Terminal className="w-4 h-4 text-[#06B6D4]" />
+                   <span className="uppercase tracking-wider font-bold">Live Telemetry</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse"></div>
+             </div>
+             
+             <div className="flex flex-col gap-3 min-h-[120px] justify-start">
+               <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={msgIndex}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.3 }}
+                    className="text-[#06B6D4] font-bold tracking-widest flex items-center gap-2"
+                  >
+                    <span className="text-[#8B5CF6]">&gt;</span> {FEED_MESSAGES[msgIndex]}
+                  </motion.div>
+                  <motion.div
+                    key={`${msgIndex}-history`}
+                    className="text-white/30 tracking-widest flex items-center gap-2 line-through"
+                  >
+                    <span className="text-white/10">&gt;</span> {FEED_MESSAGES[(msgIndex - 1 + FEED_MESSAGES.length) % FEED_MESSAGES.length]}
+                  </motion.div>
+               </AnimatePresence>
+             </div>
+
+             {/* Animated Progress Bar */}
+             <div className="mt-4 pt-4 border-t border-white/10">
+               <div className="flex justify-between text-[9px] text-[#94A3B8] uppercase tracking-widest mb-1">
+                 <span>System Load</span>
+                 <span className="text-[#EC4899]">OPTIMAL</span>
+               </div>
+               <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                 <div className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] w-[45%] animate-[pulse_2s_ease-in-out_infinite]"></div>
+               </div>
+             </div>
+          </div>
+        </motion.div>
       </div>
-      
-      {/* Decorative right side graphic */}
-      <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none overflow-hidden">
-         <div className="absolute right-[-10%] top-[10%] w-[600px] h-[600px] bg-[#8B5CF6]/20 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten animate-pulse" style={{ animationDuration: '4s' }}></div>
-         <div className="absolute right-[20%] bottom-[-10%] w-[400px] h-[400px] bg-[#06B6D4]/20 rounded-full blur-[100px] mix-blend-screen mix-blend-lighten animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
-      </div>
+
     </div>
   );
 }
+

@@ -21,7 +21,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
     <motion.div 
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative group overflow-hidden rounded-3xl h-[400px] sm:h-[450px] border border-white/10 mb-12 shadow-[0_0_40px_rgba(139,92,246,0.15)] bg-[#070B14]"
+      className="relative group overflow-hidden rounded-3xl h-[400px] sm:h-[450px] border border-white/10 mb-12 shadow-[0_0_40px_rgba(139,92,246,0.15)] bg-[#050816]"
     >
       <div className="absolute inset-0 z-0">
         <img 
@@ -32,7 +32,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
           fetchPriority="high"
         />
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/60 to-transparent z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent z-10"></div>
       
       <div className="absolute top-6 left-6 z-20 px-4 py-2 bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white text-[10px] font-orbitron font-bold uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.4)] flex items-center gap-2">
         Featured Drop

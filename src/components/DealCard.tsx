@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Monitor, MonitorSmartphone, Smartphone, Gamepad2, Share2, BadgeCheck, ShieldCheck, Star } from "lucide-react";
+import { Monitor, MonitorSmartphone, Smartphone, Gamepad2, Share2, BadgeCheck, ShieldCheck, Star, ShieldAlert, Activity } from "lucide-react";
 import { type Key, useRef, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { type GameDeal } from "../types";
@@ -49,16 +49,18 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
   const rarity = getDealRarity(deal);
   
   // Trust Score Simulation
-  let trustScore = "Official Store";
+  let trustScore = "VERIFIED INTEL";
   let trustColor = "text-[#22C55E]";
   let trustBg = "bg-[#22C55E]/10";
   let trustBorder = "border-[#22C55E]/30";
+  let TrustIcon = ShieldCheck;
   
   if (deal.users < 1000) {
-    trustScore = "Community Verified";
+    trustScore = "COMMUNITY HEAT";
     trustColor = "text-[#06B6D4]";
     trustBg = "bg-[#06B6D4]/10";
     trustBorder = "border-[#06B6D4]/30";
+    TrustIcon = Activity;
   }
 
   return (
@@ -69,7 +71,7 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
       whileHover={{ y: -4, scale: 1.01 }}
-      className="flex flex-col overflow-hidden transition-all duration-500 bg-[#111827]/80 backdrop-blur-xl border border-white/5 rounded-2xl group relative shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:border-[#8B5CF6]/50"
+      className="flex flex-col overflow-hidden transition-all duration-500 bg-[#0F172A]/80 backdrop-blur-xl border border-white/5 rounded-2xl group relative shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:border-[#8B5CF6]/50"
     >
       <div 
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
@@ -91,12 +93,23 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
             fetchPriority={priority ? "high" : "auto"}
             decoding={priority ? "sync" : "async"}
           />
-          <div className="absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-[#070B14] via-transparent to-transparent opacity-80 group-hover:opacity-60"></div>
+          <div className="absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-[#050816] via-[#050816]/40 to-transparent opacity-80 group-hover:opacity-60"></div>
           
           <div className="absolute top-3 right-3 flex gap-2">
             <span className={cn("px-2 py-1 rounded bg-black/60 backdrop-blur-md border text-[10px] font-bold uppercase tracking-widest flex items-center gap-1", trustBorder, trustColor)}>
-              <ShieldCheck className="w-3 h-3" />
+              <TrustIcon className="w-3 h-3" /> {trustScore}
             </span>
+          </div>
+          <div className="absolute top-3 left-3 flex gap-2">
+            {deal.salePrice === "0.00" || originalPrice === "$0.00" ? (
+                <span className="px-2 py-1 rounded bg-[#EF4444]/20 backdrop-blur-md border border-[#EF4444]/50 text-[#EF4444] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                  100% OFF ANOMALY
+                </span>
+            ) : deal.type?.includes("Discount") ? (
+                <span className="px-2 py-1 rounded bg-[#F59E0B]/20 backdrop-blur-md border border-[#F59E0B]/50 text-[#F59E0B] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                  PRICE DROP DETECTED
+                </span>
+            ) : null}
           </div>
         </Link>
       </div>
@@ -140,50 +153,49 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
         </Link>
         
         {deal.description && (
-          <p className="text-[#9CA3AF] text-sm line-clamp-2 mb-5 leading-relaxed font-poppins font-light">
+          <p className="text-[#94A3B8] text-sm line-clamp-2 mb-5 leading-relaxed font-poppins font-light border-l-2 border-white/10 pl-3">
             {deal.description.replace(/<[^>]*>?/gm, '')}
           </p>
         )}
 
         <div className="flex flex-wrap items-center gap-3 mb-6 font-poppins">
            {deal.steamRatingPercent && (
-            <span className="px-2 py-1 rounded bg-[#111827] border border-[#06B6D4]/30 text-[#06B6D4] text-[10px] font-bold uppercase tracking-widest">
+            <span className="px-2 py-1 rounded bg-[#0F172A] border border-[#06B6D4]/30 text-[#06B6D4] text-[10px] font-bold uppercase tracking-widest">
               STEAM {deal.steamRatingPercent}%
             </span>
            )}
            {gameInfo?.rating > 0 && (
-            <span className="px-2 py-1 rounded bg-[#111827] border border-[#F59E0B]/30 text-[#F59E0B] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+            <span className="px-2 py-1 rounded bg-[#0F172A] border border-[#F59E0B]/30 text-[#F59E0B] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
               <Star className="w-3 h-3 fill-current" /> {Math.round(gameInfo.rating)}
             </span>
            )}
-           <span className="px-2 py-1 rounded bg-[#111827] border border-white/10 text-[#9CA3AF] text-[10px] font-bold uppercase tracking-widest">
-              {deal.type || "Special Deal"}
+           {deal.users > 0 && (
+             <span className="px-2 py-1 rounded bg-[#0F172A] border border-[#EF4444]/30 text-[#EF4444] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                <Activity className="w-3 h-3" /> HEAT: {deal.users > 999 ? (deal.users/1000).toFixed(1)+'k' : deal.users}
+             </span>
+           )}
+           <span className="px-2 py-1 rounded bg-[#0F172A] border border-white/10 text-[#9CA3AF] text-[10px] font-bold uppercase tracking-widest">
+              {deal.type || "Intel Source"}
            </span>
         </div>
 
-        <div className="mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-5">
+        <div className="mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-5 relative">
+          <div className="absolute top-0 right-0 w-1/3 h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent"></div>
           <Countdown endDate={deal.end_date} />
 
           <div className="flex items-center justify-start sm:justify-end gap-3 w-full sm:w-auto">
-            <button
-              onClick={() => onShare(deal.title, deal.open_giveaway_url)}
-              className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-[#9CA3AF] bg-[#111827] hover:text-white hover:border-[#8B5CF6] transition-all group/btn"
-              title="Share Deal"
-            >
-              <Share2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
-            </button>
-            <button 
+             <button 
                type="button"
                className="h-10 px-4 flex items-center justify-center border border-[#F59E0B]/50 text-[#F59E0B] bg-[#F59E0B]/10 text-xs font-poppins font-bold uppercase tracking-widest rounded-xl hover:bg-[#F59E0B]/20 transition-colors"
                onClick={() => onRemind?.(deal)}
-            >
-              Wishlist
-            </button>
+             >
+              Track Price
+             </button>
             <Link 
               to={gameUrl}
-              className="h-10 px-6 flex items-center justify-center bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white text-xs font-poppins font-bold uppercase tracking-widest rounded-xl hover:scale-105 transition-transform shadow-[0_0_15px_rgba(139,92,246,0.3)]"
+              className="h-10 px-6 flex items-center justify-center bg-[#8B5CF6]/10 border border-[#8B5CF6]/50 text-[#F8FAFC] hover:bg-[#8B5CF6] hover:text-[#050816] text-[10px] font-orbitron font-bold uppercase tracking-widest rounded-xl transition-all shadow-[0_0_15px_rgba(139,92,246,0.3)]"
              >
-              Claim Deal
+              Extract Asset
             </Link>
           </div>
         </div>
