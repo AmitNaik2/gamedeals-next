@@ -24,7 +24,7 @@ export function LiveFeed({ deals }: { deals: GameDeal[] }) {
               className="flex gap-3 items-start border-b border-white/5 pb-4 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors cursor-pointer"
             >
               <div className="w-10 h-10 rounded shrink-0 overflow-hidden bg-black/50 border border-white/10">
-                 <img src={deal.thumbnail} alt="" className="w-full h-full object-cover" />
+                 <img src={deal.thumbnail} alt={deal.title} className="w-full h-full object-cover" />
               </div>
               <div>
                 <p className="text-[10px] font-bold text-white mb-1 line-clamp-1">{deal.title}</p>
