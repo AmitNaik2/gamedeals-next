@@ -969,6 +969,7 @@ app.use(express.json());
     res.header("Content-Type", "text/plain");
     res.send(`User-agent: *
 Allow: /
+Crawl-delay: 1
 
 Sitemap: https://www.gamesdealshub.me/sitemap.xml
 `);
