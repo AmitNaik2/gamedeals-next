@@ -1049,19 +1049,19 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
 
       if (pathName === "/about") {
         title = "About Us | GamesDealsHub";
-        desc = "Learn more about GamesDealsHub, your trusted source for tracking free PC games and analyzing premium deals across Steam, Epic, GOG, and more.";
+        desc = "Learn how GamesDealsHub finds and tracks free PC game deals from Epic Games, Steam, and GOG every day.";
         preRenderedContent = `<h1>About Us</h1><p>${desc}</p>`;
       } else if (pathName === "/privacy") {
         title = "Privacy Policy | GamesDealsHub";
-        desc = "Privacy Policy for GamesDealsHub outlining data collection, Google AdSense personalization, and how your privacy is protected.";
+        desc = "Read the GamesDealsHub privacy policy — how we collect, use, and protect your data.";
         preRenderedContent = `<h1>Privacy Policy</h1><p>${desc}</p>`;
       } else if (pathName === "/terms") {
         title = "Terms of Service | GamesDealsHub";
-        desc = "Terms of Service and conditions for using GamesDealsHub's deals and alerts platform.";
+        desc = "GamesDealsHub terms of service — rules for using our free game deals tracker.";
         preRenderedContent = `<h1>Terms of Service</h1><p>${desc}</p>`;
       } else if (pathName === "/contact") {
         title = "Contact Us | GamesDealsHub";
-        desc = "Contact the GamesDealsHub team for advertising, partnerships, or general inquiries.";
+        desc = "Get in touch with the GamesDealsHub team. Report a missing deal or send us feedback.";
         preRenderedContent = `<h1>Contact Us</h1><p>${desc}</p>`;
       }
       // Dynamic specific game page
@@ -1101,9 +1101,15 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
           title = "Free Epic Games Weekly | GamesDealsHub";
           desc = "Don't miss the weekly free PC games from the Epic Games Store. Track the latest free Epic games here.";
           apiUrl = "https://www.gamerpower.com/api/giveaways?platform=epic-games-store";
+        } else if (pathName === "/free-gog-games") {
+          title = "DRM-Free GOG Games | GamesDealsHub";
+          desc = "DRM-free GOG giveaways. Active free titles to keep forever in your GOG library.";
+          apiUrl = "https://www.gamerpower.com/api/giveaways?platform=gog";
         } else if (pathName === "/loot") {
           title = "Free Game Loot & Promo Codes | GamesDealsHub";
           apiUrl = "https://www.gamerpower.com/api/giveaways?type=loot";
+        } else if (pathName === "/") {
+          desc = "Track and claim free PC games before they expire. Updated daily with Epic, Steam, and GOG freebies.";
         }
         
         try {
@@ -1151,6 +1157,42 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
       if (ogImage) {
         $('meta[property="og:image"]').attr('content', ogImage);
         $('meta[property="twitter:image"]').attr('content', ogImage);
+      }
+
+      // Add Structured Data (JSON-LD)
+      let schemaJson = "";
+      if (pathName.startsWith("/game/")) {
+        schemaJson = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": title,
+          "image": ogImage,
+          "description": desc,
+          "offers": {
+            "@type": "Offer",
+            "price": "0.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          }
+        });
+      } else {
+        schemaJson = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "GamesDealsHub",
+          "url": canonical,
+          "description": desc,
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.gamesdealshub.me/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        });
+      }
+      
+      if (schemaJson) {
+        $('script[type="application/ld+json"]').remove();
+        $('head').append(`<script type="application/ld+json">\n${schemaJson}\n</script>`);
       }
 
       if (preRenderedContent) {

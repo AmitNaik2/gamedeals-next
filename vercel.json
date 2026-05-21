@@ -9,10 +9,6 @@
     }
   },
   "functions": {
-    "api/render.ts": {
-      "includeFiles": "dist/**",
-      "maxDuration": 30
-    },
     "api/index.ts": {
       "includeFiles": "dist/**",
       "maxDuration": 30
@@ -33,7 +29,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/api/render"
+      "destination": "/api/index"
     }
   ],
   "headers": [
