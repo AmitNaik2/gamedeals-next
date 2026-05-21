@@ -7,16 +7,8 @@ import nodemailer from "nodemailer";
 import * as dotenv from "dotenv";
 import * as cheerio from "cheerio";
 import { Server as SocketIOServer } from "socket.io";
-import {
-  buildDealsListHtml,
-  buildGameDetailHtml,
-  buildHomeFallbackContent,
-  buildItemListJsonLd,
-  buildProductJsonLd,
-  buildStaticPageContext,
-  renderHtml,
-  type SsrPageContext,
-} from "./lib/ssr-html";
+import { loadSsrTemplate, resolveSsrContext } from "./lib/ssr-handler";
+import { renderHtml } from "./lib/ssr-html";
 
 dotenv.config();
 dotenv.config({ path: ".env.local", override: true });
@@ -1025,134 +1017,10 @@ Sitemap: https://www.gamesdealshub.me/sitemap.xml
     // In production (including Vercel), serve the built static UI
     const distPath = path.join(process.cwd(), "dist");
     
-    function loadSsrTemplate(): string {
-      const candidates = [
-        path.join(distPath, "ssr-template.html"),
-        path.join(process.cwd(), "dist", "ssr-template.html"),
-        path.join(distPath, "index.html"),
-        path.join(process.cwd(), "index.html"),
-      ];
-      for (const filePath of candidates) {
-        try {
-          return fs.readFileSync(filePath, "utf-8");
-        } catch {
-          /* try next */
-        }
-      }
-      return "";
-    }
-
     const baseHtml = loadSsrTemplate();
 
-    // Serve static assets; no index.html at / (renamed in postbuild)
+    // Serve static assets; index.html renamed to ssr-template.html in postbuild
     app.use(express.static(distPath, { index: false }));
-
-    async function resolveSsrContext(pathName: string): Promise<SsrPageContext> {
-      const staticPage = buildStaticPageContext(pathName);
-      if (staticPage) return staticPage;
-
-      if (pathName.startsWith("/game/")) {
-        const id = pathName.split("/")[2];
-        const defaultTitle = "Free Game Deal | GamesDealsHub";
-        const defaultDesc =
-          "Claim this free PC game before the giveaway ends. Official store link verified by GamesDealsHub.";
-        try {
-          const dl = await fetchGamerPower(`https://www.gamerpower.com/api/giveaway?id=${id}`);
-          if (dl?.title) {
-            const plainDesc = (dl.description || defaultDesc).replace(/<[^>]*>/g, "").slice(0, 160);
-            return {
-              pathName,
-              title: `${dl.title} - Free ${dl.platforms || "PC"} Game | GamesDealsHub`,
-              description: plainDesc,
-              preRenderedContent: buildGameDetailHtml(dl),
-              ogImage: dl.image || dl.thumbnail,
-              jsonLd: buildProductJsonLd(dl),
-            };
-          }
-        } catch (e) {
-          console.warn("SSR game fetch failed", e);
-        }
-        return {
-          pathName,
-          title: defaultTitle,
-          description: defaultDesc,
-          preRenderedContent: buildHomeFallbackContent(pathName, defaultTitle, defaultDesc),
-        };
-      }
-
-      let title = "GamesDealsHub | Track Free PC Games & Gaming Deals";
-      let description =
-        "Track and claim free PC games before they expire. Steam free weekends, Epic Games weekly giveaways, GOG DRM-free drops, and limited-time promotions.";
-      let apiUrl = "https://www.gamerpower.com/api/giveaways?sort-by=popularity";
-
-      if (pathName === "/free-steam-games") {
-        title = "Free Steam Games & Weekends | GamesDealsHub";
-        description =
-          "Active free Steam games, free weekends, and DLC giveaways. Claim directly on Steam before offers expire.";
-        apiUrl = "https://www.gamerpower.com/api/giveaways?platform=steam";
-      } else if (pathName === "/free-epic-games") {
-        title = "Free Epic Games Weekly | GamesDealsHub";
-        description =
-          "Every free Epic Games Store title this week. Add to your library before the Thursday reset.";
-        apiUrl = "https://www.gamerpower.com/api/giveaways?platform=epic-games-store";
-      } else if (pathName === "/free-gog-games") {
-        title = "Free GOG Games & DRM-Free Giveaways | GamesDealsHub";
-        description = "Free GOG games and DRM-free promotions. Keep every title forever in your GOG library.";
-        apiUrl = "https://www.gamerpower.com/api/giveaways?platform=gog";
-      } else if (pathName === "/expired") {
-        title = "Expired Free Games Archive | GamesDealsHub";
-        description =
-          "Recently expired free game giveaways on Steam, Epic, and GOG. See what ended and catch the next drop.";
-        try {
-          const all = await fetchGamerPower("https://www.gamerpower.com/api/giveaways?sort-by=date");
-          const expired = Array.isArray(all)
-            ? all.filter((d: { end_date?: string; status?: string }) => !isActiveGiveaway(d)).slice(0, 30)
-            : [];
-          return {
-            pathName,
-            title,
-            description,
-            preRenderedContent:
-              expired.length > 0
-                ? buildDealsListHtml(title, description, expired)
-                : buildHomeFallbackContent(pathName, title, description),
-            jsonLd: expired.length > 0 ? buildItemListJsonLd(expired) : undefined,
-          };
-        } catch (e) {
-          console.warn("SSR expired fetch failed", e);
-        }
-        return {
-          pathName,
-          title,
-          description,
-          preRenderedContent: buildHomeFallbackContent(pathName, title, description),
-        };
-      }
-
-      try {
-        const list = await fetchGamerPower(apiUrl);
-        if (Array.isArray(list) && list.length > 0) {
-          const active = list.filter(isActiveGiveaway).slice(0, 30);
-          const deals = active.length > 0 ? active : list.slice(0, 30);
-          return {
-            pathName,
-            title,
-            description,
-            preRenderedContent: buildDealsListHtml(title, description, deals),
-            jsonLd: buildItemListJsonLd(deals),
-          };
-        }
-      } catch (e) {
-        console.warn("SSR list fetch failed", e);
-      }
-
-      return {
-        pathName,
-        title,
-        description,
-        preRenderedContent: buildHomeFallbackContent(pathName, title, description),
-      };
-    }
 
     app.get("*", async (req, res) => {
       if (!baseHtml) {
