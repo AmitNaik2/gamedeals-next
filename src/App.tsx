@@ -26,6 +26,13 @@ import { HeroSection } from "./components/HeroSection";
 import { SkeletonCard } from "./components/SkeletonCard";
 import { EmailSubscription } from "./components/EmailSubscription";
 
+const PlaceholderPage = ({ title }: { title: string }) => (
+  <div className="min-h-[60vh] pt-24 px-4 text-center text-white">
+    <h1 className="text-4xl font-orbitron font-bold text-[#06B6D4] mb-4 uppercase tracking-widest">{title}</h1>
+    <p className="text-[#9CA3AF] max-w-2xl mx-auto">This section is currently being updated with fresh intelligence. Check back soon for new content.</p>
+  </div>
+);
+
 function InlineSubscribe() {
   const [email, setEmail] = useState("");
   const [action, setAction] = useState<"subscribe" | "unsubscribe">("subscribe");
@@ -944,6 +951,15 @@ export default function App() {
           <Route path="/article/hp-omen-16-vs-lenovo-loq" element={<ArticleComparison />} />
           <Route path="/admin" element={<Admin deals={[...deals, ...dlcDeals, ...premiumDeals]} />} />
           <Route path="/archive" element={<Archive />} />
+          <Route path="/free-games" element={<PlaceholderPage title="Free Games" />} />
+          <Route path="/reviews" element={<PlaceholderPage title="Game Reviews" />} />
+          <Route path="/guides" element={<PlaceholderPage title="Gaming Guides" />} />
+          <Route path="/optimization" element={<PlaceholderPage title="PC Optimization" />} />
+          <Route path="/news" element={<PlaceholderPage title="News" />} />
+          <Route path="/disclaimer" element={<PlaceholderPage title="Disclaimer" />} />
+          <Route path="/dmca" element={<PlaceholderPage title="DMCA" />} />
+          <Route path="/cookie-policy" element={<PlaceholderPage title="Cookie Policy" />} />
+          <Route path="/write-for-us" element={<PlaceholderPage title="Write For Us" />} />
         </Routes>
       </main>
 
