@@ -13,7 +13,7 @@ const FEED_MESSAGES = [
   "STEAM_API_SYNC: COMPLETE"
 ];
 
-export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void }) {
+export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick, onUpcomingClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void, onUpcomingClick?: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick 
               <Radar className="w-4 h-4" /> Scan Free Games
             </button>
             <button 
-              onClick={onTrendingClick}
+              onClick={onUpcomingClick}
               className="h-12 px-8 rounded bg-transparent border border-[#94A3B8]/30 hover:border-[#F8FAFC] text-[#94A3B8] hover:text-[#F8FAFC] font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#8B5CF6]" /> View Upcoming Drops
             </button>

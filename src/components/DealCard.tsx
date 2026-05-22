@@ -154,15 +154,18 @@ export function DealCard({ deal, index, onShare, onRemind, priority = false }: D
         <div className="mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-purple-500/20 pt-5 relative">
           <div className="absolute top-0 right-0 w-1/3 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
           
-          <div className="flex items-center gap-2">
-            {originalPrice !== "$0.00" && (
-              <span className="text-gray-400 line-through text-sm font-poppins">
-                {originalPrice}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              {originalPrice !== "$0.00" && (
+                <span className="text-gray-400 line-through text-sm font-poppins">
+                  {originalPrice}
+                </span>
+              )}
+              <span className="text-green-400 font-bold text-xl font-orbitron glow-text">
+                {deal.type === 'Game Info' ? "INFO" : (deal.salePrice ? `$${deal.salePrice}` : "FREE")}
               </span>
-            )}
-            <span className="text-green-400 font-bold text-xl font-orbitron">
-              {deal.type === 'Game Info' ? "INFO" : (deal.salePrice ? `$${deal.salePrice}` : "FREE")}
-            </span>
+            </div>
+            {deal.end_date && deal.end_date !== 'N/A' && <Countdown endDate={deal.end_date} />}
           </div>
 
           <div className="flex items-center justify-start sm:justify-end gap-3 w-full sm:w-auto">

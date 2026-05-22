@@ -17,8 +17,6 @@ import { EmailModal } from "./components/EmailModal";
 import { type GameDeal } from "./types";
 import { getDealRarity, type RarityLevel } from "./lib/deal-utils";
 import { cn, openExternalUrl } from "./lib/utils";
-import { HistoricalPrices } from "./components/HistoricalPrices";
-import { UpcomingDropsGrid } from "./components/UpcomingDropsGrid";
 import { FeaturedDeal } from "./components/FeaturedDeal";
 import { LiveFeed } from "./components/LiveFeed";
 import { UpcomingDrops } from "./components/UpcomingDrops";
@@ -60,11 +58,11 @@ function InlineSubscribe() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#EC4899]/30 rounded-3xl p-6 text-left relative overflow-hidden w-full max-w-md mx-auto mt-10 shadow-[0_0_20px_rgba(236,72,153,0.1)] group">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-[#EC4899]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
+    <form onSubmit={handleSubmit} className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-6 text-left relative overflow-hidden w-full max-w-md mx-auto mt-10 shadow-[0_0_20px_rgba(6,182,212,0.1)] group">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#06B6D4]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
       
-      <h4 className="text-lg font-orbitron font-bold italic mb-1 text-[#F9FAFB] glow-text">Never miss a drop.</h4>
-      <p className="text-[11px] font-poppins text-[#9CA3AF] mb-4 tracking-tight">Instant email alerts for amazing deals and limited free games.</p>
+      <h4 className="text-lg font-orbitron font-bold italic mb-1 text-[#F9FAFB] drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]">Intel Direct Line.</h4>
+      <p className="text-[11px] font-poppins text-[#9CA3AF] mb-4 tracking-tight">Intercept alerts for 100% free anomalies & extreme drops.</p>
       
       <AnimatePresence>
         {status === 'success' && (
@@ -72,10 +70,10 @@ function InlineSubscribe() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            className="absolute inset-0 bg-[#0A0A0B]/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center z-10"
+            className="absolute inset-0 bg-[#050816]/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center z-10"
           >
               <span className="text-[#22C55E] mb-2"><CheckCircle2 className="w-8 h-8 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)]" /></span>
-              <p className="text-xs text-white font-medium">{message}</p>
+              <p className="text-xs text-white font-mono uppercase tracking-widest">{message}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -88,9 +86,9 @@ function InlineSubscribe() {
             value="subscribe" 
             checked={action === "subscribe"} 
             onChange={() => setAction("subscribe")}
-            className="accent-[#EC4899]"
+            className="accent-[#06B6D4]"
           />
-          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Subscribe</span>
+          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Establish</span>
         </label>
         <label className="flex items-center gap-2 cursor-pointer">
           <input 
@@ -101,7 +99,7 @@ function InlineSubscribe() {
             onChange={() => setAction("unsubscribe")}
             className="accent-[#EF4444]"
           />
-          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Unsubscribe</span>
+          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Sever</span>
         </label>
       </div>
 
@@ -110,21 +108,21 @@ function InlineSubscribe() {
           type="email" 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com" 
+          placeholder="COMM_LINK (EMAIL)" 
           disabled={status === 'loading'}
-          className="w-full bg-[#050816] border border-white/10 rounded-xl py-3 pl-4 pr-[100px] text-xs focus:outline-none focus:border-[#EC4899] focus:shadow-[0_0_10px_rgba(236,72,153,0.3)] transition-all text-white placeholder:text-[#9CA3AF] disabled:opacity-50" 
+          className="w-full bg-[#050816] border border-white/10 rounded-xl py-3 pl-4 pr-[100px] text-xs font-mono focus:outline-none focus:border-[#06B6D4] focus:shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all text-white placeholder:text-[#9CA3AF]/50 disabled:opacity-50" 
         />
         <button 
           type="submit"
           disabled={status === 'loading' || !email}
           className={cn(
-            "absolute right-2 top-2 h-8 px-4 transition-all text-[#050816] text-[10px] font-bold uppercase tracking-widest rounded-lg disabled:opacity-50",
+            "absolute right-2 top-2 h-8 px-4 transition-all text-[#050816] text-[10px] font-bold uppercase tracking-widest rounded-lg disabled:opacity-50 font-orbitron",
             action === "subscribe" 
-              ? "bg-[#EC4899] hover:bg-white shadow-[0_0_10px_rgba(236,72,153,0.5)]" 
+              ? "bg-[#06B6D4] hover:bg-white shadow-[0_0_10px_rgba(6,182,212,0.5)]" 
               : "bg-[#EF4444] hover:bg-white text-white hover:text-[#050816]"
           )}
         >
-          {status === 'loading' ? '...' : (action === "subscribe" ? 'Join' : 'Leave')}
+          {status === 'loading' ? '...' : (action === "subscribe" ? 'SYNC' : 'CUT')}
         </button>
       </div>
       {status === 'error' && <p className="text-[#EF4444] text-[10px] mt-2 font-poppins">{message}</p>}
@@ -145,7 +143,7 @@ export default function App() {
     setCookieConsent(true);
   };
 
-  const [activeTab, setActiveTab] = useState<"Games" | "DLC" | "Premium" | "Upcoming">("Games");
+  const [activeTab, setActiveTab] = useState<"Games" | "Upcoming" | "DLC" | "Premium">("Games");
   
   const [deals, setDeals] = useState<GameDeal[]>([]); // This will just be Free Games now
   const [upcomingDeals, setUpcomingDeals] = useState<GameDeal[]>([]);
@@ -457,11 +455,6 @@ export default function App() {
     scrollToDeals();
   };
 
-  const goUpcoming = () => {
-    setActiveTab("Upcoming");
-    scrollToDeals();
-  };
-
   const handleNavbarSearch = (value: string) => {
     setActiveTab("Games");
     setSelectedRarity("All");
@@ -471,7 +464,11 @@ export default function App() {
   // Removed top level loading UI
   
   return (
-    <div className="min-h-screen font-sans text-white bg-[#050505] selection:bg-[#7C3AED] selection:text-white relative">
+    <div className="min-h-screen font-sans text-[#F8FAFC] bg-[#050816] selection:bg-[#8B5CF6] selection:text-[#050816] relative overflow-hidden">
+      {/* Background Ambient Glow */}
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#8B5CF6]/10 via-transparent to-transparent"></div>
+      <div className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-[#06B6D4]/10 via-transparent to-transparent"></div>
+
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDescription} />
@@ -543,7 +540,9 @@ export default function App() {
               <>
                 <HeroSection 
                   onExploreClick={goFreeGames}
-                  onTrendingClick={goUpcoming}
+                  onTrendingClick={goTrending}
+                  onFreeGamesClick={goFreeGames}
+                  onUpcomingClick={() => { setActiveTab('Upcoming'); scrollToDeals(); }}
                 />
 
               {/* Error State */}
@@ -566,16 +565,16 @@ export default function App() {
           <div className="flex-1 w-full min-w-0">
             
             {/* Tabs */}
-            <div id="deals-tabs" className="flex items-center justify-between mb-8 pb-0 overflow-x-auto hide-scrollbar flex-nowrap border-b border-white/5">
+            <div id="deals-tabs" className="relative flex items-center justify-between mb-8 pb-0 overflow-x-auto hide-scrollbar flex-nowrap border-b border-white/5 z-10">
               <div className="flex items-center space-x-6">
                  <button onClick={() => setActiveTab("Games")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-orbitron font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Games" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Tactical Intel</button>
+                 <button onClick={() => setActiveTab("Upcoming")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-orbitron font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Upcoming" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Upcoming Drops</button>
                  <button onClick={() => setActiveTab("DLC")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-orbitron font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "DLC" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Free DLC Intelligence</button>
                  <button onClick={() => setActiveTab("Premium")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-orbitron font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Premium" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Trending Market Intel</button>
-                 <button onClick={() => setActiveTab("Upcoming")} className={cn("whitespace-nowrap pb-4 text-[11px] md:text-sm font-orbitron font-bold uppercase tracking-widest transition-all border-b-2", activeTab === "Upcoming" ? "text-white border-[#06B6D4] text-shadow-[0_0_10px_rgba(6,182,212,0.8)]" : "text-[#9CA3AF] border-transparent hover:text-white")}>Upcoming Drops</button>
               </div>
-              <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#9CA3AF] px-2 tracking-widest uppercase shrink-0 pb-4">
-                <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
-                 <span><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
+              <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#06B6D4] px-2 tracking-widest uppercase shrink-0 pb-4">
+                <span className="flex items-center gap-1.5 glow-text"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
+                 <span className="glow-text"><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
               </div>
             </div>
 
@@ -742,6 +741,28 @@ export default function App() {
               );
             })()}
             </>
+            ) : activeTab === "Upcoming" ? (
+              <>
+                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                    <AnimatePresence mode="popLayout">
+                      {upcomingDeals.map((deal, index) => (
+                        <DealCard 
+                          key={deal.id}
+                          deal={deal}
+                          index={index}
+                          priority={index < 4}
+                          onShare={openShareModal}
+                          onRemind={openSubscribeModal}
+                        />
+                      ))}
+                    </AnimatePresence>
+                 </div>
+                 {upcomingDeals.length === 0 && (
+                   <div className="py-20 text-center text-white/50">
+                     No upcoming drops tracked right now. Check back later!
+                   </div>
+                 )}
+              </>
             ) : activeTab === "DLC" ? (
               <>
              {/* Floating Top Bar (Filters) */}
@@ -894,17 +915,7 @@ export default function App() {
                    </div>
                 )}
               </>
-            ) : activeTab === "Upcoming" ? (
-              <>
-                <div className="space-y-6">
-                  <UpcomingDropsGrid deals={upcomingDeals} />
-                </div>
-              </>
             ) : null}
-            
-            <div className="mt-12 pt-8 border-t border-white/10 space-y-12">
-              <HistoricalPrices />
-            </div>
             
             {/* Mobile / Tablet Subscribe Box */}
             <div className="xl:hidden mt-12 pt-8 border-t border-white/10">
@@ -915,7 +926,7 @@ export default function App() {
           {/* Right Sidebar (Feeds) */}
           <aside className="xl:w-72 shrink-0 xl:sticky xl:top-24 space-y-6 mt-12 xl:mt-0 pt-8 xl:pt-0 border-t xl:border-t-0 border-white/10">
             <LiveFeed deals={activeGamesDeals} />
-            <UpcomingDrops deals={upcomingDeals} onViewAll={goUpcoming} />
+            {activeTab !== 'Upcoming' && <UpcomingDrops deals={upcomingDeals} onViewAll={() => { setActiveTab('Upcoming'); scrollToDeals(); }} />}
             <GamingNews />
             <div className="pt-4 border-t border-white/10 hidden xl:block">
               <InlineSubscribe />
