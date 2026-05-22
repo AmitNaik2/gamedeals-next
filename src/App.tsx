@@ -952,24 +952,25 @@ export default function App() {
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#06B6D4]/50 to-transparent"></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 text-[10px] uppercase font-orbitron tracking-widest font-bold text-[#9CA3AF]">
             <div className="flex flex-col gap-4">
+               <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">Company</span>
+               <Link to="/about" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">About Us</Link>
+               <Link to="/contact" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Contact</Link>
+               <Link to="/write-for-us" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Write For Us</Link>
+            </div>
+            <div className="flex flex-col gap-4">
+               <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">Legal Protocols</span>
+               <Link to="/privacy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Privacy Policy</Link>
+               <Link to="/terms" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Terms &amp; Conditions</Link>
+               <Link to="/disclaimer" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Disclaimer</Link>
+               <Link to="/dmca" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">DMCA</Link>
+               <Link to="/cookie-policy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Cookie Policy</Link>
+            </div>
+            <div className="flex flex-col gap-4">
                <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">Intelligence Network</span>
                <button type="button" onClick={goHome} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Command Dashboard</button>
                <button type="button" onClick={goFreeGames} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">All Captured Assets</button>
                <button type="button" onClick={() => {navigate('/free-steam-games')}} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Steam Asset Map</button>
                <button type="button" onClick={() => {navigate('/free-epic-games')}} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Epic Games Asset Map</button>
-            </div>
-             <div className="flex flex-col gap-4">
-               <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">Protocols</span>
-               <Link to="/terms" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Terms of Service</Link>
-               <Link to="/privacy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Privacy Directive</Link>
-               <Link to="/privacy" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Cookie Directive</Link>
-            </div>
-             <div className="flex flex-col gap-4">
-               <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">Secure Comms</span>
-               <button type="button" onClick={() => openExternalUrl("https://discord.gg/gamesdealshub")} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Encrypted Discord</button>
-               <button type="button" onClick={() => openExternalUrl("https://reddit.com/r/GamesDealsHub")} className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Reddit Operatives</button>
-               <Link to="/contact" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Secure Comms Request</Link>
-               <Link to="/about" className="text-left py-1 hover:text-[#06B6D4] hover:scale-105 origin-left transition-all">Project Logs</Link>
             </div>
             <div className="flex flex-col gap-4">
                <span className="text-[#06B6D4] mb-2 font-black tracking-[0.2em] drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">System Log</span>
@@ -978,7 +979,7 @@ export default function App() {
                   <span className="text-[#22C55E] drop-shadow-[0_0_5px_rgba(34,197,94,0.4)]">API Status: OPERATIONAL</span>
                </div>
                <div className="py-1">Extracted Nodes: <span className="text-[#F9FAFB] font-mono">{deals.length + dlcDeals.length + premiumDeals.length}</span></div>
-               <div className="mt-8 pt-4 border-t border-white/10 opacity-40 font-mono tracking-tighter">© 2026 GAMESDEALSHUB</div>
+               <div className="mt-8 pt-4 border-t border-white/10 opacity-40 font-mono tracking-tighter">© 2026 GamesDealsHub. All rights reserved.</div>
             </div>
           </div>
         </div>

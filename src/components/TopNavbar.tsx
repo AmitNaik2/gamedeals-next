@@ -121,11 +121,15 @@ export function TopNavbar({
           </Link>
 
           {/* Links (Desktop) */}
-          <div className="hidden lg:flex items-center gap-6">
-            <Link to="/" onClick={onHomeClick} className="text-xs font-bold uppercase tracking-widest text-white/90 hover:text-[#06B6D4] transition-colors">DASHBOARD</Link>
-            {hasSteamDeals && <Link to="/free-steam-games" onClick={onFreeGamesClick} className="text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors relative group"><span className="absolute -inset-2 bg-[#8B5CF6]/10 opacity-0 group-hover:opacity-100 rounded blur-sm transition-opacity"></span>ASSET MAP</Link>}
-            {hasEpicDeals && <Link to="/free-epic-games" onClick={onFreeGamesClick} className="text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors relative group"><span className="absolute -inset-2 bg-[#EC4899]/10 opacity-0 group-hover:opacity-100 rounded blur-sm transition-opacity"></span>MARKET SURVEILLANCE</Link>}
-            {hasGogDeals && <Link to="/free-gog-games" onClick={onFreeGamesClick} className="text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors relative group"><span className="absolute -inset-2 bg-white/10 opacity-0 group-hover:opacity-100 rounded blur-sm transition-opacity"></span>INTEL ARCHIVE</Link>}
+          <div className="hidden lg:flex items-center gap-4 xl:gap-5 flex-wrap">
+            <Link to="/" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-white/90 hover:text-[#06B6D4] transition-colors">HOME</Link>
+            <Link to="/free-games" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">FREE GAMES</Link>
+            <Link to="/reviews" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">GAME REVIEWS</Link>
+            <Link to="/guides" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">GAMING GUIDES</Link>
+            <Link to="/optimization" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#06B6D4] transition-colors">PC OPTIMIZATION</Link>
+            <Link to="/news" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">NEWS</Link>
+            <Link to="/about" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">ABOUT</Link>
+            <Link to="/contact" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">CONTACT</Link>
           </div>
 
           {/* Right Side */}
