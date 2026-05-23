@@ -38,6 +38,20 @@ async function fetchSteamData(title: string) {
   if (!gameDetails) return { not_found: true, reason: "steam_details_missing" };
 
   // 4. Format to match IGDB/RAWG expected structure
+  const gallery: any[] = [];
+  if (gameDetails.movies && gameDetails.movies.length > 0) {
+    gameDetails.movies.forEach((m: any) => {
+      if (m.mp4?.max || m.webm?.max) {
+        gallery.push({ type: 'video', url: m.mp4?.max || m.webm?.max, thumbnail: m.thumbnail });
+      }
+    });
+  }
+  if (gameDetails.screenshots && gameDetails.screenshots.length > 0) {
+    gameDetails.screenshots.forEach((s: any) => {
+      gallery.push({ type: 'image', url: s.path_full, thumbnail: s.path_thumbnail });
+    });
+  }
+
   return {
     id: appId,
     name: gameDetails.name,
@@ -49,7 +63,8 @@ async function fetchSteamData(title: string) {
       .filter(([_, supported]) => supported)
       .map(([platform]) => ({ platform: { name: platform } })),
     genres: gameDetails.genres?.map((g: any) => ({ name: g.description })) || [],
-    description_raw: gameDetails.short_description
+    description_raw: gameDetails.short_description,
+    gallery
   };
 }
 

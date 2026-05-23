@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { type GameDeal } from "../types";
-import { ArrowLeft, Gamepad2, Info, LayoutTemplate, Monitor, Image as ImageIcon, Video, Heart, Share2, Check } from "lucide-react";
+import { ArrowLeft, Gamepad2, Info, LayoutTemplate, Monitor, Image as ImageIcon, Video, Heart, Share2, Check, X, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { generateUniqueSummary, generateTags } from "../lib/text-utils";
 import { Countdown } from "./Countdown";
 import { useIgdb } from "../hooks/useIgdb";
@@ -15,6 +15,12 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
   const [deal, setDeal] = useState<GameDeal | null>(null);
   const [activeReqTab, setActiveReqTab] = useState<"min" | "rec">("min");
 
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState("overview");
+
   useEffect(() => {
     if (deals.length > 0) {
       const found = deals.find((d) => String(d.id) === id || decodeURIComponent(String(d.id)) === id);
@@ -22,7 +28,126 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
     }
   }, [id, deals]);
 
+  useEffect(() => {
+    setSelectedMediaIndex(0);
+    setIsPlaying(false);
+  }, [deal]);
+
   const gameInfo = useIgdb(deal?.title || "");
+
+  // Construct the gallery items
+  const mediaItems: Array<{ type: 'image' | 'video' | 'youtube'; url: string; thumbnail: string }> = [];
+
+  if (deal) {
+    // 1. Add video trailers first to put them in the spotlight if available!
+    if (gameInfo && gameInfo.gallery && Array.isArray(gameInfo.gallery)) {
+      // Add videos/youtube items first
+      gameInfo.gallery.forEach((item: any) => {
+        if (item.type === 'video' || item.type === 'youtube') {
+          mediaItems.push({
+            type: item.type,
+            url: item.url,
+            thumbnail: item.thumbnail || deal.thumbnail || deal.image
+          });
+        }
+      });
+    }
+
+    // 2. Add main image/thumbnail if available
+    if (deal.image || deal.thumbnail) {
+      const mainImgUrl = deal.image || deal.thumbnail;
+      const mainThumbUrl = deal.thumbnail || deal.image;
+      // Deduplicate
+      if (!mediaItems.some(item => item.url === mainImgUrl)) {
+        mediaItems.push({
+          type: 'image',
+          url: mainImgUrl,
+          thumbnail: mainThumbUrl
+        });
+      }
+    }
+
+    // 3. Add other screenshot images from gameInfo.gallery
+    if (gameInfo && gameInfo.gallery && Array.isArray(gameInfo.gallery)) {
+      gameInfo.gallery.forEach((item: any) => {
+        if (item.type === 'image') {
+          if (!mediaItems.some(existing => existing.url === item.url)) {
+            mediaItems.push({
+              type: 'image',
+              url: item.url,
+              thumbnail: item.thumbnail
+            });
+          }
+        }
+      });
+    }
+
+    // If we still have nothing, add a placeholder
+    if (mediaItems.length === 0) {
+      mediaItems.push({
+        type: 'image',
+        url: deal.thumbnail,
+        thumbnail: deal.thumbnail
+      });
+    }
+  }
+
+  const selectedMediaItem = mediaItems[selectedMediaIndex] || mediaItems[0];
+
+  const handlePrevLightbox = () => {
+    setLightboxIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1));
+  };
+
+  const handleNextLightbox = () => {
+    setLightboxIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsLightboxOpen(false);
+      if (e.key === "ArrowLeft") handlePrevLightbox();
+      if (e.key === "ArrowRight") handleNextLightbox();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, mediaItems.length]);
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    
+    if (tabId === "gameplay") {
+      // Find the first video or youtube item in mediaItems
+      const firstVideoIdx = mediaItems.findIndex(item => item.type === 'video' || item.type === 'youtube');
+      if (firstVideoIdx !== -1) {
+        setSelectedMediaIndex(firstVideoIdx);
+        setIsPlaying(true);
+      } else {
+        setIsPlaying(false);
+      }
+      const element = document.getElementById("screens");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    } else if (tabId === "screens") {
+      // If screenshots clicked, make sure we show first image if we were playing video
+      const firstImgIdx = mediaItems.findIndex(item => item.type === 'image');
+      if (firstImgIdx !== -1) {
+        setSelectedMediaIndex(firstImgIdx);
+      }
+      setIsPlaying(false);
+      const element = document.getElementById("screens");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    } else {
+      const element = document.getElementById(tabId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
 
   if (!deal && !isLoading) {
     return (
@@ -173,15 +298,24 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
         </div>
         
         {/* Tabs Bar */}
-        <div className="flex gap-4 overflow-x-auto border-b border-white/10 mb-8 pb-px no-scrollbar">
+        <div className="flex gap-4 overflow-x-auto border-b border-white/10 mb-8 pb-px no-scrollbar sticky top-16 sm:top-20 bg-[#070A11]/90 backdrop-blur-md z-20 transition-all duration-300">
           {[
-            { id: "overview", label: "OVERVIEW", icon: LayoutTemplate, active: true },
-            { id: "sysreq", label: "SYSTEM REQUIREMENTS", icon: Monitor, active: false },
-            { id: "screens", label: "SCREENSHOTS", icon: ImageIcon, active: false },
-            { id: "gameplay", label: "GAMEPLAY", icon: Video, active: false },
-            { id: "info", label: "INFO", icon: Info, active: false }
+            { id: "overview", label: "OVERVIEW", icon: LayoutTemplate },
+            { id: "sysreq", label: "SYSTEM REQUIREMENTS", icon: Monitor },
+            { id: "screens", label: "SCREENSHOTS", icon: ImageIcon },
+            { id: "gameplay", label: "GAMEPLAY", icon: Video },
+            { id: "info", label: "INFO", icon: Info }
           ].map((tab) => (
-             <button key={tab.id} className={cn("flex items-center gap-2 pb-4 px-2 text-[11px] font-bold tracking-[0.15em] border-b-2 hover:text-white transition-colors whitespace-nowrap", tab.active ? "text-[#8B5CF6] border-[#8B5CF6]" : "text-slate-400 border-transparent")}>
+             <button
+               key={tab.id}
+               onClick={() => handleTabClick(tab.id)}
+               className={cn(
+                 "flex items-center gap-2 pb-4 px-2 text-[11px] font-bold tracking-[0.15em] border-b-2 hover:text-white transition-all whitespace-nowrap",
+                 activeTab === tab.id
+                   ? "text-[#8B5CF6] border-[#8B5CF6]"
+                   : "text-slate-400 border-transparent hover:border-slate-700"
+               )}
+             >
                <tab.icon className="w-4 h-4" /> {tab.label}
              </button>
           ))}
@@ -193,7 +327,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
            <div className="space-y-6 flex flex-col">
               
               {/* Overview */}
-              <div className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 flex-grow">
+              <div id="overview" className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 flex-grow scroll-mt-28">
                  <h2 className="flex items-center gap-2 font-bold mb-6 text-xl"><Gamepad2 className="w-5 h-5 text-[#8B5CF6]" /> Overview</h2>
                  <p className="text-sm text-slate-300 leading-relaxed mb-8 whitespace-pre-wrap">
                     {deal.description}
@@ -208,7 +342,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
               </div>
               
               {/* About This Game */}
-              <div className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5">
+              <div id="info" className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 scroll-mt-28">
                  <h2 className="font-bold mb-4 text-xl">About This Game</h2>
                  <p className="text-sm text-slate-300 mb-8">
                    Dive into {deal.title} and experience an amazing adventure. Each round is different, and the fun never ends!
@@ -224,7 +358,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
               </div>
               
               {/* System Requirements */}
-              <div className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5">
+              <div id="sysreq" className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 scroll-mt-28">
                 <h2 className="flex items-center gap-2 font-bold mb-6 text-xl"><Monitor className="w-5 h-5 text-[#8B5CF6]" /> System Requirements</h2>
                 <div className="flex gap-2 mb-6 border-b border-white/10">
                   <button onClick={() => setActiveReqTab("min")} className={cn("px-5 py-2 text-sm font-bold transition-colors", activeReqTab === "min" ? "bg-[#1E293B] rounded-t-lg text-white border-b-2 border-[#8B5CF6]" : "text-slate-400 hover:text-white")}>Minimum</button>
@@ -274,41 +408,118 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
            
            {/* Right Col */}
            <div className="space-y-6 flex flex-col">
-             
-             {/* Screenshots */}
-             <div className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5">
-               <div className="flex justify-between items-center mb-6">
-                 <h2 className="flex items-center gap-2 font-bold text-xl"><ImageIcon className="w-5 h-5 text-[#8B5CF6]" /> Screenshots</h2>
-                 <button className="text-sm text-slate-400 hover:text-white font-medium group">View all <span className="group-hover:translate-x-1 inline-block transition-transform">&gt;</span></button>
-               </div>
-               
-               {/* Main Image */}
-               <div className="aspect-video bg-slate-900 rounded-xl mb-3 relative overflow-hidden group border border-white/5">
-                 <img src={deal.image || deal.thumbnail} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                 <div className="absolute inset-0 flex items-center justify-center">
-                   <div className="w-14 h-14 rounded-full border-[3px] border-white flex items-center justify-center bg-black/50 hover:bg-black/70 transition-colors cursor-pointer hover:scale-110">
-                     <div className="ml-1 w-0 h-0 border-t-[8px] border-t-transparent border-l-[14px] border-l-white border-b-[8px] border-b-transparent"></div>
-                   </div>
-                 </div>
-               </div>
-               
-               {/* Thumbs */}
-               <div className="grid grid-cols-4 gap-3">
-                 <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden border border-[#8B5CF6] ring-2 ring-[#8B5CF6]/20 relative">
-                   <img src={deal.thumbnail} className="w-full h-full object-cover" />
-                 </div>
-                 <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/5 hover:border-white/20 transition-colors cursor-pointer opacity-70 hover:opacity-100 relative items-center justify-center flex text-slate-500">
-                    <ImageIcon className="w-6 h-6" />
-                 </div>
-                 <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/5 hover:border-white/20 transition-colors cursor-pointer opacity-70 hover:opacity-100 relative items-center justify-center flex text-slate-500">
-                    <ImageIcon className="w-6 h-6" />
-                 </div>
-                 <div className="aspect-video bg-slate-800 rounded-lg overflow-hidden border border-white/5 hover:border-white/20 transition-colors cursor-pointer opacity-70 hover:opacity-100 relative items-center justify-center flex text-slate-500">
-                    <ImageIcon className="w-6 h-6" />
-                 </div>
-               </div>
-             </div>
-             
+              
+              {/* Screenshots & Trailers */}
+              <div id="screens" className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 scroll-mt-28">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="flex items-center gap-2 font-bold text-xl"><ImageIcon className="w-5 h-5 text-[#8B5CF6]" /> Media Gallery</h2>
+                  {mediaItems.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setLightboxIndex(selectedMediaIndex);
+                        setIsLightboxOpen(true);
+                      }}
+                      className="text-sm text-slate-400 hover:text-white font-medium group flex items-center gap-1 transition-colors"
+                    >
+                      View all <span className="group-hover:translate-x-1 inline-block transition-transform duration-200">&gt;</span>
+                    </button>
+                  )}
+                </div>
+                
+                {/* Main Media Viewer */}
+                <div className="aspect-video bg-slate-950 rounded-xl mb-4 relative overflow-hidden group border border-white/5 shadow-inner">
+                  {isPlaying && selectedMediaItem && (selectedMediaItem.type === 'video' || selectedMediaItem.type === 'youtube') ? (
+                    <div className="w-full h-full">
+                      {selectedMediaItem.type === 'video' ? (
+                        <video
+                          src={selectedMediaItem.url}
+                          controls
+                          autoPlay
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${selectedMediaItem.url}?autoplay=1&rel=0`}
+                          className="w-full h-full border-0"
+                          allowFullScreen
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    selectedMediaItem && (
+                      <div
+                        className="w-full h-full relative cursor-pointer group"
+                        onClick={() => {
+                          if (selectedMediaItem.type === 'video' || selectedMediaItem.type === 'youtube') {
+                            setIsPlaying(true);
+                          } else {
+                            setLightboxIndex(selectedMediaIndex);
+                            setIsLightboxOpen(true);
+                          }
+                        }}
+                      >
+                        <img
+                          src={selectedMediaItem.url || selectedMediaItem.thumbnail}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                          alt={deal.title}
+                        />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300" />
+                        
+                        {/* Video play overlay */}
+                        {(selectedMediaItem.type === 'video' || selectedMediaItem.type === 'youtube') ? (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-16 h-16 rounded-full border-[3px] border-white flex items-center justify-center bg-black/60 backdrop-blur-sm group-hover:bg-[#8B5CF6] group-hover:scale-110 transition-all duration-300 shadow-2xl">
+                              <Play className="w-6 h-6 text-white fill-current ml-1" />
+                            </div>
+                            <span className="absolute bottom-4 right-4 bg-black/85 text-xs font-bold text-white px-3 py-1.5 rounded-lg border border-white/10 uppercase tracking-wider flex items-center gap-1.5 backdrop-blur-sm">
+                              <Video className="w-3.5 h-3.5" /> Watch Trailer
+                            </span>
+                          </div>
+                        ) : (
+                          /* Zoom overlay for image */
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20">
+                            <div className="w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/10 hover:scale-115 transition-transform duration-200">
+                              <span className="text-white text-base">🔍</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  )}
+                </div>
+                
+                {/* Thumbnails Swiper Row */}
+                <div className="relative">
+                  <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-2 pt-1 scroll-smooth">
+                    {mediaItems.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSelectedMediaIndex(idx);
+                          setIsPlaying(false);
+                        }}
+                        className={cn(
+                          "relative aspect-video w-24 shrink-0 rounded-lg overflow-hidden border transition-all duration-300",
+                          selectedMediaIndex === idx
+                            ? "border-[#8B5CF6] ring-2 ring-[#8B5CF6]/40 opacity-100 scale-95"
+                            : "border-white/5 opacity-60 hover:opacity-100 hover:border-white/20 hover:scale-[1.02]"
+                        )}
+                      >
+                        <img src={item.thumbnail} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
+                        {(item.type === 'video' || item.type === 'youtube') && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[0.5px]">
+                            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                              <Play className="w-2.5 h-2.5 text-white fill-current ml-0.5" />
+                            </div>
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
              {/* Why Play */}
              <div className="bg-[#111A2D] p-6 lg:p-8 rounded-2xl border border-white/5 relative overflow-hidden flex-grow flex flex-col justify-center">
                <h2 className="font-bold mb-6 relative z-10 text-xl">Why Play {deal.title}?</h2>
@@ -391,7 +602,75 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
            </div>
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {isLightboxOpen && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[999] flex flex-col items-center justify-center p-4 select-none">
+          {/* Close Button */}
+          <button 
+            onClick={() => setIsLightboxOpen(false)} 
+            className="absolute top-6 right-6 text-slate-400 hover:text-white p-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/5 transition-all duration-200 z-50 animate-in fade-in"
+            aria-label="Close Lightbox"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Main Content Area */}
+          <div className="relative w-full max-w-5xl aspect-video flex items-center justify-center">
+            {/* Prev Button */}
+            <button 
+              onClick={handlePrevLightbox} 
+              className="absolute left-4 z-10 p-4 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/5 hover:scale-110 active:scale-95 transition-all"
+              aria-label="Previous Media"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            
+            {/* Media Container */}
+            <div className="w-full h-full rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/5">
+              {mediaItems[lightboxIndex]?.type === 'image' && (
+                <img 
+                  src={mediaItems[lightboxIndex].url} 
+                  className="max-h-full max-w-full object-contain animate-in zoom-in-95 duration-200" 
+                  alt="Game Screenshot" 
+                />
+              )}
+              {mediaItems[lightboxIndex]?.type === 'video' && (
+                <video 
+                  src={mediaItems[lightboxIndex].url} 
+                  controls 
+                  autoPlay 
+                  className="max-h-full max-w-full object-contain" 
+                />
+              )}
+              {mediaItems[lightboxIndex]?.type === 'youtube' && (
+                <iframe 
+                  src={`https://www.youtube.com/embed/${mediaItems[lightboxIndex].url}?autoplay=1&rel=0`} 
+                  className="w-full h-full border-0" 
+                  allowFullScreen 
+                  allow="autoplay; encrypted-media" 
+                />
+              )}
+            </div>
+
+            {/* Next Button */}
+            <button 
+              onClick={handleNextLightbox} 
+              className="absolute right-4 z-10 p-4 rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/5 hover:scale-110 active:scale-95 transition-all"
+              aria-label="Next Media"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Caption & Counter */}
+          <div className="mt-6 flex flex-col items-center">
+            <p className="text-sm font-semibold tracking-wider text-slate-400 bg-white/5 px-4 py-1.5 rounded-full border border-white/5">
+              Media {lightboxIndex + 1} of {mediaItems.length}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

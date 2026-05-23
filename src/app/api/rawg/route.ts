@@ -41,7 +41,17 @@ async function fetchRawgData(title: string) {
   let data; try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from RAWG"); }
   
   if (data.results && data.results.length > 0) {
-    const gameId = data.results[0].id;
+    const baseData = data.results[0];
+    
+    // Process gallery
+    const gallery: any[] = [];
+    if (baseData.short_screenshots) {
+      baseData.short_screenshots.forEach((s: any) => {
+        gallery.push({ type: 'image', url: s.image, thumbnail: s.image });
+      });
+    }
+
+    const gameId = baseData.id;
     const detailRes = await fetch(`https://api.rawg.io/api/games/${gameId}?key=${rawgKey}`, {
       headers: { "User-Agent": "FreeGameTracker/1.0" },
       next: { revalidate: 604800 } // Cache for 7 days
@@ -51,12 +61,16 @@ async function fetchRawgData(title: string) {
        try {
           const detailData = await detailRes.json();
           detailData.release_date = detailData.released;
+          if (detailData.clip && detailData.clip.clip) {
+             gallery.unshift({ type: 'video', url: detailData.clip.clip, thumbnail: detailData.clip.preview });
+          }
+          detailData.gallery = gallery;
           return detailData;
        } catch(e) {}
     }
     
-    const baseData = data.results[0];
     baseData.release_date = baseData.released;
+    baseData.gallery = gallery;
     return baseData;
   }
   

@@ -55,7 +55,7 @@ async function fetchIgdbData(title: string) {
       "Authorization": `Bearer ${token}`,
       "Accept": "application/json",
     },
-    body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url,involved_companies.company.name,first_release_date; limit 1;`,
+    body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url,involved_companies.company.name,first_release_date,screenshots.url,videos.video_id; limit 1;`,
     next: { revalidate: 604800 } // Cache for 7 days on Vercel
   });
   
@@ -66,6 +66,23 @@ async function fetchIgdbData(title: string) {
     if (data[0].cover && data[0].cover.url) {
       data[0].background_image = 'https:' + data[0].cover.url.replace('t_thumb', 't_1080p');
     }
+    
+    // Process gallery
+    const gallery: any[] = [];
+    if (data[0].videos) {
+      data[0].videos.forEach((v: any) => {
+        gallery.push({ type: 'youtube', url: v.video_id, thumbnail: `https://img.youtube.com/vi/${v.video_id}/0.jpg` });
+      });
+    }
+    if (data[0].screenshots) {
+      data[0].screenshots.forEach((s: any) => {
+        const url = 'https:' + s.url.replace('t_thumb', 't_1080p');
+        const thumb = 'https:' + s.url;
+        gallery.push({ type: 'image', url, thumbnail: thumb });
+      });
+    }
+    data[0].gallery = gallery;
+
     // Format involved companies
     if (data[0].involved_companies) {
        data[0].developers = data[0].involved_companies.map((ic: any) => ({ name: ic.company?.name }));
