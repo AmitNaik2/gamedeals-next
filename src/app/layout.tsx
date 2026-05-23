@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const siteUrl = "https://www.gamesdealshub.me";
@@ -104,6 +105,7 @@ export default function RootLayout({
         </noscript>
 
         {children}
+        <Analytics />
       </body>
     </html>
   );
