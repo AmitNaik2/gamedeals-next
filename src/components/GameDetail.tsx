@@ -475,7 +475,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
                       >
                         <img
                           src={selectedMediaItem.url || selectedMediaItem.thumbnail}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                          className="w-full h-full object-cover"
                           alt={deal.title}
                         />
                         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300" />
