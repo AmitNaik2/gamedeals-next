@@ -17,7 +17,8 @@ async function fetchRawgData(title: string) {
 
   const encodedTitle = encodeURIComponent(cleanTitle);
   const response = await fetch(`https://api.rawg.io/api/games?search=${encodedTitle}&key=${rawgKey}&page_size=1`, {
-    headers: { "User-Agent": "FreeGameTracker/1.0" }
+    headers: { "User-Agent": "FreeGameTracker/1.0" },
+    next: { revalidate: 604800 } // Cache for 7 days on Vercel Edge network to save 20k API limit
   });
   
   rawgUsageCount++;
@@ -34,7 +35,8 @@ async function fetchRawgData(title: string) {
   if (data.results && data.results.length > 0) {
     const gameId = data.results[0].id;
     const detailRes = await fetch(`https://api.rawg.io/api/games/${gameId}?key=${rawgKey}`, {
-      headers: { "User-Agent": "FreeGameTracker/1.0" }
+      headers: { "User-Agent": "FreeGameTracker/1.0" },
+      next: { revalidate: 604800 } // Cache for 7 days
     });
     rawgUsageCount++;
     if (detailRes.ok) {

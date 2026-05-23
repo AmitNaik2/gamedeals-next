@@ -51,7 +51,8 @@ async function fetchIgdbData(title: string) {
       "Authorization": `Bearer ${token}`,
       "Accept": "application/json",
     },
-    body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url,involved_companies.company.name; limit 1;`
+    body: `search "${cleanTitle}"; fields name,rating,summary,cover.url,genres.name,platforms.name,url,involved_companies.company.name; limit 1;`,
+    next: { revalidate: 604800 } // Cache for 7 days on Vercel
   });
   
   if (!response.ok) throw new Error("Failed to fetch from IGDB");

@@ -11,7 +11,8 @@ async function fetchRawgSearch(query: string) {
 
   const encodedTitle = encodeURIComponent(query);
   const response = await fetch(`https://api.rawg.io/api/games?search=${encodedTitle}&key=${rawgKey}&page_size=10`, {
-    headers: { "User-Agent": "FreeGameTracker/1.0" }
+    headers: { "User-Agent": "FreeGameTracker/1.0" },
+    next: { revalidate: 604800 } // Cache for 7 days on Vercel Edge network to save 20k API limit
   });
   rawgUsageCount++;
   
