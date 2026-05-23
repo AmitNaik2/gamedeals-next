@@ -32,7 +32,7 @@ export function ContactForm() {
         setResult("Success! Your message has been sent.");
         (event.target as HTMLFormElement).reset();
       } else {
-        setResult(data.message || "Error sending message");
+        setResult(data.error || data.message || "Error sending message");
       }
     } catch (error) {
       setResult("Something went wrong. Please try again.");
