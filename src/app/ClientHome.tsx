@@ -534,7 +534,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
               </div>
               <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#9CA3AF] px-2 tracking-widest uppercase shrink-0 pb-4">
                 <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
-                 <span><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
+                 <span suppressHydrationWarning><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
               </div>
             </div>
 
