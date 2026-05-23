@@ -34,8 +34,12 @@ export default function GamePage() {
           safeParse(resUpcoming),
           safeParse(dbRes)
         ]);
+        const formattedGames = games.map((deal: any) => ({
+          ...deal,
+          id: `gp_${deal.id}`
+        }));
         
-        allDeals = [...games, ...upcoming, ...dlc];
+        allDeals = [...formattedGames, ...upcoming, ...dlc];
         
         if (premiumRes && premiumRes.ok) {
            try {
