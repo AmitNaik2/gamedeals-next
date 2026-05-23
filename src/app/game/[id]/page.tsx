@@ -59,9 +59,10 @@ async function fetchServerDeal(id: string): Promise<GameDeal | null> {
 }
 
 export async function generateMetadata(
-  { params }: { params: { id: string } },
+  props: { params: Promise<{ id: string }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
+  const params = await props.params;
   const deal = await fetchServerDeal(params.id);
   
   if (!deal) {
@@ -82,7 +83,8 @@ export async function generateMetadata(
   };
 }
 
-export default async function GamePage({ params }: { params: { id: string } }) {
+export default async function GamePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const deal = await fetchServerDeal(params.id);
 
   if (!deal) {
