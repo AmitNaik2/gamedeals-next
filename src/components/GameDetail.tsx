@@ -94,6 +94,16 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
 
   const selectedMediaItem = mediaItems[selectedMediaIndex] || mediaItems[0];
 
+  const handlePrevMedia = () => {
+    setSelectedMediaIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1));
+    setIsPlaying(false);
+  };
+
+  const handleNextMedia = () => {
+    setSelectedMediaIndex((prev) => (prev === mediaItems.length - 1 ? 0 : prev + 1));
+    setIsPlaying(false);
+  };
+
   const handlePrevLightbox = () => {
     setLightboxIndex((prev) => (prev === 0 ? mediaItems.length - 1 : prev - 1));
   };
@@ -502,72 +512,64 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
                     )
                   )}
 
-                  {/* Navigation Arrows */}
-                  {mediaItems.length > 1 && (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedMediaIndex((prev) => (prev > 0 ? prev - 1 : mediaItems.length - 1));
-                          setIsPlaying(false);
-                        }}
-                        className="absolute left-3 bottom-3 w-10 h-10 rounded-full bg-black/60 hover:bg-[#8B5CF6] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:scale-110 z-10 backdrop-blur-sm shadow-xl"
-                        aria-label="Previous Media"
-                      >
-                        <ChevronLeft className="w-6 h-6 mr-0.5" />
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedMediaIndex((prev) => (prev < mediaItems.length - 1 ? prev + 1 : 0));
-                          setIsPlaying(false);
-                        }}
-                        className="absolute right-3 bottom-3 w-10 h-10 rounded-full bg-black/60 hover:bg-[#8B5CF6] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-all duration-300 border border-white/10 hover:scale-110 z-10 backdrop-blur-sm shadow-xl"
-                        aria-label="Next Media"
-                      >
-                        <ChevronRight className="w-6 h-6 ml-0.5" />
-                      </button>
-                    </>
-                  )}
+                  {/* Removed Navigation Arrows from here */}
                 </div>
                 
-                {/* Thumbnails Grid */}
-                <div className="grid grid-cols-4 gap-3">
-                  {[0, 1, 2, 3].map((idx) => {
-                    const item = mediaItems[idx];
-                    if (item) {
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => {
-                            setSelectedMediaIndex(idx);
-                            setIsPlaying(false);
-                          }}
-                          className={cn(
-                            "relative aspect-video w-full rounded-lg overflow-hidden transition-all duration-300",
-                            selectedMediaIndex === idx
-                              ? "opacity-100 ring-2 ring-[#8B5CF6] ring-offset-2 ring-offset-[#111A2D] scale-100"
-                              : "opacity-50 hover:opacity-100 hover:scale-[1.02]"
-                          )}
-                        >
-                          <img src={item.thumbnail} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
-                          {(item.type === 'video' || item.type === 'youtube') && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[0.5px]">
-                              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                                <Play className="w-2 h-2 text-white fill-current ml-0.5" />
+                {/* Thumbnails Navigation Row */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePrevMedia}
+                    className="p-2 rounded-lg bg-[#1E293B]/60 hover:bg-[#1E293B] border border-white/10 hover:text-white text-slate-400 transition-colors shrink-0"
+                    title="Previous Media"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  <div className="grid grid-cols-4 gap-3 flex-1">
+                    {[0, 1, 2, 3].map((idx) => {
+                      const item = mediaItems[idx];
+                      if (item) {
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              setSelectedMediaIndex(idx);
+                              setIsPlaying(false);
+                            }}
+                            className={cn(
+                              "relative aspect-video w-full rounded-lg overflow-hidden transition-all duration-300",
+                              selectedMediaIndex === idx
+                                ? "opacity-100 ring-2 ring-[#8B5CF6] ring-offset-2 ring-offset-[#111A2D] scale-100"
+                                : "opacity-50 hover:opacity-100 hover:scale-[1.02]"
+                            )}
+                          >
+                            <img src={item.thumbnail} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
+                            {(item.type === 'video' || item.type === 'youtube') && (
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[0.5px]">
+                                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                                  <Play className="w-2 h-2 text-white fill-current ml-0.5" />
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    } else {
-                      return (
-                        <div key={idx} className="relative aspect-video w-full rounded-lg bg-[#1A2235] flex items-center justify-center opacity-30">
-                          <ImageIcon className="w-5 h-5 text-slate-500" />
-                        </div>
-                      );
-                    }
-                  })}
+                            )}
+                          </button>
+                        );
+                      } else {
+                        return (
+                          <div key={idx} className="relative aspect-video w-full rounded-lg bg-[#1A2235] flex items-center justify-center opacity-30">
+                            <ImageIcon className="w-5 h-5 text-slate-500" />
+                          </div>
+                        );
+                      }
+                    })}
+                  </div>
+
+                  <button
+                    onClick={handleNextMedia}
+                    className="p-2 rounded-lg bg-[#1E293B]/60 hover:bg-[#1E293B] border border-white/10 hover:text-white text-slate-400 transition-colors shrink-0"
+                    title="Next Media"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               </div>
 
