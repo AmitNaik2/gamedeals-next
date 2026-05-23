@@ -308,28 +308,39 @@ function CommandItem({ icon: Icon, label }: { icon: any, label: string }) {
 // --- VIEWS ---
 
 function DashboardOverview({ deals }: { deals: GameDeal[] }) {
+  // Generate real activity from deals
+  const liveActivity = deals.slice(0, 4).map((deal, index) => ({
+    id: deal.id || index,
+    type: 'deal',
+    message: `New deal detected: ${deal.title} on ${deal.platforms}`,
+    time: deal.published_date || 'recently'
+  }));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
         <div className="flex gap-2">
            <button className="px-3 py-1.5 text-sm bg-[#18181b] border border-[#3f3f46] rounded-lg hover:border-[#3b82f6] transition-colors flex items-center gap-2">
-             <Clock className="w-4 h-4" /> Last 24h
+             <Clock className="w-4 h-4" /> Live Data
            </button>
         </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-         <StatCard title="Active Deals" value={String(deals.length)} trend="+12%" icon={Tag} />
-         <StatCard title="Active Users" value="1,482" trend="+5.4%" icon={Users} />
-         <StatCard title="Revenue (AdSense)" value="$241.50" trend="-2.1%" icon={TrendingUp} negative />
-         <StatCard title="Total Traffic" value="24.5k" trend="+18%" icon={Globe} />
+         <StatCard title="Active Deals" value={String(deals.length)} trend="Live" icon={Tag} />
+         <StatCard title="Active Users" value="--" trend="Needs GA API" icon={Users} />
+         <StatCard title="Revenue" value="--" trend="Needs AdSense API" icon={TrendingUp} negative />
+         <StatCard title="Total Traffic" value="--" trend="Needs Vercel API" icon={Globe} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mt-6">
          {/* Fake Chart Area */}
          <div className="bg-[#18181b] border border-[#3f3f46] rounded-xl p-6 flex flex-col min-h-[400px]">
-            <h3 className="font-bold mb-6">Traffic & Engagement</h3>
+            <h3 className="font-bold mb-6 flex items-center justify-between">
+              Traffic & Engagement
+              <span className="text-xs font-normal text-[#a1a1aa] bg-[#27272a] px-2 py-1 rounded">Requires Analytics Setup</span>
+            </h3>
             <div className="flex-1 border border-dashed border-[#3f3f46] rounded-lg flex items-center justify-center text-[#a1a1aa]">
                Interactive Chart Placeholder
             </div>
@@ -342,12 +353,10 @@ function DashboardOverview({ deals }: { deals: GameDeal[] }) {
               <span className="w-2 h-2 rounded-full bg-[#3b82f6] animate-ping"></span>
             </div>
             <div className="space-y-4">
-               {recentActivity.map(act => (
+               {liveActivity.map(act => (
                  <div key={act.id} className="flex gap-3">
                     <div className="mt-0.5">
-                      {act.type === 'alert' ? <ShieldAlert className="w-4 h-4 text-[#ef4444]" /> :
-                       act.type === 'deal' ? <Tag className="w-4 h-4 text-[#3b82f6]" /> :
-                       <Users className="w-4 h-4 text-[#22c55e]" />}
+                      <Tag className="w-4 h-4 text-[#3b82f6]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-[#fafafa] leading-snug">{act.message}</p>
@@ -355,6 +364,13 @@ function DashboardOverview({ deals }: { deals: GameDeal[] }) {
                     </div>
                  </div>
                ))}
+               <div className="flex gap-3">
+                  <div className="mt-0.5"><Users className="w-4 h-4 text-[#22c55e]" /></div>
+                  <div>
+                    <p className="text-sm font-medium text-[#fafafa] leading-snug">System tracking active.</p>
+                    <span className="text-xs text-[#a1a1aa]">now</span>
+                  </div>
+               </div>
             </div>
          </div>
       </div>
@@ -371,7 +387,7 @@ function StatCard({ title, value, trend, icon: Icon, negative = false }: any) {
       </div>
       <div className="flex items-end justify-between">
         <span className="text-3xl font-bold tracking-tight">{value}</span>
-        <span className={cn("text-xs font-bold px-2 py-1 rounded-md", negative ? "bg-[#ef4444]/10 text-[#ef4444]" : "bg-[#22c55e]/10 text-[#22c55e]")}>
+        <span className={cn("text-xs font-bold px-2 py-1 rounded-md", trend.includes("API") ? "bg-[#3f3f46]/50 text-[#a1a1aa]" : negative ? "bg-[#ef4444]/10 text-[#ef4444]" : "bg-[#22c55e]/10 text-[#22c55e]")}>
           {trend}
         </span>
       </div>
@@ -384,15 +400,15 @@ function DealTracker({ deals }: { deals: GameDeal[] }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Deal Tracker</h1>
-        <button className="bg-[#fafafa] text-[#09090b] px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-white transition-colors">
+        <button onClick={() => window.location.reload()} className="bg-[#fafafa] text-[#09090b] px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-white transition-colors">
           <RefreshCw className="w-4 h-4" /> Sync Now
         </button>
       </div>
 
       <div className="bg-[#18181b] border border-[#3f3f46] rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-[#09090b] text-[#a1a1aa]">
+        <div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
+          <table className="w-full text-left text-sm relative">
+            <thead className="bg-[#09090b] text-[#a1a1aa] sticky top-0 z-10 shadow-sm shadow-black/50">
               <tr>
                 <th className="px-6 py-3 font-semibold border-b border-[#3f3f46]">Game Title</th>
                 <th className="px-6 py-3 font-semibold border-b border-[#3f3f46]">Platform</th>
@@ -402,16 +418,16 @@ function DealTracker({ deals }: { deals: GameDeal[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#3f3f46]">
-              {deals.slice(0, 10).map((deal, i) => (
+              {deals.map((deal, i) => (
                 <tr key={i} className="hover:bg-[#27272a]/50 transition-colors">
-                  <td className="px-6 py-4 font-medium max-w-[200px] truncate">{deal.title}</td>
+                  <td className="px-6 py-4 font-medium max-w-[200px] truncate" title={deal.title}>{deal.title}</td>
                   <td className="px-6 py-4 text-[#a1a1aa]">{deal.platforms}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 bg-[#27272a] rounded text-xs font-semibold text-[#fafafa]">{deal.type || 'Discount'}</span>
                   </td>
-                  <td className="px-6 py-4 font-bold">{deal.salePrice === "0.00" ? "FREE" : `$${deal.salePrice || deal.worth}`}</td>
+                  <td className="px-6 py-4 font-bold">{deal.salePrice === "0.00" || deal.salePrice === "0" ? "FREE" : deal.salePrice ? `$${deal.salePrice}` : (deal.worth === "N/A" ? "FREE" : deal.worth)}</td>
                   <td className="px-6 py-4 text-right">
-                    <span className="px-2 py-1 bg-[#22c55e]/10 text-[#22c55e] rounded text-xs font-bold uppercase">Active</span>
+                    <span className="px-2 py-1 bg-[#22c55e]/10 text-[#22c55e] rounded text-xs font-bold uppercase">{deal.status || "Active"}</span>
                   </td>
                 </tr>
               ))}
@@ -424,22 +440,66 @@ function DealTracker({ deals }: { deals: GameDeal[] }) {
 }
 
 function PerformanceMonitor() {
+  const [metrics, setMetrics] = useState([
+    { label: 'Page Load', value: 'Calculating...', status: 'measuring' },
+    { label: 'API Response', value: 'Pinging...', status: 'measuring' }
+  ]);
+
+  useEffect(() => {
+    // Measure Page Load
+    const observer = new PerformanceObserver((list) => {
+      const entries = list.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+      if (entries.length > 0) {
+        const loadTime = (entries[0].loadEventEnd / 1000).toFixed(2);
+        setMetrics(prev => {
+          const newMetrics = [...prev];
+          newMetrics[0] = { label: 'Page Load', value: `${loadTime}s`, status: 'optimal' };
+          return newMetrics;
+        });
+      }
+    });
+    observer.observe({ type: "navigation", buffered: true });
+
+    // Measure API latency
+    const measureApi = async () => {
+      const start = performance.now();
+      try {
+        await fetch('/api/giveaways-feed?limit=1');
+        const end = performance.now();
+        const latency = Math.round(end - start);
+        setMetrics(prev => {
+          const newMetrics = [...prev];
+          newMetrics[1] = { label: 'API Response', value: `${latency}ms`, status: latency < 300 ? 'optimal' : 'warning' };
+          return newMetrics;
+        });
+      } catch (e) {
+        setMetrics(prev => {
+          const newMetrics = [...prev];
+          newMetrics[1] = { label: 'API Response', value: `Error`, status: 'error' };
+          return newMetrics;
+        });
+      }
+    };
+    measureApi();
+  }, []);
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold tracking-tight">System Performance</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {performanceMetrics.map((m, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {metrics.map((m, i) => (
           <div key={i} className="bg-[#18181b] border border-[#3f3f46] p-5 rounded-xl">
              <div className="text-sm font-semibold text-[#a1a1aa] mb-2">{m.label}</div>
              <div className="text-3xl font-bold mb-1">{m.value}</div>
-             <div className="text-xs text-[#22c55e] uppercase font-bold tracking-wider">{m.status}</div>
+             <div className={cn("text-xs uppercase font-bold tracking-wider", m.status === 'error' ? 'text-[#ef4444]' : m.status === 'warning' ? 'text-[#eab308]' : 'text-[#22c55e]')}>{m.status}</div>
           </div>
         ))}
       </div>
       <div className="bg-[#18181b] border border-[#3f3f46] rounded-xl p-6 min-h-[300px] flex items-center justify-center">
          <div className="flex flex-col items-center gap-4 text-[#a1a1aa]">
             <Server className="w-12 h-12 opacity-50" />
-            <p>Vercel Edge Network Analytics Visualizations</p>
+            <p>Vercel Analytics & Speed Insights Not Configured</p>
+            <p className="text-xs text-[#3f3f46] max-w-sm text-center">Enable Vercel Web Vitals in your dashboard to view detailed traffic and performance distribution graphs.</p>
          </div>
       </div>
     </div>
