@@ -275,12 +275,12 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       fetchPremium("");
     }
     
-    if (path.includes('/free-steam-games')) {
+    if (path.includes('/free-steam-games') || path.includes('/free_steam_games')) {
       setPlatformSearch("Steam");
-    } else if (path.includes('/free-epic-games')) {
+    } else if (path.includes('/free-epic-games') || path.includes('/free_epic_games')) {
       setActiveTab("Games");
       setPlatformSearch("Epic Games");
-    } else if (path.includes('/free-gog-games')) {
+    } else if (path.includes('/free-gog-games') || path.includes('/free_gog_games')) {
       setActiveTab("Games");
       setPlatformSearch("GOG");
     }

@@ -55,6 +55,34 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/free_steam_games',
+        destination: '/',
+      },
+      {
+        source: '/free-steam-games',
+        destination: '/',
+      },
+      {
+        source: '/free_epic_games',
+        destination: '/',
+      },
+      {
+        source: '/free-epic-games',
+        destination: '/',
+      },
+      {
+        source: '/free_gog_games',
+        destination: '/',
+      },
+      {
+        source: '/free-gog-games',
+        destination: '/',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
