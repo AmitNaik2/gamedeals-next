@@ -30,109 +30,7 @@ import { HeroSection } from "../components/HeroSection";
 import { SkeletonCard } from "../components/SkeletonCard";
 import { EmailSubscription } from "../components/EmailSubscription";
 
-function InlineSubscribe() {
-  const [email, setEmail] = useState("");
-  const [action, setAction] = useState<"subscribe" | "unsubscribe">("subscribe");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setStatus("loading");
-    try {
-      const endpoint = action === "subscribe" ? "/api/subscribe" : "/api/unsubscribe";
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Something went wrong");
-      setStatus("success");
-      setMessage(data.message);
-      setTimeout(() => {
-        setStatus("idle");
-        setEmail("");
-      }, 4000);
-    } catch (err: any) {
-      setStatus("error");
-      setMessage(err.message || "Failed to submit.");
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#EC4899]/30 rounded-3xl p-6 text-left relative overflow-hidden w-full max-w-md mx-auto mt-10 shadow-[0_0_20px_rgba(236,72,153,0.1)] group">
-      <div className="absolute top-0 right-0 w-32 h-32 bg-[#EC4899]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
-      
-      <h4 className="text-lg font-orbitron font-bold italic mb-1 text-[#F9FAFB] glow-text">Never miss a drop.</h4>
-      <p className="text-[11px] font-poppins text-[#9CA3AF] mb-4 tracking-tight">Instant email alerts for amazing deals and limited free games.</p>
-      
-      <AnimatePresence>
-        {status === 'success' && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            className="absolute inset-0 bg-[#0A0A0B]/95 backdrop-blur-md flex flex-col items-center justify-center p-4 text-center z-10"
-          >
-              <span className="text-[#22C55E] mb-2"><CheckCircle2 className="w-8 h-8 drop-shadow-[0_0_10px_rgba(34,197,94,0.8)]" /></span>
-              <p className="text-xs text-white font-medium">{message}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="flex items-center gap-4 mb-4">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input 
-            type="radio" 
-            name="action" 
-            value="subscribe" 
-            checked={action === "subscribe"} 
-            onChange={() => setAction("subscribe")}
-            className="accent-[#EC4899]"
-          />
-          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Subscribe</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input 
-            type="radio" 
-            name="action" 
-            value="unsubscribe" 
-            checked={action === "unsubscribe"} 
-            onChange={() => setAction("unsubscribe")}
-            className="accent-[#EF4444]"
-          />
-          <span className="text-xs font-poppins text-[#9CA3AF] group-hover:text-white transition-colors">Unsubscribe</span>
-        </label>
-      </div>
-
-      <div className="relative">
-        <input 
-          type="email" 
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com" 
-          disabled={status === 'loading'}
-          className="w-full bg-[#050816] border border-white/10 rounded-xl py-3 pl-4 pr-[100px] text-xs focus:outline-none focus:border-[#EC4899] focus:shadow-[0_0_10px_rgba(236,72,153,0.3)] transition-all text-white placeholder:text-[#9CA3AF] disabled:opacity-50" 
-        />
-        <button 
-          type="submit"
-          disabled={status === 'loading' || !email}
-          className={cn(
-            "absolute right-2 top-2 h-8 px-4 transition-all text-[#050816] text-[10px] font-bold uppercase tracking-widest rounded-lg disabled:opacity-50",
-            action === "subscribe" 
-              ? "bg-[#EC4899] hover:bg-white shadow-[0_0_10px_rgba(236,72,153,0.5)]" 
-              : "bg-[#EF4444] hover:bg-white text-white hover:text-[#050816]"
-          )}
-        >
-          {status === 'loading' ? '...' : (action === "subscribe" ? 'Join' : 'Leave')}
-        </button>
-      </div>
-      {status === 'error' && <p className="text-[#EF4444] text-[10px] mt-2 font-poppins">{message}</p>}
-    </form>
-  );
-}
 
 interface ClientHomeProps {
   initialActiveGames?: GameDeal[];
@@ -501,9 +399,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
       <main className="container px-4 py-8 mx-auto max-w-7xl">
                 <HeroSection 
-                  onExploreClick={goFreeGames}
-                  onTrendingClick={goUpcoming}
-                />
+          onExploreClick={goFreeGames}
+          onFreeGamesClick={goFreeDlc}
+          onTrendingClick={goUpcoming}
+        />
 
               {/* Error State */}
               {error && (
