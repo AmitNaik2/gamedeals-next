@@ -10,10 +10,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-    const port = Number(process.env.SMTP_PORT) || 587;
-    const user = process.env.SMTP_EMAIL;
-    const pass = process.env.SMTP_PASSWORD;
+    const host = process.env.EMAIL_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.EMAIL_PORT) || 587;
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASS;
 
     if (!user || !pass) {
       console.error("SMTP credentials missing in environment variables");
