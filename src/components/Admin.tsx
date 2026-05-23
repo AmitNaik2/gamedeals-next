@@ -1,6 +1,7 @@
+﻿"use client";
 import { useState, useEffect, type FormEvent } from "react";
 import { Lock, LogOut, Monitor, Smartphone } from "lucide-react";
-import { Navigate } from "react-router-dom";
+
 import { type GameDeal } from "../types";
 
 interface AdminProps {
@@ -213,3 +214,5 @@ export function Admin({ deals }: AdminProps) {
     </div>
   );
 }
+
+

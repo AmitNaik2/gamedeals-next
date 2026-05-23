@@ -1,7 +1,17 @@
+"use client";
 import { motion } from "motion/react";
 import { type GameDeal } from "../types";
 import { Clock, Key, ArrowRight, Activity, CalendarClock, Target, Zap } from "lucide-react";
 import { Countdown } from "./Countdown";
+import Image from "next/image";
+
+// Helper to format date consistently on server & client (UTC) to prevent hydration mismatches
+const formatDateStr = (dateVal: string) => {
+  const date = new Date(dateVal);
+  if (isNaN(date.getTime())) return "Soon";
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+};
 
 export function UpcomingDropsGrid({ deals }: { deals: GameDeal[] }) {
   if (!deals || deals.length === 0) return null;
@@ -25,7 +35,7 @@ export function UpcomingDropsGrid({ deals }: { deals: GameDeal[] }) {
 
       <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
         {deals.map((item, i) => {
-          const dateStr = item.start_date ? new Date(item.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric'}) : "Soon";
+          const dateStr = item.start_date ? formatDateStr(item.start_date) : "Soon";
           
           let confidence = "High";
           let confidenceColor = "text-[#22C55E]";
@@ -52,11 +62,12 @@ export function UpcomingDropsGrid({ deals }: { deals: GameDeal[] }) {
               <div className="absolute inset-0 bg-gradient-to-br from-[#8B5CF6]/0 via-transparent to-[#8B5CF6]/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0"></div>
               
               <div className="relative h-40 overflow-hidden w-full bg-[#050816]">
-                <img 
+                <Image 
                   src={item.image} 
                   alt={item.title} 
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out z-0" 
-                  loading="lazy" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/80 to-transparent z-10 block" />
                 

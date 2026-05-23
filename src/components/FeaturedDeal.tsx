@@ -1,6 +1,8 @@
+"use client";
 import { motion } from "motion/react";
 import { type MouseEvent } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { type GameDeal } from "../types";
 import { Countdown } from "./Countdown";
 import { ExternalLink, BadgeCheck } from "lucide-react";
@@ -24,12 +26,13 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
       className="relative group overflow-hidden rounded-3xl h-[400px] sm:h-[450px] border border-white/10 mb-12 shadow-[0_0_40px_rgba(139,92,246,0.15)] bg-[#050816]"
     >
       <div className="absolute inset-0 z-0">
-        <img 
+        <Image 
           src={bgImage} 
           alt={deal.title} 
+          fill
+          sizes="100vw"
           className="w-full h-full object-cover opacity-50 group-hover:scale-110 group-hover:opacity-70 transition-all duration-1000 ease-out" 
-          loading="eager"
-          fetchPriority="high"
+          priority
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent z-10"></div>
@@ -47,7 +50,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
              </span>
           ))}
         </div>
-        <Link to={gameUrl} className="block w-fit group/title">
+        <Link href={gameUrl} className="block w-fit group/title">
           <h2 className="text-4xl sm:text-6xl font-orbitron font-black mb-4 text-[#F9FAFB] leading-tight group-hover/title:text-[#8B5CF6] group-hover/title:glow-text transition-all duration-300">
             {deal.title}
           </h2>
@@ -57,7 +60,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
         </p>
         <div className="flex flex-wrap items-center gap-6">
           <Link
-            to={gameUrl}
+            href={gameUrl}
             className="px-8 py-4 bg-white text-black text-[12px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#06B6D4] hover:text-white transition-all duration-300 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:scale-105"
           >
             Claim Drop

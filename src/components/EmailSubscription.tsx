@@ -1,3 +1,4 @@
+"use client";
 import { useState, type FormEvent } from 'react';
 import { Mail, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -63,3 +64,4 @@ export function EmailSubscription() {
     </div>
   );
 }
+

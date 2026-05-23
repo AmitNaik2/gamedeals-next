@@ -1,5 +1,6 @@
+"use client";
 import { Gamepad2, Search, Bell, User, Shield, Crosshair } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { type GameDeal } from "../types";
 
@@ -64,48 +65,11 @@ export function TopNavbar({
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 flex flex-col font-orbitron">
-      {/* Tactical Marquee */}
-      <div className="w-full bg-[#050816] border-b border-[#06B6D4]/30 py-1 overflow-hidden h-8 flex items-center relative z-[60]">
-        <div className="absolute inset-0 bg-[#06B6D4]/5 blur-xl pointer-events-none"></div>
-        <div className="flex gap-20 animate-marquee whitespace-nowrap items-center min-w-max px-4">
-           {/* Duplicate twice for seamless loop */}
-           {[1, 2].map((i) => (
-             <div key={i} className="flex gap-20 items-center">
-                <div className="flex items-center gap-2 group">
-                    <div className="flex items-center justify-center w-5 h-5 rounded-md bg-[#06B6D4]/20 text-[#06B6D4] border border-[#06B6D4]/30">
-                        <Crosshair className="w-3 h-3 fill-current animate-pulse" />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">GamesDealsHub System Active</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></div>
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                        STEAM DEALS: <span className="text-emerald-400 font-black tracking-widest">+{deals.filter(d => d.platforms.includes('Steam')).length || 124} FRESH OFFERS</span>
-                    </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] shadow-[0_0_8px_rgba(6,182,212,0.5)] animate-pulse"></div>
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                        EPIC GAMES: <span className="text-[#06B6D4] font-black tracking-widest">VERIFIED</span>
-                    </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)] animate-pulse"></div>
-                    <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                        GOG STORE: <span className="text-orange-400 font-black tracking-widest">ONLINE</span>
-                    </span>
-                </div>
-             </div>
-           ))}
-        </div>
-      </div>
-
-      <div className="bg-[#050816]/80 backdrop-blur-2xl border-b border-[#06B6D4]/20 shadow-[0_4px_30px_rgba(6,182,212,0.15)]">
-        <div className="container px-4 mx-auto max-w-[1400px]">
+    <nav className="sticky top-0 z-50 bg-[#050816]/80 backdrop-blur-2xl border-b border-[#06B6D4]/20 shadow-[0_4px_30px_rgba(6,182,212,0.15)] font-orbitron">
+      <div className="container px-4 mx-auto max-w-[1400px]">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           {/* Logo */}
-          <Link to="/" onClick={onHomeClick} className="flex items-center gap-3">
+          <Link href="/" onClick={onHomeClick} className="flex items-center gap-3">
             {onlineUsers > 0 && (
               <div className="hidden xl:flex items-center gap-2 mr-4 px-3 py-1 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full text-[10px] font-mono tracking-widest uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-[pulse_1s_ease-in-out_infinite] shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
@@ -122,14 +86,14 @@ export function TopNavbar({
 
           {/* Links (Desktop) */}
           <div className="hidden lg:flex items-center gap-4 xl:gap-5 flex-wrap">
-            <Link to="/" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-white/90 hover:text-[#06B6D4] transition-colors">HOME</Link>
-            <Link to="/free-games" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">FREE GAMES</Link>
-            <Link to="/reviews" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">GAME REVIEWS</Link>
-            <Link to="/guides" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">GAMING GUIDES</Link>
-            <Link to="/optimization" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#06B6D4] transition-colors">PC OPTIMIZATION</Link>
-            <Link to="/news" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">NEWS</Link>
-            <Link to="/about" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">ABOUT</Link>
-            <Link to="/contact" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">CONTACT</Link>
+            <Link href="/" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-white/90 hover:text-[#06B6D4] transition-colors">HOME</Link>
+            <Link href="/free-games" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">FREE GAMES</Link>
+            <Link href="/reviews" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">GAME REVIEWS</Link>
+            <Link href="/guides" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">GAMING GUIDES</Link>
+            <Link href="/optimization" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#06B6D4] transition-colors">PC OPTIMIZATION</Link>
+            <Link href="/news" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#8B5CF6] transition-colors">NEWS</Link>
+            <Link href="/about" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-[#EC4899] transition-colors">ABOUT</Link>
+            <Link href="/contact" className="text-[10px] xl:text-xs font-bold uppercase tracking-widest text-[#9CA3AF] hover:text-white transition-colors">CONTACT</Link>
           </div>
 
           {/* Right Side */}
@@ -152,7 +116,7 @@ export function TopNavbar({
               <Bell className="w-4 h-4" />
               <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#EC4899] rounded-full border border-[#050816] shadow-[0_0_8px_rgba(236,72,153,0.8)] animate-pulse"></span>
             </button>
-            <Link to="/admin" aria-label="Admin Dashboard" title="Admin Dashboard" className="hidden sm:flex w-9 h-9 rounded-full border border-[#06B6D4]/30 items-center justify-center hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:border-[#06B6D4]/50 transition-all text-[#06B6D4]">
+            <Link href="/admin" aria-label="Admin Dashboard" title="Admin Dashboard" className="hidden sm:flex w-9 h-9 rounded-full border border-[#06B6D4]/30 items-center justify-center hover:bg-[#06B6D4]/20 hover:text-[#06B6D4] hover:border-[#06B6D4]/50 transition-all text-[#06B6D4]">
               <Shield className="w-4 h-4" />
             </Link>
 
@@ -164,7 +128,8 @@ export function TopNavbar({
           </div>
         </div>
       </div>
-     </div>
     </nav>
   );
 }
+
+

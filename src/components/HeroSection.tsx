@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Shield, PlaySquare, Radar, Crosshair, Terminal, Activity } from "lucide-react";
@@ -13,7 +14,7 @@ const FEED_MESSAGES = [
   "STEAM_API_SYNC: COMPLETE"
 ];
 
-export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick, onUpcomingClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void, onUpcomingClick?: () => void }) {
+export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void }) {
   const [msgIndex, setMsgIndex] = useState(0);
 
   useEffect(() => {
@@ -24,80 +25,133 @@ export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick,
   }, []);
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden bg-[#050816] border border-[#8B5CF6]/30 mb-12 min-h-[600px] flex justify-center items-center shadow-[0_0_50px_rgba(139,92,246,0.2)] group font-orbitron">
+    <div className="relative w-full rounded-3xl overflow-hidden bg-[#050816] border border-[#06B6D4]/20 mb-12 min-h-[550px] flex items-center shadow-[0_0_50px_rgba(6,182,212,0.1)] group">
       {/* Background Cyberpunk Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#050816] via-[#0F172A] to-[#050816]"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-[#050816] via-[#0F172A] to-[#1e1b4b]"></div>
       
       {/* Scanline Effect */}
-      <div className="absolute inset-0 z-0 opacity-20 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px)", backgroundSize: "100% 4px" }}></div>
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_0%,_var(--tw-gradient-stops))] from-[#8B5CF6]/15 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjEiIGZpbGw9InJnYmEoMjU1LDExLDQzLDAuMDUpIi8+PC9zdmc+')] opacity-50 z-0"></div>
 
       {/* Radar Sweep Arc */}
-      <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full border border-[#8B5CF6]/10 border-t-[#8B5CF6]/50 animate-[spin_8s_linear_infinite] opacity-40 pointer-events-none z-0"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full border border-[#06B6D4]/10 border-b-[#06B6D4]/50 animate-[spin_6s_linear_infinite_reverse] opacity-40 pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] rounded-full border border-[#8B5CF6]/10 border-t-[#8B5CF6]/40 border-r-[#06B6D4]/40 animate-[spin_10s_linear_infinite] opacity-50 pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] rounded-full border border-[#06B6D4]/10 border-b-[#06B6D4]/40 border-l-[#8B5CF6]/40 animate-[spin_7s_linear_infinite_reverse] opacity-50 pointer-events-none z-0"></div>
 
-      <div className="relative z-10 p-4 sm:p-12 max-w-6xl w-full flex flex-col items-center">
+      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-5xl mx-auto text-center lg:text-left lg:mx-0 w-full flex flex-col lg:flex-row items-center gap-10">
         
+        {/* Left Side: Content */}
         <motion.div
-          className="flex flex-col items-center text-center max-w-4xl"
+          className="flex-1"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
         >
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded border border-[#EF4444]/50 bg-[#EF4444]/10 text-[#EF4444] text-[10px] uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#EF4444]/10 border border-[#EF4444]/50 text-[#EF4444] text-[10px] font-orbitron font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.3)]">
               <Activity className="w-3.5 h-3.5 animate-pulse" /> Live Market Surveillance
             </span>
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#F8FAFC] leading-[1.1] tracking-tighter mb-6 uppercase">
-            Track Free PC Games, Upcoming Giveaways & <br className="hidden lg:block"/>
-            Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#8B5CF6] via-[#EC4899] to-[#06B6D4] glow-text drop-shadow-[0_0_15px_rgba(139,92,246,0.6)]">Deal Intel</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-orbitron font-black text-[#F8FAFC] leading-[1.1] tracking-tighter mb-6 uppercase">
+            Track Free PC Games & <br className="hidden lg:block"/>
+            Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06B6D4] via-[#8B5CF6] to-[#EC4899] glow-text drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">Deal Intel</span>
           </h1>
           
-          <p className="text-[#94A3B8] text-base sm:text-lg mb-10 max-w-2xl font-poppins leading-relaxed">
-            Real-time surveillance of Steam, Epic Games, GOG, Humble Bundle, Fanatical, and global gaming market anomalies.
+          <p className="text-[#94A3B8] text-base sm:text-lg mb-8 max-w-2xl mx-auto lg:mx-0 font-poppins leading-relaxed border-l-4 border-[#06B6D4]/50 pl-4 bg-[#050816]/40 p-2 rounded-r-lg">
+            Real-time surveillance of Steam, Epic Games, GOG, Humble Bundle, Fanatical, and upcoming gaming price anomalies.
           </p>
           
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-10">
             <button 
               onClick={onExploreClick}
-              className="h-12 px-8 rounded relative overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6] text-[#F8FAFC] font-bold uppercase tracking-widest text-xs hover:bg-[#8B5CF6] hover:text-[#050816] transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2 group">
+              className="px-6 py-3 rounded-sm relative overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6] text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs hover:bg-[#8B5CF6] hover:text-[#050816] transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2 group">
+              <span className="absolute inset-0 w-1/4 h-full bg-white/20 -skew-x-12 -translate-x-[150%] group-hover:animate-[wave_1s_ease-in-out_infinite]"></span>
               <Crosshair className="w-4 h-4" /> Access Intel
             </button>
             <button 
               onClick={onFreeGamesClick}
-              className="h-12 px-8 rounded bg-[#06B6D4]/10 border border-[#06B6D4]/50 text-[#06B6D4] hover:bg-[#06B6D4] hover:text-[#050816] font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+              className="px-6 py-3 rounded-sm bg-[#06B6D4]/10 border border-[#06B6D4]/50 text-[#06B6D4] hover:bg-[#06B6D4] hover:text-[#050816] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
               <Radar className="w-4 h-4" /> Scan Free Games
             </button>
             <button 
-              onClick={onUpcomingClick}
-              className="h-12 px-8 rounded bg-transparent border border-[#94A3B8]/30 hover:border-[#F8FAFC] text-[#94A3B8] hover:text-[#F8FAFC] font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2">
+              onClick={onTrendingClick}
+              className="px-6 py-3 rounded-sm bg-transparent border border-[#94A3B8]/30 hover:border-[#F8FAFC] text-[#94A3B8] hover:text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2">
               <Shield className="w-4 h-4 text-[#8B5CF6]" /> View Upcoming Drops
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-12 text-[10px] text-[#06B6D4] pt-8 bg-black/20 backdrop-blur-md rounded-xl p-6 border border-white/5 w-full">
-            <div className="flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
-               <span className="uppercase tracking-widest font-bold text-white/90">GLOBAL_LINK: <span className="text-[#22C55E]">ACTIVE</span></span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">15+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Sync'd</span>
             </div>
-            <div className="flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-[#06B6D4] animate-pulse"></span>
-               <span className="uppercase tracking-widest font-bold text-white/90">PRICE_SCAN: <span className="text-[#06B6D4]">RUNNING</span></span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">90M+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Historical Price Nodes</span>
             </div>
-            <div className="flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse"></span>
-               <span className="uppercase tracking-widest font-bold text-white/90">MARKET_SYNC: <span className="text-[#22C55E]">LIVE</span></span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">24/7</span>
+              <span className="uppercase tracking-widest mt-1 text-[#8B5CF6] opacity-90">Market Surveillance</span>
             </div>
-            <div className="flex items-center gap-2">
-               <span className="w-2 h-2 rounded-full bg-[#EF4444] animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.8)]"></span>
-               <span className="uppercase tracking-widest font-bold text-white/90">EPIC_VAULT_SIGNAL: <span className="text-[#EF4444]">DETECTED</span></span>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">99.8%</span>
+              <span className="uppercase tracking-widest mt-1 text-[#22C55E] opacity-90">Extraction Efficiency</span>
             </div>
           </div>
         </motion.div>
+
+        {/* Right Side: Telemetry / Live Feed */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="hidden lg:flex w-full max-w-[320px] flex-col items-stretch justify-center relative"
+        >
+          <div className="relative bg-[#0F172A]/80 border border-[#06B6D4]/30 rounded-xl p-5 overflow-hidden backdrop-blur-xl shadow-[0_0_30px_rgba(6,182,212,0.15)] group font-mono text-xs">
+             <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10 text-[#94A3B8]">
+                <div className="flex items-center gap-2">
+                   <Terminal className="w-4 h-4 text-[#06B6D4]" />
+                   <span className="uppercase tracking-wider font-bold">Live Telemetry</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse"></div>
+             </div>
+             
+             <div className="flex flex-col gap-3 min-h-[120px] justify-start">
+               <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={msgIndex}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.3 }}
+                    className="text-[#06B6D4] font-bold tracking-widest flex items-center gap-2"
+                  >
+                    <span className="text-[#8B5CF6]">&gt;</span> {FEED_MESSAGES[msgIndex]}
+                  </motion.div>
+                  <motion.div
+                    key={`${msgIndex}-history`}
+                    className="text-white/30 tracking-widest flex items-center gap-2 line-through"
+                  >
+                    <span className="text-white/10">&gt;</span> {FEED_MESSAGES[(msgIndex - 1 + FEED_MESSAGES.length) % FEED_MESSAGES.length]}
+                  </motion.div>
+               </AnimatePresence>
+             </div>
+
+             {/* Animated Progress Bar */}
+             <div className="mt-4 pt-4 border-t border-white/10">
+               <div className="flex justify-between text-[9px] text-[#94A3B8] uppercase tracking-widest mb-1">
+                 <span>System Load</span>
+                 <span className="text-[#EC4899]">OPTIMAL</span>
+               </div>
+               <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                 <div className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] w-[45%] animate-[pulse_2s_ease-in-out_infinite]"></div>
+               </div>
+             </div>
+          </div>
+        </motion.div>
       </div>
+
     </div>
   );
 }
+
 

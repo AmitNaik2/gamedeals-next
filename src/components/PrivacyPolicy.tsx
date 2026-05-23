@@ -1,17 +1,13 @@
+﻿"use client";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import Link from "next/link";
 
 export function PrivacyPolicy() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>Privacy Policy | GamesDealsHub</title>
-        <meta name="description" content="Read our privacy policy to understand how GamesDealsHub handles your data." />
-        <link rel="canonical" href="https://www.gamesdealshub.me/privacy" />
-      </Helmet>
+      
 
-      <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
+      <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
         <ArrowLeft className="w-4 h-4" /> Back to Home
       </Link>
 
@@ -154,3 +150,6 @@ export function PrivacyPolicy() {
     </div>
   );
 }
+
+
+

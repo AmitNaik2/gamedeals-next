@@ -1,6 +1,6 @@
+﻿"use client";
 import { ArrowLeft, Mail, MessageSquare, Send, CheckCircle } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 export function ContactUs() {
@@ -35,13 +35,9 @@ export function ContactUs() {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>Contact Us | GamesDealsHub</title>
-        <meta name="description" content="Get in touch with the GamesDealsHub team for support or feedback." />
-        <link rel="canonical" href="https://www.gamesdealshub.me/contact" />
-      </Helmet>
+      
 
-      <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
+      <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
         <ArrowLeft className="w-4 h-4" /> Back to Home
       </Link>
 
@@ -149,13 +145,13 @@ export function ContactUs() {
           <h2 className="text-xl font-bold text-white mb-4">Important Links</h2>
           <ul className="space-y-2">
             <li>
-              <Link to="/about" className="text-white/70 hover:text-white hover:underline transition-all">About Us</Link>
+              <Link href="/about" className="text-white/70 hover:text-white hover:underline transition-all">About Us</Link>
             </li>
             <li>
-              <Link to="/terms" className="text-white/70 hover:text-white hover:underline transition-all">Terms of Service</Link>
+              <Link href="/terms" className="text-white/70 hover:text-white hover:underline transition-all">Terms of Service</Link>
             </li>
             <li>
-              <Link to="/privacy" className="text-white/70 hover:text-white hover:underline transition-all">Privacy Policy</Link>
+              <Link href="/privacy" className="text-white/70 hover:text-white hover:underline transition-all">Privacy Policy</Link>
             </li>
           </ul>
         </div>
@@ -163,3 +159,6 @@ export function ContactUs() {
     </div>
   );
 }
+
+
+

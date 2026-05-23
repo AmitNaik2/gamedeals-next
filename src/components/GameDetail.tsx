@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { type GameDeal } from "../types";
 import { BadgeCheck, ArrowLeft, ExternalLink, Gamepad2, Users, Star } from "lucide-react";
 import { generateUniqueSummary, generateTags } from "../lib/text-utils";
@@ -12,7 +13,7 @@ import { cn } from "../lib/utils";
 
 export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?: boolean }) {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [deal, setDeal] = useState<GameDeal | null>(null);
 
   useEffect(() => {
@@ -22,13 +23,13 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
     }
   }, [id, deals]);
 
-  const gameInfo = useIgdb(deal?.title);
+  const gameInfo = useIgdb(deal?.title || "");
 
   if (!deal && !isLoading && deals.length > 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
         <h2 className="text-2xl font-bold font-serif mb-4">Deal Not Found</h2>
-        <button onClick={() => navigate("/")} className="text-[#7C3AED] hover:underline">
+        <button onClick={() => router.push("/")} className="text-[#7C3AED] hover:underline">
           Return to Home
         </button>
       </div>
@@ -48,60 +49,16 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>{deal.title} - Free {deal.platforms} Game | GamesDealsHub</title>
-        <meta name="description" content={rewrittenSummary} />
-        <meta property="og:title" content={`${deal.title} is currently Free!`} />
-        <meta property="og:description" content={rewrittenSummary} />
-        <meta property="og:image" content={deal.image || deal.thumbnail} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org/",
-            "@type": "Product",
-            "name": deal.title,
-            "image": deal.image || deal.thumbnail,
-            "description": rewrittenSummary,
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.5",
-              "reviewCount": "89"
-            },
-            "review": {
-              "@type": "Review",
-              "reviewRating": {
-                "@type": "Rating",
-                "ratingValue": "5"
-              },
-              "author": {
-                "@type": "Person",
-                "name": "Amit Naik"
-              }
-            },
-            "offers": {
-              "@type": "Offer",
-              "url": `https://gamesdealshub.me/game/${deal.id}`,
-              "priceCurrency": "USD",
-              "price": deal.salePrice || "0.00",
-              "availability": "https://schema.org/InStock",
-              "itemCondition": "https://schema.org/NewCondition",
-              "seller": {
-                "@type": "Organization",
-                "name": deal.platforms ? deal.platforms.split(',')[0] : "Steam"
-              }
-            }
-          })}
-        </script>
-      </Helmet>
+      
 
-      <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-white/50 hover:text-white mb-6 uppercase tracking-widest text-[10px] font-bold transition-colors">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-white/50 hover:text-white mb-6 uppercase tracking-widest text-[10px] font-bold transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Deals
       </button>
 
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12 bg-black/40 border border-white/10 rounded-3xl p-6 lg:p-8 backdrop-blur-xl">
-        <div className="rounded-2xl overflow-hidden relative border border-white/10 shadow-[0_0_40px_rgba(124,58,237,0.15)] group">
-          <img src={deal.image || deal.thumbnail} alt={deal.title} className="w-full object-cover aspect-video group-hover:scale-105 transition-transform duration-700" />
-          <div className="absolute top-4 right-4 bg-green-500 text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-widest flex items-center gap-1 shadow-lg">
+        <div className="rounded-2xl overflow-hidden relative border border-white/10 shadow-[0_0_40px_rgba(124,58,237,0.15)] group aspect-video">
+          <Image src={deal.image || deal.thumbnail} alt={deal.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <div className="absolute top-4 right-4 bg-green-500 text-black px-3 py-1 rounded text-xs font-bold uppercase tracking-widest flex items-center gap-1 shadow-lg z-10">
             <BadgeCheck className="w-3 h-3" /> Verified Free
           </div>
         </div>
@@ -279,3 +236,5 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
     </div>
   );
 }
+
+

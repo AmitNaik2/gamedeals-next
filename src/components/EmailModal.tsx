@@ -1,7 +1,8 @@
+"use client";
 import { useEffect, useState, type FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Send, CheckCircle2 } from "lucide-react";
-import { cn } from "@/src/lib/utils";
+import { cn } from "../lib/utils";
 
 interface EmailModalProps {
   isOpen: boolean;
@@ -229,3 +230,4 @@ export function EmailModal({ isOpen, onClose, dealTitle, dealUrl, trackDeal }: E
     </AnimatePresence>
   );
 }
+

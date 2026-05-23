@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "motion/react";
 
 export function SkeletonCard() {
@@ -30,3 +31,4 @@ export function SkeletonCard() {
     </motion.div>
   );
 }
+

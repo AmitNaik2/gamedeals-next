@@ -1,19 +1,13 @@
+﻿"use client";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import Link from "next/link";
 
 export function TermsOfService() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>Terms of Service | GamesDealsHub</title>
-        <meta name="description" content="Review the terms and conditions for using GamesDealsHub." />
-        <link rel="canonical" href="https://www.gamesdealshub.me/terms" />
-        <meta property="og:image" content="https://www.gamesdealshub.me/og-image.jpg" />
-        <meta name="twitter:image" content="https://www.gamesdealshub.me/og-image.jpg" />
-      </Helmet>
+      
 
-      <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
+      <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
         <ArrowLeft className="w-4 h-4" /> Back to Home
       </Link>
 
@@ -69,7 +63,7 @@ export function TermsOfService() {
         <section className="mb-8">
           <h2 className="text-2xl font-bold mb-4 text-white">6. Contact Information</h2>
           <p className="text-white/80 leading-relaxed">
-            If you have any questions or concerns about these Terms, please <Link to="/contact" className="text-[#7C3AED] hover:underline">Contact Us</Link>.
+            If you have any questions or concerns about these Terms, please <Link href="/contact" className="text-[#7C3AED] hover:underline">Contact Us</Link>.
           </p>
         </section>
 
@@ -77,3 +71,6 @@ export function TermsOfService() {
     </div>
   );
 }
+
+
+

@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { Newspaper, ChevronRight, Terminal } from "lucide-react";
 import { motion } from "motion/react";
@@ -92,3 +93,4 @@ export function GamingNews() {
     </div>
   );
 }
+

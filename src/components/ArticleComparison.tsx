@@ -1,33 +1,13 @@
+﻿"use client";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import Link from "next/link";
 
 export function ArticleComparison() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>HP Omen 16 vs Lenovo LOQ for Animation in 2026 | GamesDealsHub</title>
-        <meta name="description" content="A detailed comparison of HP Omen 16 and Lenovo LOQ for animation work and gaming. Find out which laptop provides the best value and performance in 2026." />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": "HP Omen 16 vs Lenovo LOQ for Animation in 2026",
-            "author": {
-              "@type": "Person",
-              "name": "Amit"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "GamesDealsHub"
-            },
-            "datePublished": "2026-05-19",
-            "description": "We compare the HP Omen 16 against the Lenovo LOQ based on thermals, rendering speed, and display accuracy for animators and gamers."
-          })}
-        </script>
-      </Helmet>
+      
 
-      <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-6 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
+      <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-6 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
         <ArrowLeft className="w-4 h-4" /> Back to Deals
       </Link>
 
@@ -64,7 +44,7 @@ export function ArticleComparison() {
           <section>
             <h2 className="text-2xl font-bold text-white mb-4">Thermal Design: Sustained Loads</h2>
             <p className="mb-4">
-              We've found that the HP Omen's Tempest Cooling handles prolonged rendering tasks (which can take hours) much better. The Lenovo LOQ is great for burst workloads—like compiling code or gaming in shorter sessions. But if you hit the export button on a 10-minute 4K animation project, the LOQ's fans will max out quicker and you might see minor thermal throttling compared to the Omen.
+              We've found that the HP Omen's Tempest Cooling handles prolonged rendering tasks (which can take hours) much better. The Lenovo LOQ is great for burst workloadsâ€”like compiling code or gaming in shorter sessions. But if you hit the export button on a 10-minute 4K animation project, the LOQ's fans will max out quicker and you might see minor thermal throttling compared to the Omen.
             </p>
           </section>
 
@@ -72,14 +52,14 @@ export function ArticleComparison() {
             <h2 className="text-xl font-bold text-white mb-4">Final Verdict</h2>
             <ul className="list-disc list-inside space-y-2">
               <li><strong>Buy the HP Omen 16 if:</strong> You are a professional animator where render times mean money, and you need a highly color-accurate screen.</li>
-              <li><strong>Buy the Lenovo LOQ if:</strong> You are a student animator or gamer on a budget. Use the saved money to upgrade the RAM to 32GB—which is essential for After Effects!</li>
+              <li><strong>Buy the Lenovo LOQ if:</strong> You are a student animator or gamer on a budget. Use the saved money to upgrade the RAM to 32GBâ€”which is essential for After Effects!</li>
             </ul>
           </section>
 
           <section>
             <h3 className="text-xl font-serif italic text-[#7C3AED] mb-4">Why we talked about this?</h3>
             <p>
-              GamesDealsHub exists to help you get the best value—whether that's finding the latest Epic Games drop or picking the hardware to play it on. Stay tuned for more deals and reviews!
+              GamesDealsHub exists to help you get the best valueâ€”whether that's finding the latest Epic Games drop or picking the hardware to play it on. Stay tuned for more deals and reviews!
             </p>
           </section>
         </div>
@@ -87,3 +67,6 @@ export function ArticleComparison() {
     </div>
   );
 }
+
+
+

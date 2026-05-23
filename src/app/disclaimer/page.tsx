@@ -1,0 +1,1 @@
+export default function Page() { return ( <div className="min-h-screen pt-24 px-4 text-center text-white"><h1 className="text-4xl font-orbitron font-bold text-[#06B6D4] mb-4 uppercase tracking-widest">DISCLAIMER</h1><p className="text-[#9CA3AF] max-w-2xl mx-auto">This section is currently being updated with fresh intelligence. Check back soon for new content.</p></div> ); }

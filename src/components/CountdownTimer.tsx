@@ -1,9 +1,16 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 
 export function CountdownTimer({ expiryDate }: { expiryDate: string }) {
   const [timeLeft, setTimeLeft] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const tick = () => {
       const diff = new Date(expiryDate).getTime() - Date.now();
       if (diff <= 0) { 
@@ -26,7 +33,10 @@ export function CountdownTimer({ expiryDate }: { expiryDate: string }) {
     tick();
     const id = setInterval(tick, 60000);
     return () => clearInterval(id);
-  }, [expiryDate]);
+  }, [expiryDate, isMounted]);
+
+  // Return nothing until client-side mount — prevents hydration mismatch & "Loading..." flash
+  if (!isMounted) return null;
 
   return <span className="text-red-500 font-semibold">{timeLeft}</span>;
 }

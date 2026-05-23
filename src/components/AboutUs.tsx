@@ -1,17 +1,13 @@
+﻿"use client";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import Link from "next/link";
 
 export function AboutUs() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl animate-in fade-in duration-500">
-      <Helmet>
-        <title>About Us | GamesDealsHub</title>
-        <meta name="description" content="Learn about GamesDealsHub and our mission to help gamers find free PC games and deals." />
-        <link rel="canonical" href="https://www.gamesdealshub.me/about" />
-      </Helmet>
+      
 
-      <Link to="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
+      <Link href="/" className="flex items-center gap-2 text-white/50 hover:text-white mb-8 uppercase tracking-widest text-[10px] font-bold transition-colors w-fit">
         <ArrowLeft className="w-4 h-4" /> Back to Home
       </Link>
 
@@ -61,10 +57,13 @@ export function AboutUs() {
             Our Discord is rapidly growing, and it's the best place to get instant alerts on the latest free drops. We believe that a strong community makes everyone's gaming library better.
           </p>
           <p className="text-white/80 leading-relaxed">
-            Have a deal to share or a question? Feel free to <Link to="/contact" className="text-[#7C3AED] hover:underline">Contact Us</Link>.
+            Have a deal to share or a question? Feel free to <Link href="/contact" className="text-[#7C3AED] hover:underline">Contact Us</Link>.
           </p>
         </section>
       </div>
     </div>
   );
 }
+
+
+

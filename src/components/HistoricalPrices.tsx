@@ -1,3 +1,4 @@
+"use client";
 import { motion } from "motion/react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { TrendingDown, Activity, ChevronRight, BarChart2 } from "lucide-react";
@@ -128,3 +129,4 @@ export function HistoricalPrices() {
     </div>
   );
 }
+

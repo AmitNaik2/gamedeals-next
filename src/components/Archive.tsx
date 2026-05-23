@@ -1,5 +1,5 @@
+﻿"use client";
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Archive as ArchiveIcon, Clock } from 'lucide-react';
 import { type GameDeal } from '../types';
 
@@ -44,10 +44,7 @@ export function Archive() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl animate-fade-in text-white">
-      <Helmet>
-        <title>Expired Game Giveaways Archive | GamesDealsHub</title>
-        <meta name="description" content="View the history of expired free PC game giveaways on Steam, Epic Games, and GOG. See what games were given away for free." />
-      </Helmet>
+      
       
       <div className="mb-12 border-b border-white/10 pb-8">
         <h1 className="text-3xl md:text-5xl font-black italic text-transparent bg-clip-text bg-gradient-to-r from-[#7C3AED] to-cyan-500 uppercase tracking-tighter mb-4 flex items-center gap-3">
@@ -92,3 +89,6 @@ export function Archive() {
     </div>
   );
 }
+
+
+

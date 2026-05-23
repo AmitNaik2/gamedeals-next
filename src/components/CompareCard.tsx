@@ -1,6 +1,8 @@
+"use client";
 import { GameDeal } from "../types";
 import { Tag, ExternalLink } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
+import Image from "next/image";
 import { cn } from "../lib/utils";
 
 export function CompareCard({ deals }: { deals: GameDeal[] }) {
@@ -24,10 +26,12 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
     <div className="flex flex-col overflow-hidden transition-all duration-300 border bg-[#0F172A]/80 backdrop-blur-md border-[#8B5CF6]/30 rounded-[24px] sm:rounded-3xl group relative shadow-[0_0_30px_rgba(139,92,246,0.1)]">
       {/* Header with image */}
       <div className="relative w-full aspect-[16/9] sm:aspect-[2.5/1] shrink-0 overflow-hidden bg-black/50 border-b border-[#8B5CF6]/20">
-        <Link to={gameUrl} className="block w-full h-full">
-          <img 
+        <Link href={gameUrl} className="block w-full h-full">
+          <Image 
             src={image} 
             alt={title} 
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent" />

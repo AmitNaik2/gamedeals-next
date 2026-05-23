@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
@@ -5,26 +6,43 @@ interface CountdownProps {
   endDate: string;
 }
 
+/** Format a date string to a deterministic UTC string, safe for SSR + client. */
+function formatEndDate(raw: string): string {
+  const normalized = raw.includes(' ') && !raw.includes('Z') && !raw.includes('GMT')
+    ? raw.replace(' ', 'T') + 'Z'
+    : raw;
+  const d = new Date(normalized);
+  if (isNaN(d.getTime())) return '';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const hh = String(d.getUTCHours()).padStart(2, '0');
+  const mm = String(d.getUTCMinutes()).padStart(2, '0');
+  return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()} ${hh}:${mm} UTC`;
+}
+
 export function Countdown({ endDate }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isEndingSoon, setIsEndingSoon] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     if (!endDate || endDate === 'N/A') return;
 
-    // Fix Gamerpower API date string specifically
-    const endStr = endDate.includes(' ') && !endDate.includes('Z') && !endDate.includes('GMT') 
-        ? endDate.replace(' ', 'T') + 'Z' 
-        : endDate;
+    const endStr = endDate.includes(' ') && !endDate.includes('Z') && !endDate.includes('GMT')
+      ? endDate.replace(' ', 'T') + 'Z'
+      : endDate;
 
     const calculateTimeLeft = () => {
       const end = new Date(endStr).getTime();
-      const now = new Date().getTime();
+      const now = Date.now();
       const difference = end - now;
 
       if (isNaN(difference)) return '';
 
-      // Add safety check for deals that ended before May 20, 2026
       if (difference <= 0 || end < new Date("2026-05-20").getTime()) {
         setIsEndingSoon(false);
         return 'Expired';
@@ -52,9 +70,14 @@ export function Countdown({ endDate }: CountdownProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [endDate]);
+  }, [endDate, isMounted]);
+
+  // Return nothing until client-side mount — prevents hydration mismatch & "Loading..." flash
+  if (!isMounted) return null;
 
   if (!endDate || endDate === 'N/A' || !timeLeft) return null;
+
+  const formattedEnd = formatEndDate(endDate);
 
   return (
     <div className={`flex flex-col gap-0.5 ${isEndingSoon ? 'text-amber-400' : 'text-cyan-400'}`}>
@@ -62,9 +85,9 @@ export function Countdown({ endDate }: CountdownProps) {
         <Clock className="w-3 h-3" />
         {timeLeft === 'Expired' ? 'EXPIRED' : `EXPIRES IN: ${timeLeft}`}
       </span>
-      {timeLeft !== 'Expired' && (
+      {timeLeft !== 'Expired' && formattedEnd && (
         <span className="text-[9px] text-white/40 tracking-widest pl-4.5">
-          ENDS: {new Date(endDate.replace(' ', 'T') + 'Z').toLocaleString('en-IN', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }).replace('IST', 'IST')}
+          ENDS: {formattedEnd}
         </span>
       )}
     </div>
