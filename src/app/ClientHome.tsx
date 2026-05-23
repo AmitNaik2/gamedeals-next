@@ -766,7 +766,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             
             {/* Mobile / Tablet Subscribe Box */}
             <div className="xl:hidden mt-12 pt-8 border-t border-white/10">
-              <InlineSubscribe />
+              <EmailSubscription />
             </div>
           </div>
           
@@ -786,7 +786,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             <div id="optimization" className="hidden"></div>
             
             <div className="pt-4 border-t border-white/10 hidden xl:block">
-              <InlineSubscribe />
+              <EmailSubscription />
             </div>
           </aside>
         </div>
