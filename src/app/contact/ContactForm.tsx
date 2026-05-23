@@ -12,12 +12,19 @@ export function ContactForm() {
     setResult("Sending...");
 
     const formData = new FormData(event.currentTarget);
-    formData.append("access_key", "a8cfc928-66bf-489c-8920-35b526c434a1");
+    const dataObj = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      message: formData.get("message")
+    };
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
-        body: formData
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataObj)
       });
 
       const data = await response.json();
@@ -25,7 +32,7 @@ export function ContactForm() {
         setResult("Success! Your message has been sent.");
         (event.target as HTMLFormElement).reset();
       } else {
-        setResult("Error: " + data.message);
+        setResult(data.message || "Error sending message");
       }
     } catch (error) {
       setResult("Something went wrong. Please try again.");
