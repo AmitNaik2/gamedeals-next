@@ -2,7 +2,7 @@ import { GameDeal } from "../types";
 
 const BASE_URL = "https://www.gamerpower.com/api";
 
-// Titles to permanently exclude (extend array as needed)
+// Add titles to exclude here instead of hardcoding inline ifs
 const BLOCKLIST = ["Terrors to Unveil"];
 
 // ── Active deal filter ────────────────────────────────────────────────────────
@@ -12,6 +12,7 @@ export function isActiveDeal(deal: GameDeal): boolean {
   if (BLOCKLIST.some((blocked) => deal.title?.includes(blocked))) return false;
   if (!deal.end_date || deal.end_date === "N/A") return true;
 
+  // Normalize to ISO 8601 UTC so Date.parse works reliably across environments
   const endStr =
     deal.end_date.includes(" ") &&
     !deal.end_date.includes("Z") &&
@@ -20,7 +21,7 @@ export function isActiveDeal(deal: GameDeal): boolean {
       : deal.end_date;
 
   const endDate = new Date(endStr);
-  if (Number.isNaN(endDate.getTime())) return true;
+  if (Number.isNaN(endDate.getTime())) return true; // unparseable → assume active
   return endDate.getTime() > Date.now();
 }
 
@@ -53,7 +54,7 @@ function formatDeal(deal: any): GameDeal {
 export async function getActiveGames(): Promise<GameDeal[]> {
   try {
     const res = await fetch(`${BASE_URL}/giveaways?type=game&sort-by=date`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 3600 }, // ISR: revalidate every 1 hour
     });
 
     if (!res.ok) {
@@ -64,7 +65,7 @@ export async function getActiveGames(): Promise<GameDeal[]> {
     const data = await res.json();
     if (!Array.isArray(data)) return [];
 
-    // ✅ FIX: Filter expired/inactive deals before returning
+    // ✅ FIX: Filter expired/inactive deals — original returned everything raw
     return data.map(formatDeal).filter(isActiveDeal);
   } catch (error) {
     console.error("[gamerpower] getActiveGames error:", error);
@@ -91,6 +92,7 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
   }
 }
 
+// ✅ NEW: Platform-specific fetcher — powers the SEO rewrite URLs
 export async function getActiveGamesByPlatform(
   platform: "steam" | "epic-games-store" | "gog" | "all"
 ): Promise<GameDeal[]> {

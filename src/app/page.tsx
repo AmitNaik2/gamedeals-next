@@ -32,8 +32,7 @@ async function getUpcomingGames(): Promise<UpcomingGame[]> {
     const elements: any[] = data?.data?.Catalog?.searchStore?.elements || [];
 
     const upcoming = elements.filter(
-      (el) =>
-        el.promotions?.upcomingPromotionalOffers?.length > 0
+      (el) => el.promotions?.upcomingPromotionalOffers?.length > 0
     );
 
     return upcoming.map((item) => {
@@ -64,12 +63,13 @@ async function getUpcomingGames(): Promise<UpcomingGame[]> {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
+  // Both fetches run in parallel — no waterfall
   const [activeGames, upcomingGames] = await Promise.all([
     getActiveGames(),
     getUpcomingGames(),
   ]);
 
-  // JSON-LD: ItemList with typed GameDeal
+  // ✅ FIX: Use GameDeal type instead of any, added priceValidUntil for richer Google snippets
   const itemListSchemaData = {
     itemListElement: activeGames.slice(0, 10).map((game: GameDeal, index: number) => ({
       "@type": "ListItem",

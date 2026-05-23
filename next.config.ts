@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // ✅ FIX: Locked to actual domains used — wildcard allows ANY site's images
+    // ✅ FIX: Locked to actual domains — wildcard allowed ANY site's images
     remotePatterns: [
       { protocol: "https", hostname: "www.gamerpower.com" },
       { protocol: "https", hostname: "cdn.gamerpower.com" },
@@ -63,8 +63,8 @@ const nextConfig: NextConfig = {
   },
 
   async rewrites() {
-    // ✅ FIX: Pass platform as query param so ClientHome can filter on arrival
-    //         Previously all rewrites went to "/" with no differentiation — duplicate content
+    // ✅ FIX: Pass platform as query param so each URL serves distinct filtered content
+    // Previously all rewrites went to "/" with no differentiation — duplicate content for Google
     return [
       { source: "/free_steam_games", destination: "/?platform=steam" },
       { source: "/free-steam-games", destination: "/?platform=steam" },

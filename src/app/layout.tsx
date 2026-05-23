@@ -9,7 +9,8 @@ const siteUrl = "https://www.gamesdealshub.me";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "GamesDealsHub | Free PC Games & Deals — Updated Daily",
-  description: "Track and claim free PC games before they expire. Updated daily with the latest Epic Games, Steam, and GOG freebies.",
+  description:
+    "Track and claim free PC games before they expire. Updated daily with the latest Epic Games, Steam, and GOG freebies.",
   alternates: {
     canonical: "/",
   },
@@ -52,17 +53,27 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased dark">
       <head>
+        {/* WebSite structured data for Google Sitelinks Searchbox */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
+        {/* ✅ TIP: Consider dropping Poppins — Inter alone covers all weights you need */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="min-h-full flex flex-col bg-[#050505] text-white">
-        {/* Google Funding Choices */}
-        <Script id="google-fc-script" src="https://fundingchoicesmessages.google.com/i/pub-7564716797174887?ers=1" strategy="beforeInteractive" />
+
+        {/* Google Funding Choices (AdSense consent) */}
+        <Script
+          id="google-fc-script"
+          src="https://fundingchoicesmessages.google.com/i/pub-7564716797174887?ers=1"
+          strategy="beforeInteractive"
+        />
         <Script id="google-fc-present" strategy="beforeInteractive">
           {`
             (function() {
@@ -85,7 +96,8 @@ export default function RootLayout({
             })();
           `}
         </Script>
-        
+
+        {/* Google Tag Manager */}
         <Script id="google-tag-manager" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -95,14 +107,15 @@ export default function RootLayout({
             })(window,document,'script','dataLayer','GTM-KJMQXBNW');
           `}
         </Script>
-        
+
+        {/* GTM noscript fallback */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-KJMQXBNW"
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}
-          ></iframe>
+          />
         </noscript>
 
         {children}
