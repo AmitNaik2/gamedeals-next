@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useEffect, useState } from 'react';
 import { Archive as ArchiveIcon, Clock } from 'lucide-react';
 import { type GameDeal } from '../types';

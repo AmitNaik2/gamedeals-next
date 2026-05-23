@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { motion, AnimatePresence } from "motion/react";
 import { type GameDeal } from "../types";
 import { Zap, Activity } from "lucide-react";

@@ -134,7 +134,7 @@ function InlineSubscribe() {
   );
 }
 
-export default function App({ initialDeals = [], initialUpcomingDeals = [] }: { initialDeals?: GameDeal[], initialUpcomingDeals?: GameDeal[] }) {
+export default function App() {
   const pathname = usePathname() || "";
   const router = useRouter();
 
@@ -148,11 +148,11 @@ export default function App({ initialDeals = [], initialUpcomingDeals = [] }: { 
 
   const [activeTab, setActiveTab] = useState<"Games" | "DLC" | "Premium" | "Upcoming">("Games");
   
-  const [deals, setDeals] = useState<GameDeal[]>(initialDeals); // This will just be Free Games now
-  const [upcomingDeals, setUpcomingDeals] = useState<GameDeal[]>(initialUpcomingDeals);
+  const [deals, setDeals] = useState<GameDeal[]>([]); // This will just be Free Games now
+  const [upcomingDeals, setUpcomingDeals] = useState<GameDeal[]>([]);
   const [dlcDeals, setDlcDeals] = useState<GameDeal[]>([]);
   const [premiumDeals, setPremiumDeals] = useState<GameDeal[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [dlcLoading, setDlcLoading] = useState(false);
   const [premiumLoading, setPremiumLoading] = useState(false);
 
@@ -375,6 +375,8 @@ export default function App({ initialDeals = [], initialUpcomingDeals = [] }: { 
 
   // Initial fetch and setup polling
   useEffect(() => {
+    fetchDeals();
+
     // Auto update every 1 minute (60000 ms)
     const intervalId = setInterval(() => {
       fetchDeals(true);

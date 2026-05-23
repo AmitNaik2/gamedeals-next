@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useState, useEffect, type FormEvent } from "react";
 import { Lock, LogOut, Monitor, Smartphone } from "lucide-react";
 
