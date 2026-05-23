@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { ArrowLeft, Mail, MessageSquare, Send, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
@@ -18,7 +18,7 @@ export function ContactUs() {
     };
 
     try {
-      const res = await fetch("/api/contact-submit", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
