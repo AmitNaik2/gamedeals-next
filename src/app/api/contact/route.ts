@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     });
 
     const mailOptions = {
-      from: `"${name}" <${user}>`,
+      from: user, // Send strictly from the authenticated user to avoid Gmail silently dropping it for spoofing
       to: user, // Send to yourself
       replyTo: email,
       subject: `New Contact Form Message from ${name}`,
