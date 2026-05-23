@@ -2,7 +2,7 @@
 import { motion } from "motion/react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts";
 import { TrendingDown, Activity, ChevronRight, BarChart2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const generateMockData = () => {
   const data = [];
@@ -24,7 +24,21 @@ const generateMockData = () => {
 };
 
 export function HistoricalPrices() {
-  const [data] = useState(generateMockData());
+  const [data, setData] = useState<{date: string, price: number}[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setData(generateMockData());
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return (
+      <div className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-6 relative overflow-hidden h-[400px]">
+        <div className="animate-pulse bg-[#06B6D4]/10 w-full h-full rounded-2xl"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#06B6D4]/30 rounded-3xl p-6 relative overflow-hidden group shadow-[0_0_20px_rgba(6,182,212,0.15)]">

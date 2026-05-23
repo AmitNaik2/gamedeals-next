@@ -7,6 +7,13 @@ import { openExternalUrl } from "../lib/utils";
 export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewAll?: () => void }) {
   if (!deals || deals.length === 0) return null;
 
+  const formatDateStr = (dateVal: string) => {
+    const date = new Date(dateVal);
+    if (isNaN(date.getTime())) return "Soon";
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getUTCMonth()]} ${date.getUTCDate()}`;
+  };
+
   return (
     <div className="bg-[#0F172A]/80 backdrop-blur-xl border border-[#EC4899]/30 rounded-3xl p-5 overflow-hidden mt-6 relative group shadow-[0_0_20px_rgba(236,72,153,0.1)]">
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#EC4899]/10 blur-[50px] mix-blend-screen pointer-events-none"></div>
@@ -20,7 +27,7 @@ export function UpcomingDrops({ deals, onViewAll }: { deals: GameDeal[], onViewA
       
       <div className="space-y-4 relative z-10">
         {deals.map((item, i) => {
-          const dateStr = item.start_date ? new Date(item.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric'}) : "Soon";
+          const dateStr = item.start_date ? formatDateStr(item.start_date) : "Soon";
           // Mock "EPIC_MYSTERY_VAULT_SIGNAL" or "UPCOMING_DROP_DETECTED"
           const label = item.platforms.toLowerCase().includes('epic') 
             ? "EPIC_MYSTERY_VAULT_SIGNAL"
