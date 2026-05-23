@@ -32,8 +32,8 @@ interface AdminProps {
 
 export function Admin({ deals }: AdminProps) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@gamesdealshub.com");
+  const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
   
   const [activeTab, setActiveTab] = useState("dashboard");
