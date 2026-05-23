@@ -298,7 +298,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
         </div>
         
         {/* Tabs Bar */}
-        <div className="flex gap-4 overflow-x-auto border-b border-white/10 mb-8 pb-px no-scrollbar sticky top-16 sm:top-20 bg-[#070A11]/90 backdrop-blur-md z-20 transition-all duration-300">
+        <div className="flex gap-4 overflow-x-auto border-b border-white/10 mb-8 pb-px no-scrollbar">
           {[
             { id: "overview", label: "OVERVIEW", icon: LayoutTemplate },
             { id: "sysreq", label: "SYSTEM REQUIREMENTS", icon: Monitor },
