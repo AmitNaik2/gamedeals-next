@@ -1,302 +1,153 @@
 "use client";
-import { useRef, useMemo, useState, useEffect, Suspense } from "react";
-import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, PerspectiveCamera, Instances, Instance, Grid, Float } from "@react-three/drei";
-import { EffectComposer, Bloom, ChromaticAberration, Noise, Vignette } from "@react-three/postprocessing";
-import { BlendFunction } from "postprocessing";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Radar, Zap, Activity, Terminal, ScanLine } from "lucide-react";
+import { Shield, PlaySquare, Radar, Crosshair, Terminal, Activity } from "lucide-react";
 import { cn } from "../lib/utils";
 
-// --- R3F Components ---
-
-function CameraRig() {
-  const { camera, mouse } = useThree();
-  const vec = new THREE.Vector3();
-
-  useFrame(() => {
-    // Smoothly interpolate camera position based on mouse (parallax)
-    camera.position.lerp(vec.set(mouse.x * 3, mouse.y * 1 + 2, 8), 0.05);
-    camera.lookAt(0, 0, 0);
-  });
-  return null;
-}
-
-function CyberGrid() {
-  return (
-    <group position={[0, -2, 0]}>
-      <Grid 
-        infiniteGrid 
-        fadeDistance={50} 
-        cellColor="#06B6D4" 
-        sectionColor="#8B5CF6" 
-        cellSize={1} 
-        sectionSize={4} 
-        position={[0, 0, 0]} 
-      />
-      {/* Glow under the grid */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.1, 0]}>
-        <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial color="#06B6D4" transparent opacity={0.1} />
-      </mesh>
-    </group>
-  );
-}
-
-function CyberCity() {
-  const count = 150;
-  const instances = useMemo(() => {
-    const arr = [];
-    for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 60;
-      const z = (Math.random() - 0.5) * 60 - 15;
-      // keep center clear
-      if (Math.abs(x) < 8 && Math.abs(z) < 8) continue;
-      
-      const height = Math.random() * 10 + 2;
-      arr.push({
-        position: [x, height / 2 - 2, z] as [number, number, number],
-        scale: [Math.random() * 1.5 + 0.5, height, Math.random() * 1.5 + 0.5] as [number, number, number],
-        color: Math.random() > 0.8 ? "#8B5CF6" : "#02040A",
-        emissive: Math.random() > 0.9 ? "#06B6D4" : "#000000"
-      });
-    }
-    return arr;
-  }, []);
-
-  return (
-    <Instances limit={count} range={instances.length}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial metalness={0.8} roughness={0.2} />
-      {instances.map((data, i) => (
-        <Instance 
-          key={i} 
-          position={data.position} 
-          scale={data.scale} 
-          color={data.color}
-          // @ts-expect-error emissive exists on Instance
-          emissive={data.emissive}
-        />
-      ))}
-    </Instances>
-  );
-}
-
-function Particles() {
-  const count = 300;
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const dummy = useMemo(() => new THREE.Object3D(), []);
-  
-  const particles = useMemo(() => {
-    const temp = [];
-    for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 20;
-      const y = (Math.random() - 0.5) * 10 + 2;
-      const z = (Math.random() - 0.5) * 20;
-      temp.push({ 
-        position: new THREE.Vector3(x, y, z), 
-        velocity: new THREE.Vector3((Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02, (Math.random() - 0.5) * 0.02) 
-      });
-    }
-    return temp;
-  }, []);
-
-  const { mouse, camera } = useThree();
-  const raycaster = new THREE.Raycaster();
-  const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-  const mouseWorld = new THREE.Vector3();
-
-  useFrame(() => {
-    if (!mesh.current) return;
-    
-    // Find mouse position in 3D world (roughly at z=0)
-    raycaster.setFromCamera(mouse, camera);
-    raycaster.ray.intersectPlane(plane, mouseWorld);
-
-    particles.forEach((particle, i) => {
-      // Mouse repulsion
-      const dist = particle.position.distanceTo(mouseWorld);
-      if (dist < 4) {
-        const dir = particle.position.clone().sub(mouseWorld).normalize();
-        particle.velocity.add(dir.multiplyScalar(0.015));
-      }
-
-      // Return to base speed (friction)
-      particle.velocity.multiplyScalar(0.95);
-      
-      // Floating motion & apply velocity
-      particle.position.add(particle.velocity);
-      particle.position.y += Math.sin(Date.now() * 0.001 + i) * 0.005;
-
-      // Wrap around bounds
-      if (particle.position.y > 10) particle.position.y = -2;
-      if (particle.position.x > 15) particle.position.x = -15;
-      if (particle.position.x < -15) particle.position.x = 15;
-      if (particle.position.z > 5) particle.position.z = -15;
-
-      dummy.position.copy(particle.position);
-      dummy.updateMatrix();
-      mesh.current!.setMatrixAt(i, dummy.matrix);
-    });
-    mesh.current.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-      <boxGeometry args={[0.04, 0.04, 0.04]} />
-      <meshBasicMaterial color="#06B6D4" />
-    </instancedMesh>
-  );
-}
-
-function HologramCards() {
-  return (
-    <>
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={1} position={[-4, 2, -2]}>
-        <Html transform wrapperClass="pointer-events-none select-none" distanceFactor={8}>
-          <div className="w-64 p-4 border border-[#06B6D4]/50 bg-[#06B6D4]/10 backdrop-blur-md rounded-xl text-[#06B6D4] font-mono shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-             <div className="flex items-center gap-2 mb-4 border-b border-[#06B6D4]/30 pb-2">
-                 <Terminal className="w-4 h-4" />
-                 <span className="text-xs tracking-widest font-bold">SYSTEM SCAN</span>
-             </div>
-             <div className="space-y-2 text-[10px]">
-                <div className="flex justify-between"><span>TARGET:</span> <span className="text-white">EPIC GAMES</span></div>
-                <div className="flex justify-between"><span>STATUS:</span> <span className="text-[#22C55E] animate-pulse">DETECTING...</span></div>
-                <div className="w-full h-1 bg-[#06B6D4]/20 mt-2"><div className="h-full bg-[#06B6D4] w-2/3"></div></div>
-             </div>
-          </div>
-        </Html>
-      </Float>
-
-      <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.5} position={[4, 1.5, -3]}>
-        <Html transform wrapperClass="pointer-events-none select-none" distanceFactor={9}>
-          <div className="w-56 p-4 border border-[#8B5CF6]/50 bg-[#8B5CF6]/10 backdrop-blur-md rounded-xl text-[#8B5CF6] font-mono shadow-[0_0_30px_rgba(139,92,246,0.4)]">
-             <Activity className="w-8 h-8 mb-4 animate-pulse drop-shadow-[0_0_10px_#8B5CF6]" />
-             <div className="text-xs font-bold tracking-widest mb-1 text-white">LIVE INTEL</div>
-             <div className="text-[10px] opacity-70">Detecting price anomalies across 15+ storefronts.</div>
-          </div>
-        </Html>
-      </Float>
-    </>
-  );
-}
-
-// --- Main Hero Component ---
+const FEED_MESSAGES = [
+  "GLOBAL_LINK: ACTIVE",
+  "PRICE_SCAN: RUNNING",
+  "EPIC_VAULT_DECRYPTION: 84%",
+  "MARKET_ANOMALY_DETECTED",
+  "STEALTH_MODE: ENGAGED",
+  "HISTORICAL_LOW_FOUND",
+  "STEAM_API_SYNC: COMPLETE"
+];
 
 export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick }: { onExploreClick?: () => void, onTrendingClick?: () => void, onFreeGamesClick?: () => void }) {
-  
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [msgIndex, setMsgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex((prev) => (prev + 1) % FEED_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="relative w-full rounded-3xl overflow-hidden bg-[#02040A] border border-[#06B6D4]/30 mb-12 h-[600px] sm:h-[700px] shadow-[0_0_60px_rgba(6,182,212,0.15)] group cursor-crosshair">
+    <div className="relative w-full rounded-3xl overflow-hidden bg-[#050816] border border-[#06B6D4]/20 mb-12 min-h-[550px] flex items-center shadow-[0_0_50px_rgba(6,182,212,0.1)] group">
+      {/* Background Cyberpunk Elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#050816] via-[#0F172A] to-[#1e1b4b]"></div>
       
-      {/* 3D WebGL Canvas */}
-      {mounted && (
-      <div className="absolute inset-0 z-0 opacity-80">
-        <Canvas gl={{ antialias: false, powerPreference: "high-performance" }}>
-          <PerspectiveCamera makeDefault position={[0, 2, 8]} fov={60} />
-          <color attach="background" args={["#02040A"]} />
-          <fog attach="fog" args={["#02040A", 5, 30]} />
+      {/* Scanline Effect */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjEiIGZpbGw9InJnYmEoMjU1LDExLDQzLDAuMDUpIi8+PC9zdmc+')] opacity-50 z-0"></div>
+
+      {/* Radar Sweep Arc */}
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[800px] h-[800px] rounded-full border border-[#8B5CF6]/10 border-t-[#8B5CF6]/40 border-r-[#06B6D4]/40 animate-[spin_10s_linear_infinite] opacity-50 pointer-events-none z-0"></div>
+      <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] rounded-full border border-[#06B6D4]/10 border-b-[#06B6D4]/40 border-l-[#8B5CF6]/40 animate-[spin_7s_linear_infinite_reverse] opacity-50 pointer-events-none z-0"></div>
+
+      <div className="relative z-10 p-8 sm:p-12 lg:p-16 max-w-5xl mx-auto text-center lg:text-left lg:mx-0 w-full flex flex-col lg:flex-row items-center gap-10">
+        
+        {/* Left Side: Content */}
+        <motion.div
+          className="flex-1"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-6">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-[#EF4444]/10 border border-[#EF4444]/50 text-[#EF4444] text-[10px] font-orbitron font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(239,68,68,0.3)]">
+              <Activity className="w-3.5 h-3.5 animate-pulse" /> Live Market Surveillance
+            </span>
+          </div>
           
-          <ambientLight intensity={0.2} />
-          <directionalLight position={[10, 10, 5]} intensity={1} color="#8B5CF6" />
-          <pointLight position={[0, 2, 0]} intensity={5} color="#06B6D4" distance={20} />
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-orbitron font-black text-[#F8FAFC] leading-[1.1] tracking-tighter mb-6 uppercase">
+            Track Free PC Games & <br className="hidden lg:block"/>
+            Tactical <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#06B6D4] via-[#8B5CF6] to-[#EC4899] glow-text drop-shadow-[0_0_15px_rgba(6,182,212,0.6)]">Deal Intel</span>
+          </h1>
+          
+          <p className="text-[#94A3B8] text-base sm:text-lg mb-8 max-w-2xl mx-auto lg:mx-0 font-poppins leading-relaxed border-l-4 border-[#06B6D4]/50 pl-4 bg-[#050816]/40 p-2 rounded-r-lg">
+            Real-time surveillance of Steam, Epic Games, GOG, Humble Bundle, Fanatical, and upcoming gaming price anomalies.
+          </p>
+          
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mb-10">
+            <button 
+              onClick={onExploreClick}
+              className="px-6 py-3 rounded-sm relative overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6] text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs hover:bg-[#8B5CF6] hover:text-[#050816] transition-all shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center gap-2 group">
+              <span className="absolute inset-0 w-1/4 h-full bg-white/20 -skew-x-12 -translate-x-[150%] group-hover:animate-[wave_1s_ease-in-out_infinite]"></span>
+              <Crosshair className="w-4 h-4" /> Access Intel
+            </button>
+            <button 
+              onClick={onFreeGamesClick}
+              className="px-6 py-3 rounded-sm bg-[#06B6D4]/10 border border-[#06B6D4]/50 text-[#06B6D4] hover:bg-[#06B6D4] hover:text-[#050816] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+              <Radar className="w-4 h-4" /> Scan Free Games
+            </button>
+            <button 
+              onClick={onTrendingClick}
+              className="px-6 py-3 rounded-sm bg-transparent border border-[#94A3B8]/30 hover:border-[#F8FAFC] text-[#94A3B8] hover:text-[#F8FAFC] font-orbitron font-bold uppercase tracking-widest text-xs transition-all flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#8B5CF6]" /> View Upcoming Drops
+            </button>
+          </div>
 
-          <Suspense fallback={null}>
-             <CyberGrid />
-             <CyberCity />
-             <Particles />
-             <HologramCards />
-             <CameraRig />
-             
-             {/* Post Processing */}
-             <EffectComposer>
-                <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.2} />
-                <ChromaticAberration 
-                   offset={new THREE.Vector2(0.002, 0.002)} 
-                   blendFunction={BlendFunction.NORMAL} 
-                />
-                <Noise opacity={0.03} />
-                <Vignette offset={0.1} darkness={1.1} />
-             </EffectComposer>
-          </Suspense>
-        </Canvas>
-      </div>
-      )}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">15+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Sync'd</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">90M+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Historical Price Nodes</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">24/7</span>
+              <span className="uppercase tracking-widest mt-1 text-[#8B5CF6] opacity-90">Market Surveillance</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-sans text-white">99.8%</span>
+              <span className="uppercase tracking-widest mt-1 text-[#22C55E] opacity-90">Extraction Efficiency</span>
+            </div>
+          </div>
+        </motion.div>
 
-      {/* 2D HTML UI Overlay */}
-      <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pointer-events-none p-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="flex flex-col items-center text-center w-full"
-          >
-             {/* Main Title Logo */}
-             <div className="relative flex flex-col md:flex-row items-center gap-2 md:gap-4 mb-4">
-               {/* Neon Bloom Behind Text */}
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[100px] bg-[#06B6D4]/20 blur-[60px] rounded-full pointer-events-none"></div>
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80px] bg-[#8B5CF6]/20 blur-[50px] rounded-full pointer-events-none"></div>
-               
-               <Zap className="w-12 h-12 md:w-16 md:h-16 text-[#06B6D4] drop-shadow-[0_0_15px_rgba(6,182,212,0.8)] animate-pulse" />
-               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-orbitron font-black text-white tracking-tighter glow-text drop-shadow-[0_0_20px_rgba(6,182,212,0.5)] relative z-10">
-                 GamesDealsHub
-               </h1>
+        {/* Right Side: Telemetry / Live Feed */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="hidden lg:flex w-full max-w-[320px] flex-col items-stretch justify-center relative"
+        >
+          <div className="relative bg-[#0F172A]/80 border border-[#06B6D4]/30 rounded-xl p-5 overflow-hidden backdrop-blur-xl shadow-[0_0_30px_rgba(6,182,212,0.15)] group font-mono text-xs">
+             <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10 text-[#94A3B8]">
+                <div className="flex items-center gap-2">
+                   <Terminal className="w-4 h-4 text-[#06B6D4]" />
+                   <span className="uppercase tracking-wider font-bold">Live Telemetry</span>
+                </div>
+                <div className="w-2 h-2 rounded-full bg-[#22C55E] shadow-[0_0_8px_rgba(34,197,94,0.8)] animate-pulse"></div>
              </div>
              
-             {/* Subtitle */}
-             <motion.p 
-                initial={{ opacity: 0, letterSpacing: "0px" }}
-                animate={{ opacity: 1, letterSpacing: typeof window !== 'undefined' && window.innerWidth > 768 ? "10px" : "4px" }}
-                transition={{ delay: 0.8, duration: 1.5 }}
-                className="text-[#94A3B8] font-mono text-[10px] sm:text-xs md:text-sm uppercase mb-12 drop-shadow-md text-center max-w-2xl relative z-10"
-              >
-                Gaming Deal Intelligence Network
-              </motion.p>
-              
-              {/* Feature List */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 1 }}
-                className="flex flex-wrap justify-center gap-3 md:gap-8 text-[9px] md:text-[11px] font-orbitron font-bold text-[#06B6D4] uppercase tracking-widest mb-12 max-w-4xl opacity-90 relative z-10"
-              >
-                 <span className="drop-shadow-[0_0_5px_#06B6D4] flex items-center gap-2"><ScanLine className="w-3 h-3"/> Track Free Games</span>
-                 <span className="hidden sm:inline">•</span>
-                 <span className="text-[#8B5CF6] drop-shadow-[0_0_5px_#8B5CF6] flex items-center gap-2"><Activity className="w-3 h-3"/> Real-time Deal Intel</span>
-                 <span className="hidden lg:inline">•</span>
-                 <span className="text-[#EC4899] drop-shadow-[0_0_5px_#EC4899] flex items-center gap-2"><Terminal className="w-3 h-3"/> PC Optimization</span>
-              </motion.div>
+             <div className="flex flex-col gap-3 min-h-[120px] justify-start">
+               <AnimatePresence mode="popLayout">
+                  <motion.div
+                    key={msgIndex}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.3 }}
+                    className="text-[#06B6D4] font-bold tracking-widest flex items-center gap-2"
+                  >
+                    <span className="text-[#8B5CF6]">&gt;</span> {FEED_MESSAGES[msgIndex]}
+                  </motion.div>
+                  <motion.div
+                    key={`${msgIndex}-history`}
+                    className="text-white/30 tracking-widest flex items-center gap-2 line-through"
+                  >
+                    <span className="text-white/10">&gt;</span> {FEED_MESSAGES[(msgIndex - 1 + FEED_MESSAGES.length) % FEED_MESSAGES.length]}
+                  </motion.div>
+               </AnimatePresence>
+             </div>
 
-              {/* Call to Actions - Pointer events auto allows clicking them in the overlay */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1.5, duration: 0.6, type: "spring" }}
-                className="flex flex-col sm:flex-row items-center justify-center gap-6 pointer-events-auto relative z-10"
-              >
-                 <button 
-                  onClick={onFreeGamesClick}
-                  className="relative group overflow-hidden rounded-sm bg-[#02040A]/60 backdrop-blur-md border border-[#06B6D4] px-8 py-4 flex items-center gap-3 transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
-                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#06B6D4]/10 to-[#8B5CF6]/10 group-hover:from-[#06B6D4]/30 group-hover:to-[#8B5CF6]/30 transition-colors duration-300"></div>
-                    <Radar className="w-5 h-5 text-[#06B6D4] group-hover:text-white relative z-10 animate-[spin_4s_linear_infinite]" />
-                    <span className="font-orbitron font-bold uppercase tracking-[0.2em] text-[#06B6D4] group-hover:text-white relative z-10 text-xs sm:text-sm">
-                      Scan Free Games
-                    </span>
-                 </button>
-                 
-                 <button 
-                  onClick={onTrendingClick}
-                  className="px-6 py-4 rounded-sm border border-transparent hover:border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm text-[#94A3B8] hover:text-white font-orbitron font-bold uppercase tracking-widest text-[10px] sm:text-xs transition-all"
-                 >
-                   View Upcoming Drops
-                 </button>
-              </motion.div>
-
-          </motion.div>
+             {/* Animated Progress Bar */}
+             <div className="mt-4 pt-4 border-t border-white/10">
+               <div className="flex justify-between text-[9px] text-[#94A3B8] uppercase tracking-widest mb-1">
+                 <span>System Load</span>
+                 <span className="text-[#EC4899]">OPTIMAL</span>
+               </div>
+               <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                 <div className="h-full bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] w-[45%] animate-[pulse_2s_ease-in-out_infinite]"></div>
+               </div>
+             </div>
+          </div>
+        </motion.div>
       </div>
 
     </div>
