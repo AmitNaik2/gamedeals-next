@@ -73,7 +73,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.05, ease: "easeOut" }}
       whileHover={{ y: -4, scale: 1.01 }}
-      className="flex flex-col overflow-hidden transition-all duration-500 bg-[#0F172A]/80 backdrop-blur-xl border border-white/5 rounded-2xl group relative shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:border-[#8B5CF6]/50"
+      className="flex flex-col overflow-hidden transition-colors duration-500 bg-[#0F172A]/80 backdrop-blur-xl border border-white/5 rounded-2xl group relative shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:border-[#8B5CF6]/50"
     >
       <div 
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
