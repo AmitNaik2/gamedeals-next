@@ -13,7 +13,7 @@ async function fetchServerDeal(id: string): Promise<GameDeal | null> {
     return getGameDealById(id);
   } else if (id.startsWith('cs_')) {
     const dealID = id.replace('cs_', '');
-    const csRes = await fetch(`https://www.cheapshark.com/api/1.0/deals?id=${dealID}`, { next: { revalidate: 3600 } });
+    const csRes = await fetch(`https://www.cheapshark.com/api/1.0/deals?id=${encodeURIComponent(dealID)}`, { next: { revalidate: 3600 } });
     if (csRes.ok) {
       const csDeal = await csRes.json();
       if (csDeal && csDeal.gameInfo) {
