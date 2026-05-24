@@ -4,15 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // ✅ FIX: Locked to actual domains — wildcard allowed ANY site's images
+    // Allow images from any secure remote source since GamerPower aggregates from many stores
     remotePatterns: [
-      { protocol: "https", hostname: "www.gamerpower.com" },
-      { protocol: "https", hostname: "cdn.gamerpower.com" },
-      { protocol: "https", hostname: "store-cdn.epicgames.com" },
-      { protocol: "https", hostname: "cdn1.epicgames.com" },
-      { protocol: "https", hostname: "cdn2.epicgames.com" },
-      { protocol: "https", hostname: "shared.cloudflare.steamstatic.com" },
-      { protocol: "https", hostname: "cdn.akamai.steamstatic.com" },
+      { protocol: "https", hostname: "**" },
     ],
   },
 

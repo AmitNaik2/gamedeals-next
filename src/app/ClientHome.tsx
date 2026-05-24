@@ -440,7 +440,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             {activeTab === "Games" ? (
               <>
             {/* Floating Top Bar (Filters) */}
-            <div className="sticky top-24 z-40 w-full mb-8 bg-[#0F172A]/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-2 md:p-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
+            <div className="w-full mb-8 bg-[#0F172A]/90 backdrop-blur-2xl border border-white/5 rounded-2xl p-2 md:p-3 shadow-[0_0_30px_rgba(0,0,0,0.5)] flex flex-col xl:flex-row items-center gap-4 hidden-scrollbar overflow-x-auto">
               <div className="flex items-center gap-1 w-full xl:w-auto shrink-0 px-2 lg:px-0 lg:ml-2 overflow-x-auto hide-scrollbar">
                  <Filter className="w-4 h-4 text-[#06B6D4] mr-2 shrink-0" />
                  <span className="text-[10px] font-orbitron uppercase font-bold text-[#F9FAFB] tracking-widest hidden md:inline-block mr-2 shrink-0">Filters</span>
