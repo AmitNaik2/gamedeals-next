@@ -83,14 +83,14 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
       />
       
       {/* Image Section */}
-      <div className="relative w-full aspect-video sm:aspect-[16/9] shrink-0 overflow-hidden bg-black border-b border-white/5">
+      <div className="relative w-full h-[200px] shrink-0 overflow-hidden bg-black border-b border-white/5">
         <Link href={gameUrl} className="block w-full h-full">
           <Image
             src={bgImage}
             alt={`Free download of ${deal.title} on ${deal.platforms}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-            className="block object-cover w-full h-full transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+            className="block object-cover w-full h-full transition-all duration-300 group-hover:scale-[1.02] opacity-90 group-hover:opacity-100"
             priority={priority}
           />
           <div className="absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-[#050816] via-[#050816]/40 to-transparent opacity-80 group-hover:opacity-60"></div>
@@ -115,8 +115,8 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
       </div>
 
       {/* Content Section */}
-      <div className="flex flex-col p-5 flex-grow relative z-10">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+      <div className="flex flex-col p-4 flex-grow relative z-10">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
            <div className="flex flex-wrap items-center gap-2 text-[10px] font-poppins uppercase tracking-widest text-[#9CA3AF]">
             {platforms.map((platform, i) => (
               <span key={i} className="flex items-center gap-1 text-[#06B6D4] bg-[#06B6D4]/10 border border-[#06B6D4]/20 px-2 py-1 rounded">
@@ -146,19 +146,19 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
           </div>
         </div>
 
-        <Link href={gameUrl} className="inline-block group-hover:text-[#8B5CF6] transition-colors mb-3">
+        <Link href={gameUrl} className="inline-block group-hover:text-[#8B5CF6] transition-colors mb-2">
           <h3 className="text-xl sm:text-2xl font-bold leading-tight text-white font-orbitron line-clamp-2">
             {deal.title}
           </h3>
         </Link>
         
         {deal.description && (
-          <p className="text-[#94A3B8] text-sm line-clamp-2 mb-5 leading-relaxed font-poppins font-light border-l-2 border-white/10 pl-3">
+          <p className="text-[#94A3B8] text-sm line-clamp-2 mb-4 leading-relaxed font-poppins font-light border-l-2 border-white/10 pl-3">
             {deal.description.replace(/<[^>]*>?/gm, '')}
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-3 mb-6 font-poppins">
+        <div className="flex flex-wrap items-center gap-3 mb-4 font-poppins">
            {deal.steamRatingPercent && (
             <span className="px-2 py-1 rounded bg-[#0F172A] border border-[#06B6D4]/30 text-[#06B6D4] text-[10px] font-bold uppercase tracking-widest">
               STEAM {deal.steamRatingPercent}%
@@ -179,7 +179,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
            </span>
         </div>
 
-        <div className="mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-5 relative">
+        <div className="mt-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/5 pt-4 relative">
           <div className="absolute top-0 right-0 w-1/3 h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent"></div>
           <Countdown endDate={deal.end_date} />
 
