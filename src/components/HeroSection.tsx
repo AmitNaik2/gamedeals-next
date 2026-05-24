@@ -149,67 +149,7 @@ export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick 
           </div>
         </motion.div>
 
-        {/* Email Subscription Box */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-6"
-        >
-          <div className="relative p-5 rounded-xl border border-[#8B5CF6]/30 bg-[#8B5CF6]/5 backdrop-blur-md">
-            <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#EC4899] animate-pulse"></span>
-              GET NEW GAME ALERTS
-            </h3>
-            <p className="text-xs text-white/60 mb-3">
-              We'll email you instantly when a new game goes free.
-            </p>
-            <form 
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const btn = form.querySelector('button');
-                if (btn) btn.innerHTML = '...';
-                const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                try {
-                  const res = await fetch('/api/notify', {
-                    method: 'POST',
-                    body: JSON.stringify({ email }),
-                    headers: { 'Content-Type': 'application/json' }
-                  });
-                  const data = await res.json();
-                  if (data.success) {
-                    if (btn) btn.innerHTML = 'SUBSCRIBED ✓';
-                    if (btn) btn.classList.replace('from-[#8B5CF6]', 'from-[#22C55E]');
-                    if (btn) btn.classList.replace('to-[#06B6D4]', 'to-[#22C55E]');
-                    form.reset();
-                  } else {
-                    alert('Error: ' + data.error);
-                    if (btn) btn.innerHTML = 'SUBSCRIBE';
-                  }
-                } catch(err) {
-                  alert('Network error. Try again.');
-                  if (btn) btn.innerHTML = 'SUBSCRIBE';
-                }
-              }}
-              className="flex gap-2"
-            >
-              <input 
-                type="email" 
-                name="email"
-                required
-                placeholder="Enter your email" 
-                className="flex-1 min-w-0 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#06B6D4] transition-colors"
-              />
-              <button 
-                type="submit"
-                className="bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity whitespace-nowrap"
-              >
-                SUBSCRIBE
-              </button>
-            </form>
-          </div>
-        </motion.div>
+
       </div>
 
     </div>
