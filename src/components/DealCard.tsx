@@ -83,14 +83,14 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
       />
       
       {/* Image Section */}
-      <div className="relative w-full h-[200px] shrink-0 overflow-hidden bg-black border-b border-white/5">
+      <div className="relative w-full h-48 sm:h-52 shrink-0 overflow-hidden bg-black border-b border-white/5">
         <Link href={gameUrl} className="block w-full h-full">
           <Image
             src={bgImage}
             alt={`Free download of ${deal.title} on ${deal.platforms}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
-            className="block object-cover w-full h-full transition-all duration-300 group-hover:scale-[1.02] opacity-90 group-hover:opacity-100"
+            className="block object-cover w-full h-full transition-transform duration-300 group-hover:scale-[1.02] opacity-90 group-hover:opacity-100"
             priority={priority}
           />
           <div className="absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-[#050816] via-[#050816]/40 to-transparent opacity-80 group-hover:opacity-60"></div>
