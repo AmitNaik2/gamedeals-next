@@ -37,7 +37,7 @@ function buildConfirmationEmail(
   dealTitle?: string
 ): nodemailer.SendMailOptions {
   return {
-    from: process.env.EMAIL_FROM || "GamesDealsHub <noreply@gamesdealshub.me>",
+    from: process.env.EMAIL_USER,
     to: email,
     subject: "🎉 Welcome to GamesDealsHub! Your free game alerts are active",
     html: `
@@ -71,7 +71,7 @@ function buildAdminNotificationEmail(
   dealTitle?: string
 ): nodemailer.SendMailOptions {
   return {
-    from: process.env.EMAIL_FROM || "GamesDealsHub <noreply@gamesdealshub.me>",
+    from: process.env.EMAIL_USER,
     to: process.env.ADMIN_EMAIL,
     subject: `New subscriber: ${email}`,
     text: [
