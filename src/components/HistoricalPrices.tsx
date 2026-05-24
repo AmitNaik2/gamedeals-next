@@ -25,10 +25,23 @@ const generateMockData = () => {
 
 export function HistoricalPrices() {
   const [data, setData] = useState<{date: string, price: number}[]>([]);
+  const [stats, setStats] = useState<any[]>([]);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setData(generateMockData());
+    
+    // Generate dynamic dates relative to today
+    const today = new Date();
+    const lowDate = new Date(today);
+    lowDate.setDate(today.getDate() - Math.floor(Math.random() * 60 + 15)); // 15-75 days ago
+    
+    setStats([
+      { label: "All-Time Low", value: "$9.99", date: lowDate.toLocaleDateString('default', { month: 'short', day: 'numeric' }), store: "Steam" },
+      { label: "Current Avg", value: "$39.99", store: "Multiple Stores" },
+      { label: "Predicted Drop", value: "-45%", date: "Next 30 Days", store: "Epic Games" }
+    ]);
+    
     setIsMounted(true);
   }, []);
 
@@ -112,11 +125,7 @@ export function HistoricalPrices() {
 
         {/* Stats Column */}
         <div className="w-full lg:w-64 flex flex-col justify-between shrink-0 gap-4">
-           {[
-             { label: "All-Time Low", value: "$9.99", date: "Jan 15", store: "Steam" },
-             { label: "Current Avg", value: "$39.99", store: "Multiple Stores" },
-             { label: "Predicted Drop", value: "-45%", date: "Next 30 Days", store: "Epic Games" }
-           ].map((stat, i) => (
+           {stats.map((stat, i) => (
              <motion.div 
                key={i}
                initial={{ opacity: 0, x: 20 }}
