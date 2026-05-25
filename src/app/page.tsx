@@ -120,7 +120,7 @@ export default async function Home() {
                 "@type": "QuantitativeValue",
                 minValue: 0,
                 maxValue: 0,
-                unitCode": "DAY"
+                unitCode: "DAY"
               }
             }
           }
