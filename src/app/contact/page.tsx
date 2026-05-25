@@ -1,6 +1,7 @@
-// C:/Users/Amit/antigravity/gamesdealshub-next/src/app/contact/page.tsx
 import { Metadata } from 'next';
 import { ContactForm } from './ContactForm';
+import { LegalLayout } from '@/components/LegalLayout';
+import { Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Contact Us | GamesDealsHub',
@@ -15,10 +16,18 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="max-w-3xl mx-auto py-12 bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Contact Us</h1>
-      <p className="mb-6 text-gray-700">Have a question, feedback, or want to report a missing free game? We'd love to hear from you.</p>
-      <ContactForm />
-    </div>
+    <LegalLayout
+      title="Contact Us"
+      subtitle="System Communications Protocol"
+      icon={<Mail className="w-8 h-8" />}
+      accentTheme="purple"
+    >
+      <div className="bg-[#050816]/80 backdrop-blur-xl border-l-4 border-l-[#8B5CF6] border-t border-r border-b border-white/5 rounded-2xl p-6 lg:p-10 relative z-10 transition-all duration-300">
+        <p className="text-[#9CA3AF] leading-relaxed mb-8 font-medium">
+          Have a question, feedback, or want to report a missing free game? We'd love to hear from you. Enter your details below to establish a secure connection.
+        </p>
+        <ContactForm />
+      </div>
+    </LegalLayout>
   );
 }
