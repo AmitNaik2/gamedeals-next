@@ -48,6 +48,11 @@ async function fetchIgdbData(title: string) {
 
   cleanTitle = cleanTitle.replace(/"/g, '').trim();
 
+  // Skip IGDB fetch for internal apps or completely unrelated generic terms that cause bad matches
+  if (cleanTitle.toLowerCase().includes('gamerpower')) {
+    return { not_found: true, reason: "internal_app" };
+  }
+
   const response = await fetch("https://api.igdb.com/v4/games", {
     method: "POST",
     headers: {
