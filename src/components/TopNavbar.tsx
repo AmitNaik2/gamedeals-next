@@ -51,7 +51,7 @@ export function TopNavbar({
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#050816]/80 backdrop-blur-2xl border-b border-[#06B6D4]/20 shadow-[0_4px_30px_rgba(6,182,212,0.15)] font-orbitron">
+    <nav className="relative z-50 bg-[#050816]/80 backdrop-blur-2xl border-b border-[#06B6D4]/20 shadow-[0_4px_30px_rgba(6,182,212,0.15)] font-orbitron">
       <div className="container px-4 mx-auto max-w-[1400px]">
         <div className="flex items-center justify-between min-h-[4rem] sm:min-h-[5rem] py-3 gap-4">
           {/* Logo */}
