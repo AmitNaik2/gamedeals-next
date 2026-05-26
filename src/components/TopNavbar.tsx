@@ -25,7 +25,6 @@ export function TopNavbar({
   onSubscribeClick,
   deals = [],
 }: TopNavbarProps) {
-  const [onlineUsers, setOnlineUsers] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Check if we have active deals for each platform
@@ -33,35 +32,12 @@ export function TopNavbar({
   const hasEpicDeals = deals.filter(deal => deal.platforms.includes("Epic Games")).length >= 3;
   const hasGogDeals = deals.filter(deal => deal.platforms.includes("GOG")).length >= 3;
 
-  useEffect(() => {
-    // Simulate active users locally to save Vercel serverless function costs 
-    // and prevent 404 errors in Google Search Console
-    const initialUsers = Math.floor(Math.random() * 300) + 150;
-    setOnlineUsers(initialUsers);
-
-    const interval = setInterval(() => {
-      setOnlineUsers(prev => {
-        // Fluctuate by -3 to +5 users
-        const change = Math.floor(Math.random() * 9) - 3;
-        return Math.max(120, prev + change); 
-      });
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <nav className="relative z-50 bg-[#050816]/80 backdrop-blur-2xl border-b border-[#06B6D4]/20 shadow-[0_4px_30px_rgba(6,182,212,0.15)] font-orbitron">
       <div className="container px-4 mx-auto max-w-[1400px]">
         <div className="flex items-center justify-between min-h-[4rem] sm:min-h-[5rem] py-3 gap-4">
           {/* Logo */}
           <Link href="/" onClick={onHomeClick} className="flex items-center gap-3">
-            {onlineUsers > 0 && (
-              <div className="hidden xl:flex items-center gap-2 mr-4 px-3 py-1 bg-[#06B6D4]/10 border border-[#06B6D4]/30 rounded-full text-[10px] font-mono tracking-widest uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#06B6D4] animate-[pulse_1s_ease-in-out_infinite] shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
-                <span className="text-[#06B6D4]">{onlineUsers} OPERATIVES</span>
-              </div>
-            )}
             <div className="w-10 h-10 rounded-xl bg-[#0F172A] border border-[#06B6D4]/50 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <Crosshair className="w-5 h-5 text-[#06B6D4]" />
             </div>
