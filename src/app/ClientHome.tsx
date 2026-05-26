@@ -19,12 +19,10 @@ import { EmailModal } from "../components/EmailModal";
 import { type GameDeal } from "../types";
 import { getDealRarity, type RarityLevel } from "../lib/deal-utils";
 import { cn, openExternalUrl } from "../lib/utils";
-import { HistoricalPrices } from "../components/HistoricalPrices";
 import { UpcomingDropsGrid } from "../components/UpcomingDropsGrid";
 import { FeaturedDeal } from "../components/FeaturedDeal";
 import { LiveFeed } from "../components/LiveFeed";
 import { UpcomingDrops } from "../components/UpcomingDrops";
-import { GamingNews } from "../components/GamingNews";
 import { TopNavbar } from "../components/TopNavbar";
 import { HeroSection } from "../components/HeroSection";
 import { SkeletonCard } from "../components/SkeletonCard";
@@ -41,11 +39,16 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
   const pathname = usePathname() || "";
   const router = useRouter();
 
-  const [cookieConsent, setCookieConsent] = useState(false);
-  useEffect(() => { setCookieConsent(localStorage.getItem("cookieConsent") === "true"); }, []);
+  const [cookieConsent, setCookieConsent] = useState(true);
+  useEffect(() => { setCookieConsent(localStorage.getItem("cookieConsent") !== null); }, []);
 
   const acceptCookies = () => {
     localStorage.setItem("cookieConsent", "true");
+    setCookieConsent(true);
+  };
+
+  const rejectCookies = () => {
+    localStorage.setItem("cookieConsent", "false");
     setCookieConsent(true);
   };
 
@@ -761,7 +764,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             ) : null}
             
             <div className="mt-12 pt-8 border-t border-white/10 space-y-12">
-              <HistoricalPrices />
+              {/* Removed Fake Price History Chart for better UX */}
             </div>
             
             {/* Mobile / Tablet Subscribe Box */}
@@ -777,7 +780,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             </div>
             <UpcomingDrops deals={upcomingDeals} onViewAll={goUpcoming} />
             <div id="news">
-              <GamingNews />
+              {/* Removed Gaming Intel Log due to broken UI and missing API */}
             </div>
             
             {/* Placeholders for header links */}
@@ -850,12 +853,20 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <button 
-                onClick={acceptCookies} 
-                className="bg-[#06B6D4] hover:bg-[#F9FAFB] text-[#050816] px-6 py-2.5 rounded-xl text-xs font-orbitron font-bold tracking-widest transition-all uppercase shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.6)]"
-              >
-                Accept Line
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+                <button 
+                  onClick={rejectCookies} 
+                  className="w-full sm:w-auto px-6 py-2.5 bg-white/5 hover:bg-white/10 text-white font-bold font-orbitron uppercase tracking-widest text-xs rounded-xl transition-all"
+                >
+                  Reject
+                </button>
+                <button 
+                  onClick={acceptCookies} 
+                  className="w-full sm:w-auto px-6 py-2.5 bg-[#06B6D4] hover:bg-[#22D3EE] text-[#050816] font-bold font-orbitron uppercase tracking-widest text-xs rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all"
+                >
+                  Acknowledge
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -115,7 +115,7 @@ export default async function GamePage(props: { params: Promise<{ id: string }> 
       "price": deal.salePrice || "0.00",
       "priceCurrency": "USD",
       "availability": "https://schema.org/InStock",
-      "priceValidUntil": (deal.end_date && deal.end_date !== "N/A" && deal.end_date !== "2099-12-31") ? new Date(deal.end_date).toISOString() : undefined,
+      "priceValidUntil": (deal.end_date && deal.end_date !== "N/A" && deal.end_date !== "2099-12-31" && !isNaN(new Date(deal.end_date).getTime())) ? new Date(deal.end_date).toISOString() : undefined,
       "url": deal.open_giveaway_url || "",
       "hasMerchantReturnPolicy": {
         "@type": "MerchantReturnPolicy",

@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "GamesDealsHub | Free PC Games & Deals — Updated Daily",
   description:
     "Track and claim free PC games before they expire. Updated daily with the latest Epic Games, Steam, and GOG freebies.",
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: "GamesDealsHub | Free PC Games & Deals",
     description: "Track and claim free PC games before they expire.",

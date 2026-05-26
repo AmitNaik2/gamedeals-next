@@ -93,7 +93,7 @@ export default async function Home() {
           price: "0.00",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          ...(game.end_date && game.end_date !== "N/A"
+          ...(game.end_date && game.end_date !== "N/A" && !isNaN(new Date(game.end_date).getTime())
             ? { priceValidUntil: new Date(game.end_date).toISOString().split("T")[0] }
             : {}),
           url: game.open_giveaway_url || game.gamerpower_url,
