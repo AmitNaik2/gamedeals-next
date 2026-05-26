@@ -34,34 +34,19 @@ export function TopNavbar({
   const hasGogDeals = deals.filter(deal => deal.platforms.includes("GOG")).length >= 3;
 
   useEffect(() => {
-    // Generate or retrieve a persistent visitorId
-    let visitorId = localStorage.getItem("gg_visitor_id");
-    if (!visitorId) {
-      visitorId = "vis_" + Math.random().toString(36).substring(2, 15);
-      localStorage.setItem("gg_visitor_id", visitorId);
-    }
+    // Simulate active users locally to save Vercel serverless function costs 
+    // and prevent 404 errors in Google Search Console
+    const initialUsers = Math.floor(Math.random() * 300) + 150;
+    setOnlineUsers(initialUsers);
 
-    // Ping to track activity and get online user count
-    const pingActivity = async () => {
-      try {
-        const res = await fetch('/api/activity-check', { 
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ visitorId })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.activeUsers !== undefined) {
-             setOnlineUsers(data.activeUsers);
-          }
-        }
-      } catch (err) {
-        // Silently fail on network/adblocker errors
-      }
-    };
+    const interval = setInterval(() => {
+      setOnlineUsers(prev => {
+        // Fluctuate by -3 to +5 users
+        const change = Math.floor(Math.random() * 9) - 3;
+        return Math.max(120, prev + change); 
+      });
+    }, 5000);
     
-    pingActivity();
-    const interval = setInterval(pingActivity, 5000);
     return () => clearInterval(interval);
   }, []);
 
