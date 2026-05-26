@@ -79,6 +79,8 @@ export default async function Home() {
         name: game.title,
         description: game.description,
         image: game.image,
+        sku: String(game.id || Math.floor(Math.random() * 1000000)),
+        mpn: String(game.id || Math.floor(Math.random() * 1000000)),
         brand: {
           "@type": "Brand",
           name: "GamesDealsHub"
@@ -93,9 +95,9 @@ export default async function Home() {
           price: "0.00",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          ...(game.end_date && game.end_date !== "N/A" && !isNaN(new Date(game.end_date).getTime())
-            ? { priceValidUntil: new Date(game.end_date).toISOString().split("T")[0] }
-            : {}),
+          priceValidUntil: (game.end_date && game.end_date !== "N/A" && !isNaN(new Date(game.end_date).getTime()))
+            ? new Date(game.end_date).toISOString().split("T")[0]
+            : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
           url: game.open_giveaway_url || game.gamerpower_url,
           hasMerchantReturnPolicy: {
             "@type": "MerchantReturnPolicy",
