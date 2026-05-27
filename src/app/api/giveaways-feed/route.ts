@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type');
@@ -8,7 +10,7 @@ export async function GET(request: Request) {
     : `https://www.gamerpower.com/api/giveaways?sort-by=date`;
   
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const epicUrl = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US";
-    const response = await fetch(epicUrl, { next: { revalidate: 3600 } });
+    const response = await fetch(epicUrl, { cache: 'no-store' });
     if (!response.ok) {
       throw new Error("Failed to fetch epic games");
     }

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get('title') || '';
@@ -9,7 +11,7 @@ export async function GET(request: Request) {
       ? `https://www.cheapshark.com/api/1.0/deals?title=${encodeURIComponent(title)}&exact=0&sortBy=Deal%20Rating` 
       : `https://www.cheapshark.com/api/1.0/deals?storeID=1,2,3,4,8,11,13,25,30&sortBy=Deal%20Rating`;
       
-    const res = await fetch(url);
+    const res = await fetch(url, { cache: 'no-store' });
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {
