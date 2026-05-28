@@ -247,21 +247,54 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     setPremiumLoading(true);
     setActivePremiumSearch(searchTitle);
     try {
-      const url = searchTitle ? "/api/compare-deals?title=" + encodeURIComponent(searchTitle) : "/api/compare-deals";
+      const url = searchTitle 
+        ? `https://www.cheapshark.com/api/1.0/deals?title=${encodeURIComponent(searchTitle)}&exact=0&storeID=1,25&sortBy=Deal%20Rating`
+        : `https://www.cheapshark.com/api/1.0/deals?storeID=1,25&sortBy=Deal%20Rating`;
       const steamDealsRes = await fetch(url);
       if (!steamDealsRes.ok) {
          throw new Error("Failed to load Premium Deals (HTTP " + steamDealsRes.status + ")");
       }
-      const text = await steamDealsRes.text();
-      let steamData;
-      try { steamData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/compare-deals"); }
       
-      if (!Array.isArray(steamData)) {
+      const csData = await steamDealsRes.json();
+      
+      if (!Array.isArray(csData)) {
           setPremiumDeals([]);
           return;
       }
 
-      setPremiumDeals(steamData);
+      const STORE_NAMES: Record<string, string> = {
+        "1": "Steam",
+        "25": "Epic Games",
+      };
+      
+      const deals: GameDeal[] = csData.map((cs: any) => {
+        const winningStore = STORE_NAMES[cs.storeID] || "PC";
+        
+        return {
+          id: `cs_compare_${cs.dealID}`,
+          title: cs.title,
+          worth: cs.normalPrice === "N/A" ? "N/A" : `$${cs.normalPrice}`,
+          thumbnail: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
+          image: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
+          description: `Winner: ${winningStore}. Get it now for $${cs.salePrice} (was $${cs.normalPrice}).`,
+          instructions: `Cheapest price found on ${winningStore}.`,
+          open_giveaway_url: cs.rawg_url ? cs.rawg_url : `https://www.cheapshark.com/redirect?dealID=${cs.dealID}`,
+          published_date: "N/A",
+          type: cs.salePrice === "0.00" ? "Free Game" : "Discount",
+          platforms: winningStore,
+          end_date: "N/A",
+          users: parseInt(cs.steamRatingCount) || 0,
+          status: "Active",
+          gamerpower_url: "",
+          open_giveaway: `https://www.cheapshark.com/redirect?dealID=${cs.dealID}`,
+          salePrice: cs.salePrice === "N/A" ? undefined : cs.salePrice,
+          normalPrice: cs.normalPrice === "N/A" ? undefined : cs.normalPrice,
+          steamRatingPercent: cs.steamRatingPercent ? cs.steamRatingPercent.toString() : undefined,
+          steamAppID: cs.steamAppID,
+        };
+      });
+
+      setPremiumDeals(deals);
     } catch (err: any) {
       const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
       setError(errorMessage || "Failed to load Premium Deals. Please try again.");
