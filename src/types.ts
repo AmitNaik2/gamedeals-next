@@ -24,4 +24,5 @@ export interface GameDeal {
   metacriticScore?: string;
   background_image?: string;
   rawg_rating?: number;
+  steamAppID?: string;
 }

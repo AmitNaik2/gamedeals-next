@@ -74,9 +74,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       else setIsRefreshing(true);
       setError(null);
 
-      const [resGames, resUpcoming] = await Promise.all([
+      const [resGames, resUpcoming, resSteamFree] = await Promise.all([
         fetch("/api/giveaways-feed?type=game"),
-        fetch("/api/upcoming-free-games")
+        fetch("/api/upcoming-free-games"),
+        fetch("/api/steam-free-games")
       ]);
 
       if (!resGames.ok) throw new Error("Failed to load active games");
@@ -84,13 +85,15 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
       const gamesText = await resGames.text();
       const upcomingText = await resUpcoming.text();
+      const steamFreeText = resSteamFree.ok ? await resSteamFree.text() : "[]";
 
-      let gamesData, upcomingData;
+      let gamesData, upcomingData, steamFreeData;
       try { gamesData = JSON.parse(gamesText); } catch { throw new Error("Invalid games JSON"); }
       try { upcomingData = JSON.parse(upcomingText); } catch { throw new Error("Invalid upcoming JSON"); }
+      try { steamFreeData = JSON.parse(steamFreeText); } catch { steamFreeData = []; }
 
       // Map gamesData exactly as before
-      const formattedDeals: GameDeal[] = gamesData.map((deal: any) => ({
+      let formattedDeals: GameDeal[] = gamesData.map((deal: any) => ({
         id: `gp_${deal.id}`,
         title: deal.title,
         description: deal.description,
@@ -106,6 +109,9 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
         end_date: deal.end_date,
         instructions: deal.instructions
       }));
+
+      // Combine Steam Free data
+      formattedDeals = [...steamFreeData, ...formattedDeals];
 
       setDeals(formattedDeals);
       setUpcomingDeals(upcomingData || []);
@@ -241,58 +247,21 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     setPremiumLoading(true);
     setActivePremiumSearch(searchTitle);
     try {
-      const url = searchTitle ? "/api/premium-feed?title=" + encodeURIComponent(searchTitle) : "/api/premium-feed";
-      const cheapsharkRes = await fetch(url);
-      if (!cheapsharkRes.ok) {
-         throw new Error("Failed to load Premium Deals (HTTP " + cheapsharkRes.status + ")");
+      const url = searchTitle ? "/api/steam-deals?title=" + encodeURIComponent(searchTitle) : "/api/steam-deals";
+      const steamDealsRes = await fetch(url);
+      if (!steamDealsRes.ok) {
+         throw new Error("Failed to load Premium Deals (HTTP " + steamDealsRes.status + ")");
       }
-      const text = await cheapsharkRes.text();
-      let csData;
-      try { csData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/premium-feed"); }
+      const text = await steamDealsRes.text();
+      let steamData;
+      try { steamData = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/steam-deals"); }
       
-      if (!Array.isArray(csData)) {
-          console.warn("Cheapshark returned non-array:", csData);
+      if (!Array.isArray(steamData)) {
           setPremiumDeals([]);
           return;
       }
 
-      const STORE_NAMES: Record<string, string> = {
-        "1": "Steam", "2": "GamersGate", "3": "GreenManGaming", "4": "Amazon",
-        "5": "GameStop", "6": "Direct2Drive", "7": "GOG", "8": "Origin",
-        "9": "Get Games", "10": "Shiny Loot", "11": "Humble Store", "12": "Desura",
-        "13": "Uplay", "14": "IndieGameStand", "15": "Fanatical", "16": "Gamesrocket",
-        "17": "Games Republic", "18": "SilaGames", "19": "Playfield", "20": "ImperialGames",
-        "21": "WinGameStore", "22": "FunStockDigital", "23": "GameBillet", "24": "Voidu",
-        "25": "Epic Games", "26": "Razer Game Store", "27": "Gamesplanet", "28": "Gamesload",
-        "29": "2Game", "30": "IndieGala", "31": "Blizzard Shop", "32": "AllYouPlay",
-        "33": "DLGamer", "34": "Noctre", "35": "DreamGame"
-      };
-      
-        const csDeals: GameDeal[] = csData.map((cs: any) => {
-          return {
-            id: `cs_${cs.dealID}`,
-            title: cs.title,
-            worth: cs.normalPrice === "N/A" ? "N/A" : `$${cs.normalPrice}`,
-            thumbnail: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
-            image: cs.steamAppID ? `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${cs.steamAppID}/header.jpg` : cs.thumb,
-            description: cs.type === 'Game Info' ? `Overview for ${cs.title}.` : `Get it now for $${cs.salePrice} (was $${cs.normalPrice}). Steam Rating: ${cs.steamRatingText || 'N/A'} (${cs.steamRatingPercent || 0}%)`,
-            instructions: cs.type === 'Game Info' ? `Explore deals for ${cs.title}.` : "Available via digital storefronts.",
-            open_giveaway_url: cs.rawg_url ? cs.rawg_url : `https://www.cheapshark.com/redirect?dealID=${cs.dealID}`,
-            published_date: "N/A",
-            type: cs.type ? cs.type : (cs.salePrice === "0.00" ? "Free Game" : "Discount"),
-            platforms: cs.rawg_platforms || STORE_NAMES[cs.storeID] || "PC",
-            end_date: "N/A",
-            users: parseInt(cs.steamRatingCount) || 0,
-            status: "Active",
-            gamerpower_url: "",
-            open_giveaway: "",
-            salePrice: cs.salePrice === "N/A" ? undefined : cs.salePrice,
-            normalPrice: cs.normalPrice === "N/A" ? undefined : cs.normalPrice,
-            steamRatingPercent: cs.steamRatingPercent,
-            steamAppID: cs.steamAppID,
-          };
-        });
-        setPremiumDeals(csDeals.filter((d: any) => d.type === "Discount" || d.type === "Price Comparison" || d.type === "Game Info"));
+      setPremiumDeals(steamData);
     } catch (err: any) {
       const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
       setError(errorMessage || "Failed to load Premium Deals. Please try again.");
