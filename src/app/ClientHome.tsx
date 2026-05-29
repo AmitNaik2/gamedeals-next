@@ -247,12 +247,8 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     setPremiumLoading(true);
     setActivePremiumSearch(searchTitle);
     try {
-      const targetUrl = searchTitle 
-        ? `https://www.cheapshark.com/api/1.0/deals?title=${encodeURIComponent(searchTitle)}&exact=0&storeID=1,25&sortBy=Deal%20Rating`
-        : `https://www.cheapshark.com/api/1.0/deals?storeID=1,25&sortBy=Deal%20Rating`;
-        
-      const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-      const steamDealsRes = await fetch(proxyUrl);
+      const url = searchTitle ? "/api/premium-feed?title=" + encodeURIComponent(searchTitle) : "/api/premium-feed";
+      const steamDealsRes = await fetch(url);
       
       if (!steamDealsRes.ok) {
          throw new Error("Failed to load Premium Deals (HTTP " + steamDealsRes.status + ")");
@@ -299,7 +295,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
       setPremiumDeals(deals);
     } catch (err: any) {
-      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Ad-blocker or proxy failed. Please try again.' : err.message;
+      const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Please try again.' : err.message;
       setError(errorMessage || "Failed to load Premium Deals. Please try again.");
     } finally {
       setPremiumLoading(false);
