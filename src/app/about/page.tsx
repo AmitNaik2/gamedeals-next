@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react';
 import Link from 'next/link';
-import { Crosshair, Target, Cpu, Zap, Activity, Gamepad2, ChevronRight } from 'lucide-react';
+import { Crosshair, Target, Cpu, Zap, Activity, Gamepad2, ChevronRight, ShieldCheck } from 'lucide-react';
 import { LegalLayout } from '@/components/LegalLayout';
 
 export default function AboutPage() {
@@ -111,11 +111,18 @@ export default function AboutPage() {
             </ul>
           </div>
 
-          <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center">
-             <p className="text-[#9CA3AF] text-sm leading-relaxed mb-6">
-               We are constantly improving the platform by adding new features, guides, and tools to make GamesDealsHub more useful for the gaming community.
+          <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 flex flex-col justify-center relative group overflow-hidden">
+             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+               <ShieldCheck className="w-16 h-16 text-[#22C55E]" />
+             </div>
+             <h2 className="text-lg font-orbitron font-bold text-[#22C55E] uppercase tracking-widest mb-4">Authority & Sourcing</h2>
+             <p className="text-[#9CA3AF] text-sm leading-relaxed mb-4">
+               All intelligence on <strong className="text-white">GamesDealsHub</strong> is systematically verified. We utilize direct API endpoints from official storefronts including the <strong className="text-white">Epic Games GraphQL API</strong>, <strong className="text-white">Steamworks API</strong>, and <strong className="text-white">GOG API</strong> to ensure 100% accuracy.
              </p>
-             <Link href="/contact" className="w-full py-3 bg-white/5 hover:bg-[#06B6D4]/20 border border-white/10 hover:border-[#06B6D4]/50 rounded-xl text-center text-xs font-orbitron font-bold text-white hover:text-[#06B6D4] uppercase tracking-widest transition-all shadow-[0_0_0_rgba(6,182,212,0)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+             <p className="text-[#9CA3AF] text-sm leading-relaxed mb-6">
+               Founded by <strong className="text-white">Amit Naik</strong>, our platform prioritizes strict data integrity. No fake giveaways, no malware links, just direct paths to official game clients.
+             </p>
+             <Link href="/contact" className="w-full py-3 bg-white/5 hover:bg-[#06B6D4]/20 border border-white/10 hover:border-[#06B6D4]/50 rounded-xl text-center text-xs font-orbitron font-bold text-white hover:text-[#06B6D4] uppercase tracking-widest transition-all shadow-[0_0_0_rgba(6,182,212,0)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] mt-auto z-10">
                 Initialize Contact Protocol
              </Link>
           </div>

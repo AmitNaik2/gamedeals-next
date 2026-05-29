@@ -22,8 +22,27 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
     return priceA - priceB;
   });
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: title,
+    description: `Compare prices for ${title}`,
+    image: image,
+    offers: sortedDeals.map(deal => ({
+      "@type": "Offer",
+      price: deal.salePrice || "0.00",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: `https://www.gamesdealshub.me/game/${deal.id}`
+    }))
+  };
+
   return (
     <div className="flex flex-col overflow-hidden transition-all duration-300 border bg-[#0F172A]/80 backdrop-blur-md border-[#8B5CF6]/30 rounded-[24px] sm:rounded-3xl group relative shadow-[0_0_30px_rgba(139,92,246,0.1)]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       {/* Header with image */}
       <div className="relative w-full aspect-[16/9] sm:aspect-[2.5/1] shrink-0 overflow-hidden bg-black/50 border-b border-[#8B5CF6]/20">
         <Link href={gameUrl} className="block w-full h-full">

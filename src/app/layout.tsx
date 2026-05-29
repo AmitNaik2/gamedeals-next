@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   title: "GamesDealsHub | Free PC Games & Deals — Updated Daily",
   description:
     "Track and claim free PC games before they expire. Updated daily with the latest Epic Games, Steam, and GOG freebies.",
+  keywords: ["free PC games", "Epic Games freebies", "Steam deals", "100% discount", "free games download", "PC gaming deals", "game giveaways"],
   alternates: {
     canonical: '/',
   },
@@ -69,6 +70,10 @@ export default function RootLayout({
       },
       "query-input": "required name=search_term_string",
     },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      "cssSelector": ["#faq", "h1", "h2", ".text-xl"]
+    }
   };
 
   return (

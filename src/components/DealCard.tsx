@@ -65,6 +65,21 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
     TrustIcon = Activity;
   }
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: deal.title,
+    description: deal.description?.replace(/<[^>]*>?/gm, '') || `Deal for ${deal.title}`,
+    image: bgImage,
+    offers: {
+      "@type": "Offer",
+      price: deal.salePrice || "0.00",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      url: `https://www.gamesdealshub.me${gameUrl}`
+    }
+  };
+
   return (
     <motion.div
       ref={cardRef}
@@ -75,6 +90,10 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
       whileHover={{ y: -4, scale: 1.01 }}
       className="flex flex-col overflow-hidden transition-colors duration-500 bg-[#0F172A]/80 backdrop-blur-xl border border-white/5 rounded-2xl group relative shadow-lg hover:shadow-[0_0_30px_rgba(139,92,246,0.15)] hover:border-[#8B5CF6]/50"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div 
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
         style={{

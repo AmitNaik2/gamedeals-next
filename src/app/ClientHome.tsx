@@ -356,7 +356,15 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
   
   return (
     <div className="min-h-screen font-sans text-white bg-[#050505] selection:bg-[#7C3AED] selection:text-white relative">
-      
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": activeGamesDeals.slice(0, 10).map((deal, index) => ({
+          "@type": "ListItem",
+          "position": index + 1,
+          "url": `https://www.gamesdealshub.me/game/${deal.id}`
+        }))
+      })}} />
       <TopNavbar
         searchValue={platformSearch}
         onSearchChange={handleNavbarSearch}
@@ -732,7 +740,83 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             ) : null}
             
             <div className="mt-12 pt-8 border-t border-white/10 space-y-12">
-              {/* Removed Fake Price History Chart for better UX */}
+              <section id="faq" className="bg-[#0F172A]/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 md:p-8">
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  "mainEntity": [
+                    {
+                      "@type": "Question",
+                      "name": "How do I claim free PC games?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "To claim free PC games, monitor our active giveaways list. Click on any game, follow the 'Extract Asset' link to the official store (like Epic Games or Steam), log into your account, and click the 'Get' or 'Add to Library' button to permanently add the game to your collection."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "Which games are free right now?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The free games change weekly. Currently, we track 100% free promotions across Epic Games Store, Steam, GOG, and Prime Gaming. Check our 'Tactical Intel' feed for the latest live drops."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "How often are new games added?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Epic Games typically gives away new free games every Thursday. Steam and GOG have random giveaways throughout the week. Our system scans for new deals every hour."
+                      }
+                    }
+                  ]
+                })}} />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "HowTo",
+                  "name": "How to Claim Free PC Games",
+                  "step": [
+                    {
+                      "@type": "HowToStep",
+                      "name": "Find a Deal",
+                      "text": "Browse the active free game promotions on GamesDealsHub."
+                    },
+                    {
+                      "@type": "HowToStep",
+                      "name": "Visit Official Store",
+                      "text": "Click 'Extract Asset' to visit the official storefront."
+                    },
+                    {
+                      "@type": "HowToStep",
+                      "name": "Login and Claim",
+                      "text": "Log into your account and click 'Add to Library' or 'Get' to claim the game for free."
+                    }
+                  ]
+                })}} />
+                <h2 className="text-xl md:text-2xl font-orbitron font-bold text-[#06B6D4] uppercase tracking-widest mb-8 glow-text-cyan flex items-center gap-3">
+                  <Info className="w-6 h-6" /> Operations Briefing (FAQ)
+                </h2>
+                <div className="space-y-6">
+                  <div className="border-b border-white/10 pb-6">
+                    <h3 className="font-poppins font-bold text-lg text-white mb-2">How do I claim free PC games?</h3>
+                    <p className="text-[#9CA3AF] text-sm leading-relaxed">
+                      To claim free PC games, monitor our active giveaways list. Click on any game, follow the <span className="text-[#8B5CF6]">Extract Asset</span> link to the official store (like Epic Games or Steam), log into your account, and click the <strong className="text-white">Get</strong> or <strong className="text-white">Add to Library</strong> button to permanently add the game to your collection.
+                    </p>
+                  </div>
+                  <div className="border-b border-white/10 pb-6">
+                    <h3 className="font-poppins font-bold text-lg text-white mb-2">Which games are free right now?</h3>
+                    <p className="text-[#9CA3AF] text-sm leading-relaxed">
+                      The free games change weekly. Currently, we track 100% free promotions across Epic Games Store, Steam, GOG, and Prime Gaming. Check our <span className="text-[#06B6D4]">Tactical Intel</span> feed for the latest live drops.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-poppins font-bold text-lg text-white mb-2">How often are new games added?</h3>
+                    <p className="text-[#9CA3AF] text-sm leading-relaxed">
+                      Epic Games typically gives away new free games every Thursday. Steam and GOG have random giveaways throughout the week. Our system scans for new deals every hour so you never miss out.
+                    </p>
+                  </div>
+                </div>
+              </section>
             </div>
             
             {/* Mobile / Tablet Subscribe Box */}
