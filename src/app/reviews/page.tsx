@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/reviews' }
 };
 
-import { StructuredData } from "../../../components/StructuredData";
+import { StructuredData } from "@/components/StructuredData";
 
 export default function Page() { 
   const articleSchema = {
