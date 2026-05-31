@@ -8,7 +8,9 @@ import { GameDetail } from "../../../components/GameDetail";
 
 export const revalidate = 3600;
 
-async function fetchServerDeal(id: string): Promise<GameDeal | null> {
+import { cache } from 'react';
+
+const fetchServerDeal = cache(async (id: string): Promise<GameDeal | null> => {
   if (id.startsWith('gp_') || /^\d+$/.test(id)) {
     return getGameDealById(id);
   } else if (id.startsWith('cs_')) {
@@ -89,7 +91,7 @@ async function fetchServerDeal(id: string): Promise<GameDeal | null> {
     } as GameDeal;
   }
   return null;
-}
+});
 
 export async function generateMetadata(
   props: { params: Promise<{ id: string }> },

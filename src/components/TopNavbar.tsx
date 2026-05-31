@@ -77,9 +77,7 @@ export function TopNavbar({
               />
             </div>
 
-            <a href="https://reddit.com/r/FreeGameFindings" target="_blank" rel="noopener noreferrer" aria-label="Join Reddit" title="Join Reddit" className="hidden sm:flex items-center justify-center w-9 h-9 rounded-full bg-[#FF4500]/20 text-[#FF4500] hover:bg-[#FF4500] hover:text-white transition-all shadow-[0_0_10px_rgba(255,69,0,0.2)] hover:shadow-[0_0_20px_rgba(255,69,0,0.6)]">
-              <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4"><path d="M22 11.528c0-1.636-1.326-2.963-2.962-2.963-.842 0-1.602.355-2.146.924C15.011 8.232 12.651 7.5 10 7.5l1.621-5.111L15.65 3.39c.074.885.819 1.583 1.724 1.583 1.056 0 1.914-.858 1.914-1.914 0-1.056-.858-1.914-1.914-1.914-.824 0-1.522.525-1.792 1.258l-4.526-1.127a.498.498 0 0 0-.61.353l-1.844 5.82C6.115 7.644 3.9 8.358 2.109 9.539a2.955 2.955 0 0 0-2.11-.924C0 8.565 0 10.201 0 11.838c0 1.218.736 2.27 1.8 2.721C1.758 14.887 1.74 15.223 1.74 15.567c0 3.82 4.606 6.928 10.26 6.928 5.655 0 10.261-3.107 10.261-6.928 0-.343-.018-.68-.058-1.008 1.065-.452 1.801-1.504 1.801-2.722a2.953 2.953 0 0 0-2.004-2.831Zm-13.626 1.04c0-.946.767-1.713 1.713-1.713.945 0 1.713.767 1.713 1.713 0 .946-.768 1.713-1.713 1.713-.946 0-1.713-.767-1.713-1.713ZM12 19.349c-2.316 0-4.484-.71-5.011-1.895l1.042-.464c.321.72 2.016 1.259 3.969 1.259 1.954 0 3.648-.54 3.969-1.259l1.042.464c-.527 1.185-2.695 1.895-5.011 1.895Zm3.626-3.41c-.946 0-1.713-.767-1.713-1.713 0-.946.767-1.713 1.713-1.713.945 0 1.713.767 1.713 1.713 0 .946-.768 1.713-1.713 1.713Z"/></svg>
-            </a>
+
 
             <button type="button" onClick={onSubscribeClick} aria-label="Get deal alerts" title="Get deal alerts" className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center hover:bg-[#8B5CF6]/20 hover:text-[#8B5CF6] hover:border-[#8B5CF6]/50 transition-all text-[#9CA3AF] relative">
               <Bell className="w-4 h-4" />
