@@ -9,8 +9,86 @@ import { GameDetail } from "../../../components/GameDetail";
 export const revalidate = 3600;
 
 async function fetchServerDeal(id: string): Promise<GameDeal | null> {
-  const cleanId = id.replace("gp_", "");
-  return getGameDealById(cleanId);
+  if (id.startsWith('gp_') || /^\d+$/.test(id)) {
+    return getGameDealById(id);
+  } else if (id.startsWith('cs_')) {
+    const dealID = id.replace('cs_', '');
+    const csRes = await fetch(`https://www.cheapshark.com/api/1.0/deals?id=${encodeURIComponent(dealID)}`, { next: { revalidate: 3600 } });
+    if (csRes.ok) {
+      const csDeal = await csRes.json();
+      if (csDeal && csDeal.gameInfo) {
+        return {
+          id: id,
+          title: csDeal.gameInfo.name,
+          description: "Premium Deal",
+          instructions: "Get it on Store",
+          open_giveaway_url: "https://www.cheapshark.com/redirect?dealID=" + dealID,
+          image: csDeal.gameInfo.thumb || "",
+          type: "Discount",
+          platforms: "PC",
+          users: 0,
+          status: "Active",
+          salePrice: csDeal.gameInfo.salePrice,
+          normalPrice: csDeal.gameInfo.retailPrice,
+          worth: csDeal.gameInfo.retailPrice || "$0.00",
+          thumbnail: csDeal.gameInfo.thumb || "",
+          published_date: new Date().toISOString().split('T')[0],
+          end_date: "2099-12-31",
+        } as GameDeal;
+      }
+    }
+  } else if (id.startsWith('rawg_')) {
+    const titleSlug = id.replace('rawg_', '').replace(/-/g, ' ');
+    return {
+      id: id,
+      title: titleSlug,
+      description: "Game Information",
+      instructions: "View details below",
+      open_giveaway_url: "",
+      image: "",
+      type: "Game Info",
+      platforms: "PC, Console",
+      users: 0,
+      status: "Active",
+      worth: "$0.00",
+      thumbnail: "",
+      published_date: new Date().toISOString().split('T')[0],
+      end_date: "2099-12-31",
+    } as GameDeal;
+  } else if (id.startsWith('steam_free_')) {
+    const appId = id.replace('steam_free_', '');
+    let title = "Steam Free Deal";
+    try {
+       const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}`, { next: { revalidate: 3600 } });
+       if (res.ok) {
+           const data = await res.json();
+           if (data && data[appId] && data[appId].success && data[appId].data) {
+               title = data[appId].data.name;
+           }
+       }
+    } catch (e) {}
+
+    return {
+      id: id,
+      title: title,
+      description: "100% Off Promotional Deal on Steam.",
+      instructions: "Claim directly on the Steam store.",
+      open_giveaway_url: `https://store.steampowered.com/app/${appId}/`,
+      image: `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`,
+      type: "Free Game",
+      platforms: "Steam",
+      users: 0,
+      status: "Active",
+      worth: "N/A",
+      salePrice: "0.00",
+      normalPrice: "0.00",
+      thumbnail: `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appId}/header.jpg`,
+      published_date: new Date().toISOString().split('T')[0],
+      end_date: "2099-12-31",
+      steamAppID: appId,
+    } as GameDeal;
+  }
+  return null;
 }
 
 export async function generateMetadata(
