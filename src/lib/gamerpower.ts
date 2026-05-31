@@ -2,6 +2,14 @@ import { GameDeal } from "../types";
 
 const BASE_URL = "https://www.gamerpower.com/api";
 
+const GAMERPOWER_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  "Accept": "application/json, text/plain, */*",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Referer": "https://www.gamerpower.com/",
+  "Origin": "https://www.gamerpower.com",
+};
+
 // Add titles to exclude here instead of hardcoding inline ifs
 const BLOCKLIST = ["Terrors to Unveil"];
 
@@ -52,13 +60,17 @@ function formatDeal(deal: any): GameDeal {
 // ── Data fetchers (Next.js ISR via native fetch) ──────────────────────────────
 
 export async function getActiveGames(): Promise<GameDeal[]> {
+  const url = `${BASE_URL}/giveaways?type=game&sort-by=date`;
+  console.log(`[gamerpower] Fetching: ${url}`);
   try {
-    const res = await fetch(`${BASE_URL}/giveaways?type=game&sort-by=date`, {
+    const res = await fetch(url, {
       next: { revalidate: 3600 }, // ISR: revalidate every 1 hour
+      headers: GAMERPOWER_HEADERS,
     });
-
+    
+    console.log(`[gamerpower] Response status: ${res.status}`);
     if (!res.ok) {
-      console.error(`[gamerpower] getActiveGames failed: ${res.status} ${res.statusText}`);
+      console.error(`[gamerpower] Failed ${res.status}: ${res.statusText} for ${url}`);
       return [];
     }
 
@@ -74,22 +86,52 @@ export async function getActiveGames(): Promise<GameDeal[]> {
 }
 
 export async function getGameDealById(id: string | number): Promise<GameDeal | null> {
+  const cleanId = String(id).replace("gp_", "");
+  const primaryUrl = `${BASE_URL}/giveaway?id=${cleanId}`;
+  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(primaryUrl)}`;
+
+  console.log(`[gamerpower] Fetching: ${primaryUrl}`);
+
+  // Attempt 1: Direct fetch with browser headers
   try {
-    const cleanId = String(id).replace("gp_", "");
-    const res = await fetch(`${BASE_URL}/giveaway?id=${cleanId}`, {
+    const res = await fetch(primaryUrl, {
       next: { revalidate: 3600 },
+      headers: GAMERPOWER_HEADERS,
     });
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    if (data.status === "Error") return null;
-
-    return formatDeal(data);
-  } catch (error) {
-    console.error(`[gamerpower] getGameDealById(${id}) error:`, error);
-    return null;
+    
+    console.log(`[gamerpower] Response status: ${res.status}`);
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.status !== "error" && data.status !== "Error" && data.id) {
+        console.log(`[gamerpower] Direct fetch success for id: ${cleanId}`);
+        return formatDeal(data);
+      }
+    }
+    console.warn(`[gamerpower] Direct fetch failed for ${cleanId}, trying proxy...`);
+  } catch (e) {
+    console.warn(`[gamerpower] Direct fetch exception for ${cleanId}:`, e);
   }
+
+  // Attempt 2: CORS proxy fallback
+  try {
+    const proxyRes = await fetch(proxyUrl, {
+      next: { revalidate: 3600 },
+      headers: { "User-Agent": GAMERPOWER_HEADERS["User-Agent"] },
+    });
+    if (proxyRes.ok) {
+      const data = await proxyRes.json();
+      if (data && data.status !== "error" && data.status !== "Error" && data.id) {
+        console.log(`[gamerpower] Proxy fetch success for id: ${cleanId}`);
+        return formatDeal(data);
+      }
+    }
+  } catch (e) {
+    console.error(`[gamerpower] Proxy fetch exception for ${cleanId}:`, e);
+  }
+
+  console.error(`[gamerpower] All fetches failed for id: ${cleanId}`);
+  return null;
 }
 
 // ✅ NEW: Platform-specific fetcher — powers the SEO rewrite URLs
@@ -98,12 +140,19 @@ export async function getActiveGamesByPlatform(
 ): Promise<GameDeal[]> {
   if (platform === "all") return getActiveGames();
 
+  const url = `${BASE_URL}/giveaways?platform=${platform}&sort-by=date`;
+  console.log(`[gamerpower] Fetching: ${url}`);
   try {
-    const res = await fetch(`${BASE_URL}/giveaways?platform=${platform}&sort-by=date`, {
+    const res = await fetch(url, {
       next: { revalidate: 3600 },
+      headers: GAMERPOWER_HEADERS,
     });
 
-    if (!res.ok) return [];
+    console.log(`[gamerpower] Response status: ${res.status}`);
+    if (!res.ok) {
+      console.error(`[gamerpower] Failed ${res.status}: ${res.statusText} for ${url}`);
+      return [];
+    }
 
     const data = await res.json();
     if (!Array.isArray(data)) return [];

@@ -17,46 +17,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     }));
-
-    // Attempt to grab Epic Upcoming games directly from their API
-    try {
-      const epicUrl = "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US";
-      const epicRes = await fetch(epicUrl, { cache: 'no-store' });
-      if (epicRes.ok) {
-        const data = await epicRes.json();
-        const elements = data?.data?.Catalog?.searchStore?.elements || [];
-        const upcoming = elements.filter((el: any) => el.promotions && el.promotions.upcomingPromotionalOffers && el.promotions.upcomingPromotionalOffers.length > 0);
-        upcoming.forEach((item: any) => {
-          if (item.id) {
-             activeGamesUrls.push({
-               url: `${siteUrl}/game/${encodeURIComponent(item.id)}`,
-               lastModified: new Date(),
-               changeFrequency: 'daily',
-               priority: 0.8,
-             });
-          }
-        });
-      }
-    } catch (e) {}
-
-    // Add Premium Deals from CheapShark (top 20)
-    try {
-      const csRes = await fetch('https://www.cheapshark.com/api/1.0/deals?storeID=1,25&sortBy=Deal%20Rating', { cache: 'no-store' });
-      if (csRes.ok) {
-        const csData = await csRes.json();
-        if (Array.isArray(csData)) {
-           csData.slice(0, 20).forEach((cs: any) => {
-              activeGamesUrls.push({
-                 url: `${siteUrl}/game/cs_${cs.dealID}`,
-                 lastModified: new Date(cs.lastChange ? cs.lastChange * 1000 : Date.now()),
-                 changeFrequency: 'daily',
-                 priority: 0.7,
-              });
-           });
-        }
-      }
-    } catch (e) {}
-
   } catch (err) {
     console.error("Failed to fetch games for sitemap", err);
   }
