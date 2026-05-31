@@ -4,12 +4,19 @@ import { redirect } from "next/navigation";
 export const metadata: Metadata = {
   title: 'Game Reviews | GamesDealsHub',
   description: 'In-depth reviews and recommendations for PC games.',
+  keywords: ["PC game reviews", "game recommendations", "Helldivers 2 review", "gaming reviews", "GamesDealsHub reviews"],
   openGraph: {
     title: 'Game Reviews | GamesDealsHub',
     description: 'In-depth reviews and recommendations for PC games.',
-    url: 'https://www.gamesdealshub.me/reviews'
+    url: 'https://www.gamesdealshub.me/reviews',
+    type: 'article'
   },
-  alternates: { canonical: '/reviews' }
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Game Reviews | GamesDealsHub',
+    description: 'In-depth reviews and recommendations for PC games.'
+  },
+  alternates: { canonical: 'https://www.gamesdealshub.me/reviews' }
 };
 
 import { StructuredData } from "@/components/StructuredData";

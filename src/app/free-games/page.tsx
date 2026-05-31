@@ -1,17 +1,21 @@
 import { Metadata } from 'next';
-import { redirect } from "next/navigation";
+import { getActiveGames } from '../../lib/gamerpower';
+import ClientHome from '../ClientHome';
 
 export const metadata: Metadata = {
-  title: 'Free PC Games | GamesDealsHub',
-  description: 'Live feed of currently active free PC games on Epic, Steam, and GOG.',
+  title: 'Free PC Games Right Now | GamesDealsHub',
+  description: 'All 100% free PC games available now on Epic Games, Steam, GOG and more. Updated every hour.',
   openGraph: {
-    title: 'Free PC Games | GamesDealsHub',
-    description: 'Live feed of currently active free PC games on Epic, Steam, and GOG.',
+    title: 'Free PC Games Right Now | GamesDealsHub',
+    description: 'All 100% free PC games available now on Epic Games, Steam, GOG and more. Updated every hour.',
     url: 'https://www.gamesdealshub.me/free-games'
   },
-  alternates: { canonical: '/free-games' }
+  alternates: { canonical: 'https://www.gamesdealshub.me/free-games' }
 };
 
-export default function Page() { 
-  redirect("/#free-games");
+export const revalidate = 3600;
+
+export default async function Page() { 
+  const activeGames = await getActiveGames();
+  return <ClientHome initialActiveGames={activeGames} />;
 }

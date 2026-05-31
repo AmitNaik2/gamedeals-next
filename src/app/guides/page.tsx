@@ -4,12 +4,19 @@ import { redirect } from "next/navigation";
 export const metadata: Metadata = {
   title: 'Gaming Guides | GamesDealsHub',
   description: 'Tips, tricks, and walkthroughs for the best PC games.',
+  keywords: ["gaming guides", "how to get free games", "PC gaming tips", "game walkthroughs", "Epic Games guide"],
   openGraph: {
     title: 'Gaming Guides | GamesDealsHub',
     description: 'Tips, tricks, and walkthroughs for the best PC games.',
-    url: 'https://www.gamesdealshub.me/guides'
+    url: 'https://www.gamesdealshub.me/guides',
+    type: 'article'
   },
-  alternates: { canonical: '/guides' }
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Gaming Guides | GamesDealsHub',
+    description: 'Tips, tricks, and walkthroughs for the best PC games.'
+  },
+  alternates: { canonical: 'https://www.gamesdealshub.me/guides' }
 };
 
 import { StructuredData } from "@/components/StructuredData";

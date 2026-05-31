@@ -3,7 +3,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import { Inter, Orbitron, Poppins } from "next/font/google";
+import { Inter, Orbitron } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,12 +18,7 @@ const orbitron = Orbitron({
   variable: "--font-orbitron",
 });
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-poppins",
-});
+
 
 const siteUrl = "https://www.gamesdealshub.me";
 
@@ -77,7 +72,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className={`h-full antialiased dark ${inter.variable} ${orbitron.variable} ${poppins.variable}`}>
+    <html lang="en" className={`h-full antialiased dark ${inter.variable} ${orbitron.variable}`}>
       <head>
         {/* WebSite structured data for Google Sitelinks Searchbox */}
         <script

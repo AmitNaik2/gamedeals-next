@@ -1,6 +1,7 @@
 import { Metadata, ResolvingMetadata } from "next";
+import { notFound } from "next/navigation";
 import { GameDetail } from "../../../components/GameDetail";
-import { getGameDealById } from "../../../lib/gamerpower";
+import { getGameDealById, getActiveGames } from "../../../lib/gamerpower";
 import { StructuredData } from "../../../components/StructuredData";
 import { type GameDeal } from "../../../types";
 
@@ -124,11 +125,7 @@ export default async function GamePage(props: { params: Promise<{ id: string }> 
   const deal = await fetchServerDeal(params.id);
 
   if (!deal) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <h1 className="text-2xl font-bold">Deal Not Found</h1>
-      </div>
-    );
+    notFound();
   }
 
   // Generate Product + Offer Schema
@@ -138,8 +135,9 @@ export default async function GamePage(props: { params: Promise<{ id: string }> 
     "image": deal.image,
     "brand": {
       "@type": "Brand",
-      "name": "GamesDealsHub"
+      "name": deal.platforms
     },
+    "sku": deal.id,
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": (deal as any).steamRatingPercent ? (Number((deal as any).steamRatingPercent) / 20).toFixed(1) : "4.8",
@@ -195,4 +193,11 @@ export default async function GamePage(props: { params: Promise<{ id: string }> 
       <GameDetail deals={[deal]} isLoading={false} />
     </>
   );
+}
+
+export async function generateStaticParams() {
+  const games = await getActiveGames();
+  return games.map((game) => ({
+    id: game.id,
+  }));
 }

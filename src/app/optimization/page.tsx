@@ -4,12 +4,19 @@ import { redirect } from "next/navigation";
 export const metadata: Metadata = {
   title: 'PC Optimization | GamesDealsHub',
   description: 'Boost your FPS and optimize your PC for gaming.',
+  keywords: ["PC optimization", "boost FPS", "gaming performance", "Windows 11 optimization", "low end PC gaming"],
   openGraph: {
     title: 'PC Optimization | GamesDealsHub',
     description: 'Boost your FPS and optimize your PC for gaming.',
-    url: 'https://www.gamesdealshub.me/optimization'
+    url: 'https://www.gamesdealshub.me/optimization',
+    type: 'article'
   },
-  alternates: { canonical: '/optimization' }
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PC Optimization | GamesDealsHub',
+    description: 'Boost your FPS and optimize your PC for gaming.'
+  },
+  alternates: { canonical: 'https://www.gamesdealshub.me/optimization' }
 };
 
 import { StructuredData } from "@/components/StructuredData";

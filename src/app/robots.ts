@@ -1,11 +1,23 @@
-// C:/Users/Amit/antigravity/gamesdealshub-next/src/app/robots.ts
-import { MetadataRoute } from 'next';
+import { MetadataRoute } from "next";
 
-// Fix 7: Auto-generated robots.txt with sitemap reference
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = 'https://www.gamesdealshub.me';
+  const isProduction = process.env.VERCEL_ENV === "production";
+  
+  if (!isProduction) {
+    return {
+      rules: {
+        userAgent: "*",
+        disallow: "/",
+      },
+    };
+  }
+
   return {
-    rules: [{ userAgent: '*', allow: '/' }],
-    sitemap: `${siteUrl}/sitemap.xml`
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/admin", "/api/"],
+    },
+    sitemap: "https://www.gamesdealshub.me/sitemap.xml",
   };
 }

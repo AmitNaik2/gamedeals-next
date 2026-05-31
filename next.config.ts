@@ -43,6 +43,8 @@ const nextConfig: NextConfig = {
         https://store-site-backend-static.ak.epicgames.com;
     `.replace(/\s{2,}/g, " ").trim();
 
+    const isProduction = process.env.VERCEL_ENV === "production";
+
     return [
       {
         source: "/(.*)",
@@ -52,6 +54,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Vary", value: "Accept-Encoding" },
+          { key: "X-Robots-Tag", value: isProduction ? "index, follow" : "noindex, nofollow" },
         ],
       },
     ];

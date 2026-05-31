@@ -79,22 +79,14 @@ export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick 
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
+          <div className="grid grid-cols-2 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
             <div className="flex flex-col">
-              <span className="text-xl font-bold font-sans text-white">15+</span>
-              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Sync'd</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold font-sans text-white">90M+</span>
-              <span className="uppercase tracking-widest mt-1 opacity-70">Historical Price Nodes</span>
+              <span className="text-xl font-bold font-sans text-white">6</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Tracked</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold font-sans text-white">24/7</span>
               <span className="uppercase tracking-widest mt-1 text-[#8B5CF6] opacity-90">Market Surveillance</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold font-sans text-white">99.8%</span>
-              <span className="uppercase tracking-widest mt-1 text-[#22C55E] opacity-90">Extraction Efficiency</span>
             </div>
           </div>
         </motion.div>
