@@ -111,8 +111,20 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
         instructions: deal.instructions
       }));
 
-      // Combine Steam Free data
-      formattedDeals = [...steamFreeData, ...formattedDeals];
+      // Deduplicate deals between GamerPower and Steam Free feeds
+      const steamFreeNormalized = new Set(
+         steamFreeData.map((d: any) => 
+            d.title.toLowerCase().replace(/\([^)]+\)/g, '').replace(/giveaway/g, '').replace(/free/g, '').replace(/[^a-z0-9]/g, '')
+         )
+      );
+
+      const uniqueGpDeals = formattedDeals.filter((deal) => {
+         const normTitle = deal.title.toLowerCase().replace(/\([^)]+\)/g, '').replace(/giveaway/g, '').replace(/free/g, '').replace(/[^a-z0-9]/g, '');
+         return !steamFreeNormalized.has(normTitle);
+      });
+
+      // Combine Steam Free data with the deduplicated GamerPower data
+      formattedDeals = [...steamFreeData, ...uniqueGpDeals];
 
       setDeals(formattedDeals);
       setUpcomingDeals(upcomingData || []);
