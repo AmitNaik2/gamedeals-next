@@ -32,7 +32,7 @@ export default function Page() {
             Deliver this Notice, with all items completed, to our Designated Copyright Agent at the following email address:
           </p>
           <div className="bg-[#050816] border border-white/5 p-4 rounded-lg inline-block">
-             <a href="mailto:contact@gamesdealshub.me" className="text-[#06B6D4] hover:text-white transition-colors font-bold tracking-wider">contact@gamesdealshub.me</a>
+             <a href="mailto:gamedealshub1@gmail.com" className="text-[#06B6D4] hover:text-white transition-colors font-bold tracking-wider">gamedealshub1@gmail.com</a>
           </div>
 
           <p className="mt-8 text-sm">

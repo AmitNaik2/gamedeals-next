@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     const res = await fetch(url, { 
       next: { revalidate: 3600 },
       headers: {
-        'User-Agent': 'GamesDealsHub/1.0 (contact@gamesdealshub.me)'
+        'User-Agent': 'GamesDealsHub/1.0 (gamedealshub1@gmail.com)'
       }
     });
     if (!res.ok) {
