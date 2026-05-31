@@ -32,10 +32,10 @@ async function getUpcomingGames(): Promise<UpcomingGame[]> {
     const elements: any[] = data?.data?.Catalog?.searchStore?.elements || [];
 
     const upcoming = elements.filter(
-      (el) => el.promotions?.upcomingPromotionalOffers?.length > 0
+      (el: any) => el.promotions?.upcomingPromotionalOffers?.length > 0
     );
 
-    return upcoming.map((item) => {
+    return upcoming.map((item: any) => {
       const promo = item.promotions.upcomingPromotionalOffers[0].promotionalOffers[0];
       const imageObj =
         item.keyImages?.find((img: any) => img.type === "OfferImageWide") ||
