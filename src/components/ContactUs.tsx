@@ -74,8 +74,8 @@ export function ContactUs() {
                 <MessageSquare className="w-6 h-6 text-[#5865F2]" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Join Discord</h3>
-              <p className="text-white/60 mb-4 text-sm">Chat with the community and get real-time deal alerts.</p>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-[#5865F2] hover:text-white font-medium transition-colors">
+              <p className="text-gray-400 mb-4">Fastest way to get support and stay updated.</p>
+              <a href={process.env.NEXT_PUBLIC_DISCORD_URL || "https://discord.gg/gamesdealshub"} target="_blank" rel="noopener noreferrer" className="text-[#5865F2] hover:text-white font-medium transition-colors">
                 GamesDealsHub Discord
               </a>
             </div>

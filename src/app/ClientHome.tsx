@@ -570,8 +570,6 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             {activeGamesDeals.length > 0 && selectedRarity === 'All' && !platformSearch && (
                <FeaturedDeal deal={activeGamesDeals[0]} />
             )}
-            
-            <EmailSubscription />
 
             {loading ? (
               <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
@@ -895,8 +893,8 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
               </section>
             </div>
             
-            {/* Mobile / Tablet Subscribe Box */}
-            <div className="xl:hidden mt-12 pt-8 border-t border-white/10">
+            {/* Subscribe Box */}
+            <div className="mt-12 pt-8 border-t border-white/10 w-full max-w-2xl mx-auto">
               <EmailSubscription />
             </div>
           </div>
@@ -916,9 +914,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             <div id="guides" className="hidden"></div>
             <div id="optimization" className="hidden"></div>
             
-            <div className="pt-4 border-t border-white/10 hidden xl:block">
-              <EmailSubscription />
-            </div>
+
           </aside>
         </div>
       </main>
