@@ -249,7 +249,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     setPremiumError(null);
     setActivePremiumSearch(searchTitle);
     try {
-      const url = searchTitle ? "/api/premium-feed?title=" + encodeURIComponent(searchTitle) : "/api/premium-feed";
+      const cacheBuster = `&_cb=${Date.now()}`;
+      const url = searchTitle 
+         ? "/api/premium-feed?title=" + encodeURIComponent(searchTitle) + cacheBuster 
+         : "/api/premium-feed?_cb=" + Date.now();
       const steamDealsRes = await fetch(url);
       
       if (!steamDealsRes.ok) {
