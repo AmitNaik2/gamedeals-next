@@ -95,7 +95,7 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
   // Attempt 1: Direct fetch with browser headers
   try {
     const res = await fetch(primaryUrl, {
-      cache: "no-store",
+      next: { revalidate: 3600 },
       headers: GAMERPOWER_HEADERS,
     });
     
@@ -116,14 +116,16 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
       console.warn(`[gamerpower] Invalid data for ${cleanId}:`, JSON.stringify(data).slice(0, 200));
     }
     console.warn(`[gamerpower] Direct fetch failed for ${cleanId}, trying proxy...`);
-  } catch (e) {
+  } catch (e: any) {
+    // If Next.js throws a DYNAMIC_SERVER_USAGE error to bailout to dynamic rendering, we MUST rethrow it
+    if (e.digest === 'DYNAMIC_SERVER_USAGE') throw e;
     console.warn(`[gamerpower] Direct fetch exception for ${cleanId}:`, e);
   }
 
   // Attempt 2: CORS proxy fallback
   try {
     const proxyRes = await fetch(proxyUrl, {
-      cache: "no-store",
+      next: { revalidate: 3600 },
       headers: { "User-Agent": GAMERPOWER_HEADERS["User-Agent"] },
     });
     if (proxyRes.ok) {
@@ -140,7 +142,8 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
       }
       console.warn(`[gamerpower] Invalid data for ${cleanId}:`, JSON.stringify(data).slice(0, 200));
     }
-  } catch (e) {
+  } catch (e: any) {
+    if (e.digest === 'DYNAMIC_SERVER_USAGE') throw e;
     console.error(`[gamerpower] Proxy fetch exception for ${cleanId}:`, e);
   }
 
