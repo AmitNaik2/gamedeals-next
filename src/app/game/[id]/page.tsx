@@ -179,7 +179,14 @@ export default async function GamePage(props: { params: Promise<{ id: string }> 
               {relatedGames.map(related => (
                 <Link key={related.id} href={`/game/${related.id}`} className="group relative bg-[#0F172A]/80 border border-white/5 rounded-2xl overflow-hidden hover:border-[#06B6D4]/50 transition-all hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]">
                   <div className="relative w-full aspect-video">
-                    <Image src={related.image} alt={related.title} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <Image
+                      src={related.image}
+                      alt={related.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      loading="lazy"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                     <div className="absolute top-2 left-2 px-2 py-1 bg-green-500/90 text-white text-[10px] font-bold font-orbitron uppercase tracking-widest rounded">FREE</div>
                   </div>
                   <div className="p-4">

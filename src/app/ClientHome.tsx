@@ -18,6 +18,7 @@ import { Archive } from "../components/Archive";
 import { EmailModal } from "../components/EmailModal";
 import { type GameDeal } from "../types";
 import { getDealRarity, type RarityLevel } from "../lib/deal-utils";
+import { filterActiveDeals, formatLastApiFetch, sortDealsByExpiryAsc } from "../lib/deal-expiry";
 import { cn, openExternalUrl } from "../lib/utils";
 import { UpcomingDropsGrid } from "../components/UpcomingDropsGrid";
 import { FeaturedDeal } from "../components/FeaturedDeal";
@@ -25,7 +26,7 @@ import { LiveFeed } from "../components/LiveFeed";
 import { UpcomingDrops } from "../components/UpcomingDrops";
 import { TopNavbar } from "../components/TopNavbar";
 import { HeroSection } from "../components/HeroSection";
-import { SkeletonCard } from "../components/SkeletonCard";
+import { SkeletonCardGrid } from "../components/SkeletonCard";
 import { EmailSubscription } from "../components/EmailSubscription";
 
 
@@ -54,7 +55,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
   const [activeTab, setActiveTab] = useState<"Games" | "DLC" | "Premium" | "Upcoming">("Games");
   
-  const [deals, setDeals] = useState<GameDeal[]>(initialActiveGames);
+  const [deals, setDeals] = useState<GameDeal[]>(() => sortDealsByExpiryAsc(filterActiveDeals(initialActiveGames)));
   const [upcomingDeals, setUpcomingDeals] = useState<any[]>(initialUpcomingGames);
   const [dlcDeals, setDlcDeals] = useState<GameDeal[]>([]);
   const [premiumDeals, setPremiumDeals] = useState<GameDeal[]>([]);
@@ -64,10 +65,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
   const [error, setError] = useState<string | null>(null);
   const [premiumError, setPremiumError] = useState<string | null>(null);
-  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
-  const [sortOption, setSortOption] = useState<string>('Newest');
+  const [sortOption, setSortOption] = useState<string>('Expiring soon');
 
   const fetchDeals = async (refresh = false) => {
     try {
@@ -124,11 +125,13 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       });
 
       // Combine Steam Free data with the deduplicated GamerPower data
-      formattedDeals = [...steamFreeData, ...uniqueGpDeals];
+      formattedDeals = sortDealsByExpiryAsc(filterActiveDeals([...steamFreeData, ...uniqueGpDeals]));
 
+      const fetchedAt = new Date();
       setDeals(formattedDeals);
       setUpcomingDeals(upcomingData || []);
-      setLastRefreshed(new Date());
+      setLastRefreshed(fetchedAt);
+      setTimestampNow(fetchedAt.getTime());
     } catch (err: any) {
       setError(err.message === 'Failed to fetch' ? 'Connection lost' : err.message);
     } finally {
@@ -137,31 +140,21 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     }
   };
   
-  const [timeSinceRefreshed, setTimeSinceRefreshed] = useState(0);
+  const [timestampNow, setTimestampNow] = useState(Date.now());
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeSinceRefreshed(Math.floor((Date.now() - lastRefreshed.getTime()) / 60000));
-    }, 15000); // Check frequently
+      setTimestampNow(Date.now());
+    }, 60000);
     return () => clearInterval(interval);
-  }, [lastRefreshed]);
+  }, []);
 
   const sortedGamesDeals = useMemo(() => {
     const normalize = (t: string) => t.toLowerCase().replace(/[^a-z0-9]/g, '');
     const allNormTitles = new Set(deals.map(d => normalize(d.title)));
     const seenChapters = new Set();
 
-    let result = deals.filter(deal => {
-      if (deal.end_date && deal.end_date !== 'N/A') {
-         const endStr = deal.end_date.includes(' ') && !deal.end_date.includes('Z') && !deal.end_date.includes('GMT') 
-           ? deal.end_date.replace(' ', 'T') + 'Z' 
-           : deal.end_date;
-         const endTime = new Date(endStr).getTime();
-         if (!isNaN(endTime) && endTime < Date.now()) {
-           return false;
-         }
-      }
-      
+    let result = filterActiveDeals(deals).filter(deal => {
       const titleLower = deal.title.trim().toLowerCase();
       let base = titleLower;
       if (titleLower.includes(':')) base = titleLower.split(':')[0];
@@ -188,12 +181,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
     if (sortOption === 'Alphabetical') {
        result.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortOption === 'Newest') {
+       result.sort((a, b) => new Date(b.published_date).getTime() - new Date(a.published_date).getTime());
     } else if (sortOption === 'Expiring soon') {
-       result.sort((a, b) => {
-         if (a.end_date === 'N/A') return 1;
-         if (b.end_date === 'N/A') return -1;
-         return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
-       });
+       result = sortDealsByExpiryAsc(result);
     }
 
     return result;
@@ -254,7 +245,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     return matchPlatform || matchTitle;
   });
 
-  const filteredPremiumDeals = premiumDeals.filter(deal => {
+  const filteredPremiumDeals = filterActiveDeals(premiumDeals).filter(deal => {
     const search = premiumSearch.toLowerCase();
     // Skip local filtering if the server has provided results for this exact query
     if (search && search === activePremiumSearch.toLowerCase()) return true;
@@ -282,7 +273,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       const text = await dbRes.text();
       let data;
       try { data = JSON.parse(text); } catch { throw new Error("Invalid JSON from /api/dlc-feed"); }
-      setDlcDeals(data);
+      setDlcDeals(sortDealsByExpiryAsc(filterActiveDeals(data)));
     } catch (err: any) {
       const errorMessage = err.message === 'Failed to fetch' ? 'Network error: Server might be restarting. Please try again.' : err.message;
       setError(errorMessage || "Failed to load Free DLC. Please try again.");
@@ -499,7 +490,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
               </div>
               <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#9CA3AF] px-2 tracking-widest uppercase shrink-0 pb-4">
                 <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
-                 <span suppressHydrationWarning><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> Updated {Math.floor((Date.now() - lastRefreshed.getTime()) / 60000)} mins ago</span>
+                 <span suppressHydrationWarning><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> {formatLastApiFetch(lastRefreshed, timestampNow)}</span>
               </div>
             </div>
 
@@ -598,11 +589,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
             )}
 
             {loading ? (
-              <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-                {[...Array(6)].map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
+              <SkeletonCardGrid />
             ) : (() => {
               const filteredDeals = activeGamesDeals.filter((deal, idx) => {
                     // Hide the first item if it's already shown in FeaturedDeal
@@ -704,11 +691,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
                </div>
              </div>
                 {dlcLoading ? (
-                  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-                    {[...Array(6)].map((_, i) => (
-                      <SkeletonCard key={i} />
-                    ))}
-                  </div>
+                  <SkeletonCardGrid />
                 ) : filteredLootDeals.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
@@ -795,11 +778,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
                     </button>
                   </div>
                 ) : premiumLoading ? (
-                  <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-                    {[...Array(6)].map((_, i) => (
-                      <SkeletonCard key={i} />
-                    ))}
-                  </div>
+                  <SkeletonCardGrid />
                 ) : filteredPremiumDeals.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">

@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() { 
+  const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL || "#";
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -95,7 +96,7 @@ export default function Page() {
             <div className="bg-[#050816] p-6 rounded-xl border border-white/10 text-center mt-12">
               <h3 className="text-xl font-orbitron font-bold text-white mb-3">Join The Community</h3>
               <p className="text-[#9CA3AF] mb-6">The best way to stay updated on our progress and catch every free game is to join our Discord server. It's the fastest way to get notified when a drop happens.</p>
-              <Link href={process.env.NEXT_PUBLIC_DISCORD_URL || "https://discord.gg/gamesdealshub"} className="inline-block bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold px-6 py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+              <Link href={discordUrl} className="inline-block bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold px-6 py-3 rounded-lg transition-colors shadow-[0_0_15px_rgba(139,92,246,0.3)]">
                 Join Discord
               </Link>
             </div>

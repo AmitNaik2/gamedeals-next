@@ -51,6 +51,7 @@ export function CompareCard({ deals }: { deals: GameDeal[] }) {
             alt={title} 
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
+            loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-90 group-hover:scale-105 transition-all duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent" />

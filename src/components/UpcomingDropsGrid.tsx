@@ -67,6 +67,7 @@ export function UpcomingDropsGrid({ deals }: { deals: GameDeal[] }) {
                   alt={item.title} 
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                  loading="lazy"
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 ease-out z-0" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-[#0F172A]/80 to-transparent z-10 block" />

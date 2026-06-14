@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { type GameDeal } from "../types";
 import { ArrowLeft, Gamepad2, Info, LayoutTemplate, Monitor, Image as ImageIcon, Video, Heart, Share2, Check, X, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { generateUniqueSummary, generateTags } from "../lib/text-utils";
@@ -213,6 +214,7 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
   }
 
   const isSteam = deal.platforms.toLowerCase().includes("steam");
+  const coverImage = deal.thumbnail || deal.image || "/next.svg";
 
   let developerName = "Unknown Studio";
   let publisherName = "Unknown Studio";
@@ -243,6 +245,14 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
     <div className="min-h-screen bg-[#070A11] text-white font-sans p-4 lg:p-8 animate-in fade-in duration-500">
 
       <div className="max-w-[1200px] mx-auto">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="mb-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-6">
           <span>&gt;</span>
@@ -255,7 +265,14 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
         <div className="grid lg:grid-cols-[400px_1fr] gap-8 mb-6">
           {/* Cover Image */}
           <div className="relative rounded-2xl overflow-hidden aspect-[4/3] bg-slate-900 shadow-2xl">
-            <img src={deal.thumbnail} alt={deal.title} className="w-full h-full object-cover" />
+            <Image
+              src={coverImage}
+              alt={deal.title}
+              fill
+              sizes="(max-width: 1024px) 100vw, 400px"
+              loading="lazy"
+              className="object-cover"
+            />
             <div className="absolute top-4 right-4 bg-gradient-to-r from-emerald-400 to-green-500 text-[#070A11] px-3 py-1 text-xs font-bold rounded shadow-lg shadow-green-500/20 uppercase tracking-wider">
               Free to Keep
             </div>
@@ -502,10 +519,13 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
                           }
                         }}
                       >
-                        <img
-                          src={selectedMediaItem.url || selectedMediaItem.thumbnail}
-                          className="w-full h-full object-cover"
+                        <Image
+                          src={selectedMediaItem.url || selectedMediaItem.thumbnail || coverImage}
+                          className="object-cover"
                           alt={deal.title}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 50vw"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300" />
                         
@@ -563,7 +583,14 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
                                 : "opacity-50 hover:opacity-100 hover:scale-[1.02]"
                             )}
                           >
-                            <img src={item.thumbnail} className="w-full h-full object-cover" alt={`Thumb ${idx}`} />
+                            <Image
+                              src={item.thumbnail || coverImage}
+                              className="object-cover"
+                              alt={`${deal.title} thumbnail ${idx + 1}`}
+                              fill
+                              sizes="(max-width: 1024px) 25vw, 120px"
+                              loading="lazy"
+                            />
                             {(item.type === 'video' || item.type === 'youtube') && (
                               <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[0.5px]">
                                 <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
@@ -702,11 +729,16 @@ export function GameDetail({ deals, isLoading }: { deals: GameDeal[], isLoading?
             {/* Media Container */}
             <div className="w-full h-full rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-2xl border border-white/5">
               {mediaItems[lightboxIndex]?.type === 'image' && (
-                <img 
-                  src={mediaItems[lightboxIndex].url} 
-                  className="max-h-full max-w-full object-contain animate-in zoom-in-95 duration-200" 
-                  alt="Game Screenshot" 
-                />
+                <div className="relative h-full w-full">
+                  <Image
+                    src={mediaItems[lightboxIndex].url || coverImage}
+                    className="object-contain animate-in zoom-in-95 duration-200"
+                    alt={`${deal.title} screenshot`}
+                    fill
+                    sizes="100vw"
+                    loading="lazy"
+                  />
+                </div>
               )}
               {mediaItems[lightboxIndex]?.type === 'video' && (
                 <video 

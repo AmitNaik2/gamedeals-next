@@ -7,6 +7,7 @@ import Image from "next/image";
 import { type GameDeal } from "../types";
 import { cn } from "../lib/utils";
 import { getDealRarity } from "../lib/deal-utils";
+import { getDealExpiryBadge } from "../lib/deal-expiry";
 import { Countdown } from "./Countdown";
 import { useIgdb } from "../hooks/useIgdb";
 
@@ -38,6 +39,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
   };
 
   const gameUrl = `/game/${deal.id}`;
+  const expiryBadge = getDealExpiryBadge(deal);
 
   const renderPlatformIcon = (platformStr: string) => {
     const pl = platformStr.toLowerCase();
@@ -110,7 +112,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
             className="block object-cover w-full h-full opacity-90 group-hover:opacity-100 transition-opacity duration-300"
-            priority={priority}
+            loading="lazy"
           />
           <div className="absolute inset-0 transition-opacity duration-500 bg-gradient-to-t from-[#050816] via-[#050816]/40 to-transparent opacity-80 group-hover:opacity-60"></div>
           
@@ -119,7 +121,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
               <TrustIcon className="w-3 h-3" /> {trustScore}
             </span>
           </div>
-          <div className="absolute top-3 left-3 flex gap-2">
+          <div className="absolute top-3 left-3 flex flex-col items-start gap-2">
             {deal.salePrice === "0.00" || originalPrice === "$0.00" ? (
                 <span className="px-2 py-1 rounded bg-[#EF4444]/20 backdrop-blur-md border border-[#EF4444]/50 text-[#EF4444] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
                   100% OFF ANOMALY
@@ -129,6 +131,16 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
                   PRICE DROP DETECTED
                 </span>
             ) : null}
+            {expiryBadge === "today" && (
+              <span className="px-2 py-1 rounded bg-[#EF4444]/25 backdrop-blur-md border border-[#EF4444]/60 text-[#FCA5A5] text-[10px] font-bold uppercase tracking-widest">
+                Expiring Today
+              </span>
+            )}
+            {expiryBadge === "soon" && (
+              <span className="px-2 py-1 rounded bg-[#F59E0B]/20 backdrop-blur-md border border-[#F59E0B]/60 text-[#FBBF24] text-[10px] font-bold uppercase tracking-widest">
+                Expiring Soon
+              </span>
+            )}
           </div>
         </Link>
       </div>

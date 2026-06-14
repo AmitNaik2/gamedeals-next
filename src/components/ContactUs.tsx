@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 export function ContactUs() {
   const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const discordUrl = process.env.NEXT_PUBLIC_DISCORD_URL || "#";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,7 +76,7 @@ export function ContactUs() {
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Join Discord</h3>
               <p className="text-gray-400 mb-4">Fastest way to get support and stay updated.</p>
-              <a href={process.env.NEXT_PUBLIC_DISCORD_URL || "https://discord.gg/gamesdealshub"} target="_blank" rel="noopener noreferrer" className="text-[#5865F2] hover:text-white font-medium transition-colors">
+              <a href={discordUrl} target="_blank" rel="noopener noreferrer" className="text-[#5865F2] hover:text-white font-medium transition-colors">
                 GamesDealsHub Discord
               </a>
             </div>

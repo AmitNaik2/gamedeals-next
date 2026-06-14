@@ -1,4 +1,5 @@
 import { GameDeal } from "../types";
+import { getDealExpiryTime, isActiveByExpiry, sortDealsByExpiryAsc } from "./deal-expiry";
 
 const BASE_URL = "https://www.gamerpower.com/api";
 
@@ -18,19 +19,7 @@ const BLOCKLIST = ["Terrors to Unveil"];
 export function isActiveDeal(deal: GameDeal): boolean {
   if (deal.status?.toLowerCase() !== "active") return false;
   if (BLOCKLIST.some((blocked) => deal.title?.includes(blocked))) return false;
-  if (!deal.end_date || deal.end_date === "N/A") return true;
-
-  // Normalize to ISO 8601 UTC so Date.parse works reliably across environments
-  const endStr =
-    deal.end_date.includes(" ") &&
-    !deal.end_date.includes("Z") &&
-    !deal.end_date.includes("GMT")
-      ? deal.end_date.replace(" ", "T") + "Z"
-      : deal.end_date;
-
-  const endDate = new Date(endStr);
-  if (Number.isNaN(endDate.getTime())) return true; // unparseable → assume active
-  return endDate.getTime() > Date.now();
+  return isActiveByExpiry(deal);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -41,8 +30,7 @@ export function parseEstimatedValue(worth: string): number {
 }
 
 export function getUrgencyMs(endDate: string): number {
-  if (!endDate || endDate === "N/A") return Infinity;
-  return new Date(endDate).getTime() - Date.now();
+  return getDealExpiryTime(endDate) - Date.now();
 }
 
 function formatDeal(deal: any): GameDeal {
@@ -78,7 +66,7 @@ export async function getActiveGames(): Promise<GameDeal[]> {
     if (!Array.isArray(data)) return [];
 
     // ✅ FIX: Filter expired/inactive deals — original returned everything raw
-    return data.map(formatDeal).filter(isActiveDeal);
+    return sortDealsByExpiryAsc(data.map(formatDeal).filter(isActiveDeal));
   } catch (error) {
     console.error("[gamerpower] getActiveGames error:", error);
     return [];
@@ -174,7 +162,7 @@ export async function getActiveGamesByPlatform(
     const data = await res.json();
     if (!Array.isArray(data)) return [];
 
-    return data.map(formatDeal).filter(isActiveDeal);
+    return sortDealsByExpiryAsc(data.map(formatDeal).filter(isActiveDeal));
   } catch (error) {
     console.error(`[gamerpower] getActiveGamesByPlatform(${platform}) error:`, error);
     return [];

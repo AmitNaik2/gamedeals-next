@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { type GameDeal } from "../types";
 import { Zap, Activity } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export function LiveFeed({ deals }: { deals: GameDeal[] }) {
   if (!deals || deals.length === 0) return null;
@@ -25,8 +26,15 @@ export function LiveFeed({ deals }: { deals: GameDeal[] }) {
               transition={{ delay: i * 0.1 }}
               className="flex gap-3 items-start border-b border-white/5 pb-4 last:border-0 last:pb-0 hover:bg-white/5 p-2 -mx-2 rounded-xl transition-all duration-300 cursor-pointer hover:pl-2 group/item"
             >
-              <div className="w-12 h-12 rounded-lg shrink-0 overflow-hidden bg-black/50 border border-white/10 group-hover/item:border-[#06B6D4]/50 transition-colors">
-                 <img src={deal.thumbnail} alt={deal.title} className="w-full h-full object-cover opacity-80 group-hover/item:opacity-100 transition-opacity" />
+              <div className="relative w-12 h-12 rounded-lg shrink-0 overflow-hidden bg-black/50 border border-white/10 group-hover/item:border-[#06B6D4]/50 transition-colors">
+                 <Image
+                   src={deal.thumbnail || deal.image || "/next.svg"}
+                   alt={deal.title}
+                   fill
+                   sizes="48px"
+                   loading="lazy"
+                   className="object-cover opacity-80 group-hover/item:opacity-100 transition-opacity"
+                 />
               </div>
               <div className="flex-1">
                 <p className="text-[11px] font-orbitron font-bold text-white mb-1.5 line-clamp-1 group-hover/item:text-[#8B5CF6] transition-colors">{deal.title}</p>

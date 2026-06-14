@@ -81,8 +81,8 @@ export function HeroSection({ onExploreClick, onTrendingClick, onFreeGamesClick 
 
           <div className="grid grid-cols-2 gap-4 text-[10px] font-orbitron text-[#06B6D4] border-t border-white/5 pt-6 bg-black/20 backdrop-blur-md rounded-lg mx-auto lg:mx-0 p-4 w-full text-center lg:text-left">
             <div className="flex flex-col">
-              <span className="text-xl font-bold font-sans text-white">6</span>
-              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Tracked</span>
+              <span className="text-xl font-bold font-sans text-white">9+</span>
+              <span className="uppercase tracking-widest mt-1 opacity-70">Storefronts Synced</span>
             </div>
             <div className="flex flex-col">
               <span className="text-xl font-bold font-sans text-white">24/7</span>

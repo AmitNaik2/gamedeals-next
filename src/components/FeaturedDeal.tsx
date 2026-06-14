@@ -8,6 +8,7 @@ import { Countdown } from "./Countdown";
 import { ExternalLink, BadgeCheck } from "lucide-react";
 import { useIgdb } from "../hooks/useIgdb";
 import { generateUniqueSummary, generateTags } from "../lib/text-utils";
+import { formatUtcExpiry, isExpiringWithin24h } from "../lib/deal-expiry";
 
 export function FeaturedDeal({ deal }: { deal: GameDeal }) {
   const gameInfo = useIgdb(deal?.title);
@@ -16,6 +17,8 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
   const bgImage = gameInfo?.background_image || deal.image || deal.thumbnail;
   const rewrittenSummary = generateUniqueSummary(deal.title, deal.description, deal.type, deal.platforms);
   const tags = generateTags(deal.title, deal.platforms, deal.type, deal.description);
+  const expiryDate = formatUtcExpiry(deal.end_date);
+  const isUrgent = isExpiringWithin24h(deal);
 
   const gameUrl = `/game/${deal.id}`;
 
@@ -33,6 +36,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
           sizes="100vw"
           className="w-full h-full object-cover opacity-50 group-hover:scale-110 group-hover:opacity-70 transition-all duration-1000 ease-out" 
           priority
+          loading="eager"
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-[#050816]/60 to-transparent z-10"></div>
@@ -59,12 +63,24 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
           {rewrittenSummary}
         </p>
         <div className="flex flex-wrap items-center gap-6">
-          <Link
-            href={gameUrl}
-            className="px-8 py-4 bg-white text-black text-[12px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#06B6D4] hover:text-white transition-all duration-300 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:scale-105"
-          >
-            Claim Drop
-          </Link>
+          <div className="flex flex-col gap-2">
+            <Link
+              href={gameUrl}
+              className="px-8 py-4 bg-white text-black text-[12px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#06B6D4] hover:text-white transition-all duration-300 rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] hover:scale-105"
+            >
+              Claim Drop
+            </Link>
+            {expiryDate && (
+              <span className={`text-[10px] font-orbitron font-bold uppercase tracking-widest ${isUrgent ? "text-[#EF4444]" : "text-[#F59E0B]"}`}>
+                Expires {expiryDate}
+              </span>
+            )}
+            {isUrgent && (
+              <span className="text-[10px] font-orbitron font-bold uppercase tracking-widest text-[#FCA5A5]">
+                Less than 24h remaining
+              </span>
+            )}
+          </div>
           <Countdown endDate={deal.end_date} />
         </div>
       </div>
