@@ -1,6 +1,7 @@
 import ClientHome from "./ClientHome";
 import { getActiveGames } from "../lib/gamerpower";
 import { StructuredData } from "../components/StructuredData";
+import { JsonLd } from "../components/JsonLd";
 import { GameDeal } from "../types";
 
 export const revalidate = 300;
@@ -138,8 +139,72 @@ export default async function Home() {
     })),
   };
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "GamesDealsHub",
+    url: "https://www.gamesdealshub.me",
+    description: "Track free PC games and giveaways updated daily",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://www.gamesdealshub.me/search?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do I claim free PC games?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "To claim free PC games, monitor our active giveaways list, open the official store link, sign in, and complete the zero-dollar claim before the offer expires.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Which games are free right now?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The free games change weekly. GamesDealsHub tracks active free PC game giveaways across Epic Games, Steam, GOG, Prime Gaming, and other storefronts.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How often are new games added?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Epic Games gives away new free games every Thursday, while Steam, GOG, Prime Gaming, and publisher stores can add new limited-time offers throughout the week.",
+        },
+      },
+    ],
+  };
+
+  const productSchemas = activeGames.map((deal: GameDeal) => ({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: deal.title,
+    description: deal.description,
+    image: deal.thumbnail,
+    offers: {
+      "@type": "Offer",
+      price: "0.00",
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      validThrough: deal.end_date,
+      url: deal.open_giveaway_url,
+    },
+  }));
+
   return (
     <>
+      <JsonLd data={[websiteSchema, faqSchema, ...productSchemas]} />
       <StructuredData type="ItemList" data={itemListSchemaData} />
       <ClientHome
         initialActiveGames={activeGames}

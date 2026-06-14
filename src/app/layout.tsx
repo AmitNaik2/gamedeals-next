@@ -58,11 +58,12 @@ export default function RootLayout({
     "@type": "WebSite",
     name: "GamesDealsHub",
     url: siteUrl,
+    description: "Track free PC games and giveaways updated daily",
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/?q={search_term_string}`,
+        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },

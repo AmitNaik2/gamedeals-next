@@ -71,14 +71,15 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
     "@context": "https://schema.org",
     "@type": "Product",
     name: deal.title,
-    description: deal.description?.replace(/<[^>]*>?/gm, '') || `Deal for ${deal.title}`,
-    image: bgImage,
+    description: deal.description?.replace(/<[^>]*>?/gm, "") || `Deal for ${deal.title}`,
+    image: deal.thumbnail,
     offers: {
       "@type": "Offer",
-      price: deal.salePrice || "0.00",
+      price: "0.00",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      url: `https://www.gamesdealshub.me${gameUrl}`
+      validThrough: deal.end_date,
+      url: deal.open_giveaway_url
     }
   };
 
@@ -94,7 +95,7 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c") }}
       />
       <div 
         className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition duration-500 group-hover:opacity-100"
