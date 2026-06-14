@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 import { GameDeal } from '../../../types';
+import { cachedJson } from '../../../lib/api-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,9 +80,9 @@ export async function GET(request: Request) {
       }
     });
     
-    return NextResponse.json(results);
+    return cachedJson(results);
   } catch (err) {
     console.error("Steam Deals Scrape Error:", err);
-    return NextResponse.json([], { status: 500 });
+    return cachedJson([], { status: 500 });
   }
 }

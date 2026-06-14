@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cachedJson } from '../../../lib/api-cache';
 
 let twitchAccessToken = "";
 let tokenExpiration = 0;
@@ -129,9 +130,9 @@ export async function GET(request: Request) {
 
   try {
     const data = await fetchIgdbData(title);
-    return NextResponse.json(data);
+    return cachedJson(data);
   } catch (error: any) {
     console.error("Error fetching IGDB info:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch from IGDB" }, { status: 500 });
+    return cachedJson({ error: error.message || "Failed to fetch from IGDB" }, { status: 500 });
   }
 }

@@ -52,7 +52,7 @@ export async function getActiveGames(): Promise<GameDeal[]> {
   console.log(`[gamerpower] Fetching: ${url}`);
   try {
     const res = await fetch(url, {
-      next: { revalidate: 3600 }, // ISR: revalidate every 1 hour
+      next: { revalidate: 300 },
       headers: GAMERPOWER_HEADERS,
     });
     
@@ -83,7 +83,7 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
   // Attempt 1: Direct fetch with browser headers
   try {
     const res = await fetch(primaryUrl, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
       headers: GAMERPOWER_HEADERS,
     });
     
@@ -113,7 +113,7 @@ export async function getGameDealById(id: string | number): Promise<GameDeal | n
   // Attempt 2: CORS proxy fallback
   try {
     const proxyRes = await fetch(proxyUrl, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
       headers: { "User-Agent": GAMERPOWER_HEADERS["User-Agent"] },
     });
     if (proxyRes.ok) {
@@ -149,7 +149,7 @@ export async function getActiveGamesByPlatform(
   console.log(`[gamerpower] Fetching: ${url}`);
   try {
     const res = await fetch(url, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
       headers: GAMERPOWER_HEADERS,
     });
 

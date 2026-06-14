@@ -28,6 +28,7 @@ import { TopNavbar } from "../components/TopNavbar";
 import { HeroSection } from "../components/HeroSection";
 import { SkeletonCardGrid } from "../components/SkeletonCard";
 import { EmailSubscription } from "../components/EmailSubscription";
+import { AdSlot } from "../components/AdSlot";
 
 
 
@@ -40,7 +41,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
   const pathname = usePathname() || "";
   const router = useRouter();
 
-  const [cookieConsent, setCookieConsent] = useState(true);
+  const [cookieConsent, setCookieConsent] = useState<boolean | null>(null);
   useEffect(() => { setCookieConsent(localStorage.getItem("cookieConsent") !== null); }, []);
 
   const acceptCookies = () => {
@@ -455,11 +456,13 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       />
 
       <main className="container px-4 py-8 mx-auto max-w-7xl">
-                <HeroSection 
+        <HeroSection 
           onExploreClick={goFreeGames}
           onFreeGamesClick={goFreeDlc}
           onTrendingClick={goUpcoming}
         />
+
+        <AdSlot id="home-below-hero" className="mb-8" />
 
               {/* Error State */}
               {error && (
@@ -634,14 +637,21 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 mb-12">
                     <AnimatePresence mode="popLayout">
                       {filteredDeals.map((deal, index) => (
-                        <DealCard
-                          key={deal.id}
-                          deal={deal}
-                          index={index}
-                          priority={index < 4}
-                          onShare={openShareModal}
-                          onRemind={openSubscribeModal}
-                        />
+                        <div key={deal.id} className="contents">
+                          <DealCard
+                            deal={deal}
+                            index={index}
+                            priority={index < 4}
+                            onShare={openShareModal}
+                            onRemind={openSubscribeModal}
+                          />
+                          {(index + 1) % 6 === 0 && (
+                            <AdSlot
+                              id={`deals-inline-${index + 1}`}
+                              className="md:col-span-2"
+                            />
+                          )}
+                        </div>
                       ))}
                     </AnimatePresence>
                   </div>
@@ -696,14 +706,18 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
                   <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
                     <AnimatePresence mode="popLayout">
                       {filteredLootDeals.map((deal, index) => (
-                        <DealCard
-                          key={deal.id}
-                          deal={deal}
-                          index={index}
-                          priority={index < 2}
-                          onShare={openShareModal}
-                          onRemind={openSubscribeModal}
-                        />
+                        <div key={deal.id} className="contents">
+                          <DealCard
+                            deal={deal}
+                            index={index}
+                            priority={index < 2}
+                            onShare={openShareModal}
+                            onRemind={openSubscribeModal}
+                          />
+                          {(index + 1) % 6 === 0 && (
+                            <AdSlot id={`dlc-inline-${index + 1}`} className="md:col-span-2" />
+                          )}
+                        </div>
                       ))}
                     </AnimatePresence>
                   </div>
@@ -793,14 +807,18 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
                             return acc;
                          }, new Map<string, GameDeal>()).values()
                       ).map((deal: GameDeal, index: number) => (
-                        <DealCard
-                          key={deal.id}
-                          deal={deal}
-                          index={index}
-                          priority={index < 2}
-                          onShare={openShareModal}
-                          onRemind={openSubscribeModal}
-                        />
+                        <div key={deal.id} className="contents">
+                          <DealCard
+                            deal={deal}
+                            index={index}
+                            priority={index < 2}
+                            onShare={openShareModal}
+                            onRemind={openSubscribeModal}
+                          />
+                          {(index + 1) % 6 === 0 && (
+                            <AdSlot id={`premium-inline-${index + 1}`} className="md:col-span-2" />
+                          )}
+                        </div>
                       ))}
                     </AnimatePresence>
                   </div>
@@ -924,6 +942,10 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
         </div>
       </main>
 
+      <div className="container mx-auto max-w-7xl px-4">
+        <AdSlot id="above-footer" />
+      </div>
+
       <footer className="mt-20 border-t border-[#06B6D4]/30 bg-[#050816]">
         <div className="max-w-[1400px] mx-auto px-4 md:px-10 py-12 lg:py-16 relative">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-px bg-gradient-to-r from-transparent via-[#06B6D4]/50 to-transparent"></div>
@@ -971,7 +993,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
         trackDeal={trackData}
       />
 
-      {!cookieConsent && (
+      {cookieConsent === false && (
         <div className="fixed bottom-0 left-0 w-full z-[100] p-4 bg-[#0F172A]/90 border-t border-[#8B5CF6]/30 backdrop-blur-xl shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
           <div className="container mx-auto max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-start gap-4 flex-1">

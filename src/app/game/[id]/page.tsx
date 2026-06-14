@@ -6,7 +6,7 @@ import { getGameDealById, getActiveGames } from "../../../lib/gamerpower";
 import { type GameDeal } from "../../../types";
 import { GameDetail } from "../../../components/GameDetail";
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 import { cache } from 'react';
 
@@ -15,7 +15,7 @@ const fetchServerDeal = cache(async (id: string): Promise<GameDeal | null> => {
     return getGameDealById(id);
   } else if (id.startsWith('cs_')) {
     const dealID = id.replace('cs_', '');
-    const csRes = await fetch(`https://www.cheapshark.com/api/1.0/deals?id=${encodeURIComponent(dealID)}`, { next: { revalidate: 3600 } });
+    const csRes = await fetch(`https://www.cheapshark.com/api/1.0/deals?id=${encodeURIComponent(dealID)}`, { next: { revalidate: 300 } });
     if (csRes.ok) {
       const csDeal = await csRes.json();
       if (csDeal && csDeal.gameInfo) {
@@ -61,7 +61,7 @@ const fetchServerDeal = cache(async (id: string): Promise<GameDeal | null> => {
     const appId = id.replace('steam_free_', '');
     let title = "Steam Free Deal";
     try {
-       const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}`, { next: { revalidate: 3600 } });
+       const res = await fetch(`https://store.steampowered.com/api/appdetails?appids=${appId}`, { next: { revalidate: 300 } });
        if (res.ok) {
            const data = await res.json();
            if (data && data[appId] && data[appId].success && data[appId].data) {
@@ -106,6 +106,12 @@ export async function generateMetadata(
 
   const title = `${game.title} — Free on ${game.platforms} | GamesDealsHub`;
   const description = game.description ? `${game.description.slice(0, 155)}...` : `Get ${game.title} for free!`;
+  const ogImage = `/og?${new URLSearchParams({
+    title: game.title,
+    platform: game.platforms.split(',')[0] || 'PC',
+    expiry: game.end_date && game.end_date !== "N/A" ? game.end_date : "Limited Time",
+    ...(game.image ? { image: game.image } : {}),
+  }).toString()}`;
 
   return {
     title,
@@ -116,14 +122,14 @@ export async function generateMetadata(
     openGraph: {
       title,
       description,
-      images: [{ url: game.image, width: 1200, height: 630 }],
+      images: [{ url: ogImage, width: 1200, height: 630, alt: game.title }],
       type: "website"
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [game.image]
+      images: [ogImage]
     }
   };
 }

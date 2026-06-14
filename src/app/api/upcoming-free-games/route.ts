@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { cachedJson } from '../../../lib/api-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,9 +42,9 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(formatted);
+    return cachedJson(formatted);
   } catch (error) {
     console.error("Error fetching upcoming free games:", error);
-    return NextResponse.json([]);
+    return cachedJson([]);
   }
 }

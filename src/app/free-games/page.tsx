@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.gamesdealshub.me/free-games' }
 };
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 export default async function Page() { 
   const activeGames = await getActiveGames();

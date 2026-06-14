@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/archive' }
 };
 
-export const revalidate = 3600; // 1 hour for archive
+export const revalidate = 300;
 
 export default async function ArchivePage() {
   const allDeals = await fetchDeals();

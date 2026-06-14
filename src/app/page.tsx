@@ -3,6 +3,8 @@ import { getActiveGames } from "../lib/gamerpower";
 import { StructuredData } from "../components/StructuredData";
 import { GameDeal } from "../types";
 
+export const revalidate = 300;
+
 // ── Epic upcoming games ───────────────────────────────────────────────────────
 
 interface UpcomingGame {
@@ -21,7 +23,7 @@ async function getUpcomingGames(): Promise<UpcomingGame[]> {
   try {
     const epicUrl =
       "https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=US&allowCountries=US";
-    const res = await fetch(epicUrl, { next: { revalidate: 3600 } });
+    const res = await fetch(epicUrl, { next: { revalidate: 300 } });
 
     if (!res.ok) {
       console.error(`[epic] getUpcomingGames failed: ${res.status} ${res.statusText}`);

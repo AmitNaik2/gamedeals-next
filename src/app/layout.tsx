@@ -21,6 +21,7 @@ const orbitron = Orbitron({
 
 
 const siteUrl = "https://www.gamesdealshub.me";
+const defaultOgImage = "/og?title=GamesDealsHub&platform=Free%20PC%20Games&expiry=Updated%20Daily";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -36,14 +37,14 @@ export const metadata: Metadata = {
     description: "Track and claim free PC games before they expire.",
     url: `${siteUrl}/`,
     siteName: "GamesDealsHub",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "GamesDealsHub" }],
+    images: [{ url: defaultOgImage, width: 1200, height: 630, alt: "GamesDealsHub" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "GamesDealsHub | Free PC Games & Deals",
     description: "Track and claim free PC games before they expire.",
-    images: ["/og-image.jpg"],
+    images: [defaultOgImage],
   },
 };
 

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { cachedJson } from '../../../lib/api-cache';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -8,9 +8,9 @@ export async function GET(request: Request) {
       ? `https://www.cheapshark.com/api/1.0/deals?title=${encodeURIComponent(title)}&exact=0&storeID=1,25&sortBy=Deal%20Rating&_t=2` 
       : `https://www.cheapshark.com/api/1.0/deals?storeID=1,25&sortBy=Deal%20Rating&_t=2`;
       
-    // Cache the response for 1 hour (3600 seconds) to avoid CheapShark 429 Rate Limits
+    // Cache the response for 5 minutes to avoid CheapShark 429 rate limits.
     const res = await fetch(url, { 
-      next: { revalidate: 3600 },
+      next: { revalidate: 300 },
       headers: {
         'User-Agent': 'GamesDealsHub/1.0 (gamedealshub1@gmail.com)'
       }
@@ -19,8 +19,8 @@ export async function GET(request: Request) {
        throw new Error(`CheapShark API error: ${res.status}`);
     }
     const data = await res.json();
-    return NextResponse.json(data);
+    return cachedJson(data);
   } catch (err) {
-    return NextResponse.json([], { status: 500 });
+    return cachedJson([], { status: 500 });
   }
 }

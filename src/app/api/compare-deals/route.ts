@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { GameDeal } from '../../../types';
+import { cachedJson } from '../../../lib/api-cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const csData = await res.json();
     
     if (!Array.isArray(csData)) {
-        return NextResponse.json([]);
+        return cachedJson([]);
     }
 
     const STORE_NAMES: Record<string, string> = {
@@ -60,9 +60,9 @@ export async function GET(request: Request) {
       };
     });
     
-    return NextResponse.json(deals);
+    return cachedJson(deals);
   } catch (err) {
     console.error("Compare Deals API Error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    return cachedJson({ error: String(err) }, { status: 500 });
   }
 }

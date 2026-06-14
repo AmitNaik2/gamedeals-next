@@ -1,114 +1,145 @@
-import { Metadata } from 'next';
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import { AuthorBox } from "@/components/AuthorBox";
+import { JsonLd } from "@/components/JsonLd";
+
+const siteUrl = "https://www.gamesdealshub.me";
 
 export const metadata: Metadata = {
-  title: 'PC Optimization | GamesDealsHub',
-  description: 'Boost your FPS and optimize your PC for gaming.',
-  keywords: ["PC optimization", "boost FPS", "gaming performance", "Windows 11 optimization", "low end PC gaming"],
+  title: "PC Gaming Optimization Guide | Boost FPS Without Buying Hardware",
+  description:
+    "An 800+ word GamesDealsHub PC optimization guide covering Windows settings, GPU drivers, game graphics options, storage, thermals, and FPS stability.",
+  keywords: [
+    "PC optimization",
+    "boost FPS",
+    "gaming performance",
+    "Windows gaming settings",
+    "low end PC gaming",
+    "GPU driver settings",
+    "GamesDealsHub optimization",
+  ],
+  alternates: { canonical: `${siteUrl}/optimization` },
   openGraph: {
-    title: 'PC Optimization | GamesDealsHub',
-    description: 'Boost your FPS and optimize your PC for gaming.',
-    url: 'https://www.gamesdealshub.me/optimization',
-    type: 'article'
+    title: "PC Gaming Optimization Guide | GamesDealsHub",
+    description: "Boost FPS, reduce stutter, and make free PC games run better without buying new hardware.",
+    url: `${siteUrl}/optimization`,
+    siteName: "GamesDealsHub",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "PC Gaming Optimization Guide" }],
+    type: "article",
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'PC Optimization | GamesDealsHub',
-    description: 'Boost your FPS and optimize your PC for gaming.'
+    card: "summary_large_image",
+    title: "PC Gaming Optimization Guide | GamesDealsHub",
+    description: "Practical performance tuning for smoother PC gaming.",
+    images: ["/og-image.jpg"],
   },
-  alternates: { canonical: 'https://www.gamesdealshub.me/optimization' }
 };
 
-import { StructuredData } from "@/components/StructuredData";
+const sections = [
+  {
+    heading: "Start With a Clean Baseline",
+    body: "Optimization begins before you touch a graphics slider. A slow PC is often not limited by raw hardware; it is limited by background software, thermal throttling, old drivers, full storage, or conflicting overlays. Before changing game settings, restart the machine, close browsers with dozens of tabs, pause cloud sync during gameplay, and open Task Manager to see what is actually using CPU, memory, disk, and GPU resources. If a launcher, RGB utility, recording app, or browser helper is consuming resources while you play, disable it for the session. This baseline matters because you cannot judge a graphics tweak accurately while another process is causing stutter in the background.",
+  },
+  {
+    heading: "Tune Windows for Stable Gaming",
+    body: "Windows settings can help or hurt frame pacing. Set Power Mode to Best Performance on desktops and plugged-in laptops. Review startup apps and disable anything you do not need immediately after boot. Turn off background recording if you do not use it, because constant capture can create micro-stutter on weaker CPUs or slower drives. Game Mode is worth leaving on for most users because it helps prioritize game processes, but it is not magic. Also check Windows Update before a long gaming session; pending updates can trigger background work at the worst possible time. The goal is not to strip Windows down until it breaks. The goal is to remove avoidable interruptions.",
+  },
+  {
+    heading: "Update GPU Drivers Carefully",
+    body: "GPU drivers are one of the simplest performance wins, especially for new releases. NVIDIA, AMD, and Intel frequently ship game-ready updates that fix crashes, shader compilation issues, and poor performance in specific titles. Update from the official driver software or website rather than random driver bundles. If a new driver causes problems, roll back to the previous stable version instead of stacking fixes on top of fixes. In NVIDIA Control Panel, Prefer Maximum Performance can help avoid downclocking in demanding games, though it may increase power draw. In AMD Software, Anti-Lag can reduce input latency in GPU-bound games. Do not copy every setting from a random optimization video; change one thing at a time and test.",
+  },
+  {
+    heading: "Use the Right In-Game Settings",
+    body: "The fastest way to gain FPS is knowing which visual settings are expensive. Volumetric fog, ray tracing, ultra shadows, screen-space reflections, high crowd density, and heavy anti-aliasing can destroy performance while adding relatively small visual improvements during actual play. Texture quality is different: if you have enough VRAM, high textures often look better without a large FPS cost. Start with a balanced preset, then lower the expensive settings first. Keep resolution at your monitor's native value when possible, and use DLSS, FSR, or XeSS Quality mode if the game supports it. Upscaling in Quality mode often provides a major performance boost while preserving image clarity better than dropping native resolution.",
+  },
+  {
+    heading: "Fix Stutter, Not Just Average FPS",
+    body: "Average FPS is only part of the experience. A game can report 90 FPS and still feel bad if frame times spike. Stutter can come from shader compilation, slow storage, insufficient RAM, thermal throttling, overlays, or unstable CPU boosts. Install large open-world games on an SSD when possible. Leave enough free space on the drive so Windows and the game can manage temporary files. If your system has 8 GB of RAM, close everything unnecessary before launching modern titles. If temperatures are high, clean dust filters, improve airflow, and check that laptop vents are not blocked. Stable frame pacing often feels better than chasing a higher but inconsistent maximum FPS.",
+  },
+  {
+    heading: "Set Practical FPS Targets",
+    body: "Not every game needs the same target. Competitive shooters benefit from high refresh rates and low latency, so lowering visuals aggressively can make sense. Story games, strategy titles, and slower RPGs may feel excellent at a locked 60 FPS with better image quality. A stable cap can reduce heat, fan noise, and stutter. Use in-game frame limiters when available, or the limiter in your GPU control panel. If your system swings between 70 and 110 FPS, a 72 or 90 FPS cap may feel smoother than an uncapped frame rate. Optimization is not about making every slider low. It is about matching settings to the game, monitor, and hardware you actually have.",
+  },
+  {
+    heading: "Keep Launchers and Libraries Under Control",
+    body: "Free game hunters often install multiple launchers, and each one wants to run background services. Steam, Epic, GOG Galaxy, EA App, Ubisoft Connect, Battle.net, and Prime-related tools can all add startup tasks or overlays. You do not need every launcher open all the time. Disable auto-start for launchers you use occasionally, and open them only when claiming, updating, or playing a game from that library. Also review overlay settings. Steam Overlay is useful for screenshots and invites, but stacking it with Discord, GPU overlay, recording overlay, and launcher overlay can create conflicts. Fewer active overlays means fewer chances for capture hooks to affect performance.",
+  },
+  {
+    heading: "Measure Changes Like a Deal Hunter",
+    body: "Treat optimization like testing a deal: verify before you trust it. Use a repeatable benchmark area, record average FPS and 1% lows, change one setting, then test again. If a tweak gives no measurable benefit, revert it. Avoid registry hacks and miracle booster apps that promise huge gains without explaining the tradeoff. Many of them disable useful services, break updates, or create security problems. The best optimizations are boring: clean startup, current drivers, sensible graphics settings, SSD storage, healthy temperatures, and stable frame caps. Those steps help free games and premium releases alike, and they cost nothing except a little attention.",
+  },
+];
 
-export default function Page() { 
-  const articleSchema = {
-    "headline": "The Ultimate PC Optimization Guide for 2026",
-    "description": "Boost your FPS, eliminate micro-stutters, and squeeze every drop of performance out of your aging hardware.",
-    "author": { "@type": "Organization", "name": "GamesDealsHub" },
-    "publisher": { "@type": "Organization", "name": "GamesDealsHub", "logo": { "@type": "ImageObject", "url": "https://www.gamesdealshub.me/og-image.jpg" } },
-    "datePublished": "2026-05-31",
-    "dateModified": "2026-05-31"
-  };
+const schemas = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "GamesDealsHub",
+    url: siteUrl,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "GamesDealsHub PC Optimization Guide",
+    description: "A free PC gaming optimization guide for boosting FPS and reducing stutter.",
+    brand: { "@type": "Brand", name: "GamesDealsHub" },
+    offers: { "@type": "Offer", price: "0", priceCurrency: "USD", availability: "https://schema.org/InStock" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What setting usually improves FPS the most?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Lowering ray tracing, volumetric effects, shadows, and reflections often improves FPS more than lowering every setting equally.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Should I use DLSS, FSR, or XeSS?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Use Quality mode first when available. It often improves performance while preserving image quality better than lowering native resolution.",
+        },
+      },
+    ],
+  },
+];
 
+export default function OptimizationPage() {
   return (
     <>
-    <StructuredData type="Article" data={articleSchema} />
-    <div className="min-h-screen pt-24 pb-20 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-10 text-center">
-          <span className="text-[#06B6D4] font-orbitron font-bold tracking-widest text-sm uppercase mb-2 block">Performance Tuning</span>
-          <h1 className="text-4xl md:text-5xl font-orbitron font-bold text-white mb-6 uppercase tracking-tight">The Ultimate PC Optimization Guide for 2026</h1>
-          <p className="text-[#9CA3AF] text-lg font-poppins">Boost your FPS, eliminate micro-stutters, and squeeze every drop of performance out of your aging hardware without spending a dime.</p>
-        </div>
-        
-        <div className="bg-[#0F172A]/80 backdrop-blur-md border border-white/10 rounded-2xl p-8 md:p-12 shadow-[0_0_30px_rgba(6,182,212,0.05)] text-[#D1D5DB] font-poppins space-y-8 leading-relaxed">
-           
-           <p className="text-lg">
-             Whether you're trying to hit a stable 144Hz in competitive shooters or just trying to make a heavy triple-A title playable on a budget laptop, optimizing your Windows environment is critical. GamesDealsHub has compiled the definitive list of tweaks that actually work, bypassing the snake-oil "game boosters" that do more harm than good.
-           </p>
+      {schemas.map((schema, index) => (
+        <JsonLd key={index} data={schema} />
+      ))}
+      <main className="min-h-screen px-4 py-24 md:px-8">
+        <article className="mx-auto max-w-4xl rounded-2xl border border-white/10 bg-[#0F172A]/80 p-6 md:p-10">
+          <header className="mb-10 text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-[#06B6D4]">Performance Tuning</span>
+            <h1 className="mt-3 text-4xl font-black uppercase tracking-tight text-white md:text-5xl">
+              PC Gaming Optimization Guide
+            </h1>
+            <p className="mt-5 text-lg leading-relaxed text-[#9CA3AF]">
+              A practical guide to smoother frame rates, fewer stutters, cleaner launchers, and better settings choices without buying new hardware.
+            </p>
+          </header>
 
-           <h2 className="text-2xl font-orbitron font-bold text-white uppercase text-[#06B6D4] mt-12 border-b border-white/10 pb-4">1. Debloat Windows 11 Background Processes</h2>
-           <p>
-             Windows 11 comes packed with telemetry, background apps, and widgets that constantly poll your CPU and chew through your RAM. The first step to a smooth gaming experience is turning off the unnecessary weight.
-           </p>
-           <ul className="list-disc pl-6 space-y-2 mt-4 text-[#9CA3AF]">
-             <li><strong>Disable Startup Apps:</strong> Open Task Manager (Ctrl+Shift+Esc), go to the Startup tab, and disable everything except your audio drivers and essential peripherals (like mouse software). Specifically, disable Discord, Spotify, and Epic Games from launching on boot.</li>
-             <li><strong>Turn off Xbox Game Bar:</strong> Unless you actively use it to record clips, the Game Bar's background recording feature causes immense micro-stutters. Go to Settings {'>'} Gaming {'>'} Xbox Game Bar and toggle it off.</li>
-             <li><strong>Disable VBS (Virtualization-Based Security):</strong> While great for enterprise security, VBS can reduce gaming performance by up to 10% on older CPUs. Search "Core Isolation" in the Windows start menu and disable "Memory Integrity".</li>
-           </ul>
+          <div className="space-y-8 font-poppins text-[15px] leading-8 text-[#D1D5DB]">
+            {sections.map((section) => (
+              <section key={section.heading}>
+                <h2 className="mb-3 border-b border-white/10 pb-3 text-2xl font-bold text-white">
+                  {section.heading}
+                </h2>
+                <p>{section.body}</p>
+              </section>
+            ))}
+          </div>
 
-           <h2 className="text-2xl font-orbitron font-bold text-white uppercase text-[#06B6D4] mt-12 border-b border-white/10 pb-4">2. Properly Configure Your GPU Drivers</h2>
-           <p>
-             Updating your drivers is obvious, but configuring the control panel is where the magic happens. 
-           </p>
-           <p className="mt-4">
-             <strong>For NVIDIA Users:</strong> Open the NVIDIA Control Panel and navigate to "Manage 3D Settings". Change your "Power Management Mode" to "Prefer Maximum Performance". This stops your GPU from downclocking during slight lulls in action, eliminating frame drops. Next, set "Texture Filtering - Quality" to "High Performance".
-           </p>
-           <p className="mt-4">
-             <strong>For AMD Users:</strong> Open Adrenalin Edition, navigate to Gaming {'>'} Graphics, and select the "Esports" profile. Ensure Radeon Anti-Lag is turned ON, as it significantly reduces input latency in GPU-bound scenarios.
-           </p>
-
-           <h2 className="text-2xl font-orbitron font-bold text-white uppercase text-[#06B6D4] mt-12 border-b border-white/10 pb-4">3. High Performance Power Plan</h2>
-           <p>
-             By default, laptops and even some desktops are set to "Balanced" power modes to save electricity. This throttles your CPU frequency. 
-           </p>
-           <div className="bg-[#050816] border border-white/5 p-6 rounded-lg my-6">
-             <ol className="list-decimal pl-4 space-y-3">
-               <li>Hit the Windows Key and type "Choose a power plan".</li>
-               <li>Click "Show additional plans".</li>
-               <li>Select <strong>High Performance</strong> or <strong>Ultimate Performance</strong> (if available).</li>
-             </ol>
-           </div>
-
-           <h2 className="text-2xl font-orbitron font-bold text-white uppercase text-[#06B6D4] mt-12 border-b border-white/10 pb-4">4. In-Game Settings that Destroy Performance</h2>
-           <p>
-             When booting up a new game, you don't need to put everything on "Low". You just need to know which settings are the heavy hitters.
-           </p>
-           <ul className="list-disc pl-6 space-y-4 mt-4">
-             <li><strong className="text-white">Volumetric Fog / Clouds:</strong> These volumetric effects are notoriously unoptimized. Dropping them from Ultra to Medium usually yields a massive 15-20% FPS boost with almost zero noticeable visual difference during gameplay.</li>
-             <li><strong className="text-white">Shadow Resolution:</strong> High-resolution shadows chew through VRAM. Lowering shadow quality softens the edges but dramatically improves stability in open-world games.</li>
-             <li><strong className="text-white">Anti-Aliasing (MSAA):</strong> MSAA is incredibly taxing. If the game supports it, always opt for TAA (Temporal Anti-Aliasing) or better yet, use upscaling technologies like DLSS or FSR.</li>
-           </ul>
-
-           <h2 className="text-2xl font-orbitron font-bold text-white uppercase text-[#06B6D4] mt-12 border-b border-white/10 pb-4">5. The Magic of Upscaling (DLSS / FSR / XeSS)</h2>
-           <p>
-             If you are struggling to hit 60 FPS, upscaling is your best friend. Instead of rendering the game at 1080p or 1440p natively, upscalers render the game at a lower internal resolution and use AI to reconstruct the image.
-           </p>
-           <p className="mt-4">
-             Always try to use "Quality" mode first. It offers a 20-30% performance uplift while maintaining an image that is often indistinguishable from native rendering. If you are on an older GPU without DLSS support, AMD's FSR (FidelityFX Super Resolution) works on almost all graphics cards, including older NVIDIA GTX series!
-           </p>
-
-           <div className="mt-16 pt-8 border-t border-white/10 text-center">
-             <p className="text-sm text-[#9CA3AF] mb-4">Have more optimization questions? Join the GamesDealsHub community to share your benchmarks and tweaks.</p>
-             <a href="/" className="inline-block px-6 py-3 bg-[#06B6D4]/10 hover:bg-[#06B6D4]/20 border border-[#06B6D4]/50 text-[#06B6D4] font-bold font-orbitron uppercase tracking-widest rounded-lg transition-all hover:shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-               Explore Free Games
-             </a>
-           </div>
-
-        </div>
-      </div>
-    </div>
+          <AuthorBox />
+        </article>
+      </main>
     </>
   );
 }

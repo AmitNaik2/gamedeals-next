@@ -19,5 +19,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ["/admin", "/api/"],
     },
     sitemap: "https://www.gamesdealshub.me/sitemap.xml",
+    host: "https://www.gamesdealshub.me",
   };
 }

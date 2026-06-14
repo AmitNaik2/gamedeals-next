@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cachedJson } from '../../../lib/api-cache';
 
 async function fetchSteamData(title: string) {
   // 1. Clean the title exactly like we do for RAWG and IGDB
@@ -83,9 +84,9 @@ export async function GET(request: Request) {
 
   try {
     const data = await fetchSteamData(title);
-    return NextResponse.json(data);
+    return cachedJson(data);
   } catch (error: any) {
     console.error("Error fetching Steam info:", error);
-    return NextResponse.json({ error: error.message || "Failed to fetch from Steam" }, { status: 500 });
+    return cachedJson({ error: error.message || "Failed to fetch from Steam" }, { status: 500 });
   }
 }

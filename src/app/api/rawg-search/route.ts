@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { cachedJson } from '../../../lib/api-cache';
 
 const RAWG_MONTHLY_LIMIT = 20000;
 let rawgUsageCount = 0; // Simple in-memory mock for Next.js serverless
@@ -26,14 +26,14 @@ export async function GET(request: Request) {
   const query = searchParams.get('query');
 
   if (!query) {
-    return NextResponse.json([]);
+    return cachedJson([]);
   }
 
   try {
     const data = await fetchRawgSearch(query);
-    return NextResponse.json(data.results || []);
+    return cachedJson(data.results || []);
   } catch (e: any) {
     console.error("RAWG Search API Error:", e);
-    return NextResponse.json([]);
+    return cachedJson([]);
   }
 }
