@@ -18,7 +18,7 @@ import { Archive } from "../components/Archive";
 import { EmailModal } from "../components/EmailModal";
 import { type GameDeal } from "../types";
 import { getDealRarity, type RarityLevel } from "../lib/deal-utils";
-import { filterActiveDeals, formatLastApiFetch, sortDealsByExpiryAsc } from "../lib/deal-expiry";
+import { filterActiveDeals, sortDealsByExpiryAsc } from "../lib/deal-expiry";
 import { cn, openExternalUrl } from "../lib/utils";
 import { UpcomingDropsGrid } from "../components/UpcomingDropsGrid";
 import { FeaturedDeal } from "../components/FeaturedDeal";
@@ -66,7 +66,8 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
 
   const [error, setError] = useState<string | null>(null);
   const [premiumError, setPremiumError] = useState<string | null>(null);
-  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [minsAgo, setMinsAgo] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedRarity, setSelectedRarity] = useState<RarityLevel | 'All'>('All');
   const [sortOption, setSortOption] = useState<string>('Expiring soon');
@@ -131,8 +132,8 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
       const fetchedAt = new Date();
       setDeals(formattedDeals);
       setUpcomingDeals(upcomingData || []);
-      setLastRefreshed(fetchedAt);
-      setTimestampNow(fetchedAt.getTime());
+      setLastUpdated(fetchedAt);
+      setMinsAgo(0);
     } catch (err: any) {
       setError(err.message === 'Failed to fetch' ? 'Connection lost' : err.message);
     } finally {
@@ -141,14 +142,18 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
     }
   };
   
-  const [timestampNow, setTimestampNow] = useState(Date.now());
-
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimestampNow(Date.now());
+      const diff = Math.floor((new Date().getTime() - lastUpdated.getTime()) / 60000);
+      setMinsAgo(diff);
     }, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [lastUpdated]);
+
+  const lastUpdatedLabel =
+    minsAgo > 60
+      ? `Updated ${Math.floor(minsAgo / 60)}h ago`
+      : `Updated ${minsAgo} mins ago`;
 
   const sortedGamesDeals = useMemo(() => {
     const normalize = (t: string) => t.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -493,7 +498,7 @@ export default function App({ initialActiveGames = [], initialUpcomingGames = []
               </div>
               <div className="hidden md:flex items-center gap-4 text-xs font-mono text-[#9CA3AF] px-2 tracking-widest uppercase shrink-0 pb-4">
                 <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" /> {deals.length + dlcDeals.length} Tracked</span>
-                 <span suppressHydrationWarning><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> {formatLastApiFetch(lastRefreshed, timestampNow)}</span>
+                 <span suppressHydrationWarning><RefreshCcw className="w-3 h-3 inline pb-0.5 text-[#8B5CF6]" /> {lastUpdatedLabel}</span>
               </div>
             </div>
 
