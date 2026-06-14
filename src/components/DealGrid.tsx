@@ -7,13 +7,14 @@ import { Deal } from '@/types/deal';
 import { DealCard } from './DealCard';
 import { DealFilters } from './DealFilters';
 import { EmailSignup } from './EmailSignup';
+import { filterActiveDeals, sortDealsByExpiryAsc } from '@/lib/deal-expiry';
 
 export function DealGrid({ initialDeals }: { initialDeals: Deal[] }) {
   const [platform, setPlatform] = useState('All');
   const [sort, setSort] = useState('Expiring soon');
 
   // Filter logic
-  let filteredDeals = initialDeals;
+  let filteredDeals = filterActiveDeals(initialDeals);
   if (platform !== 'All') {
     filteredDeals = filteredDeals.filter(d => 
       d.platforms.toLowerCase().includes(platform.toLowerCase())
@@ -23,9 +24,7 @@ export function DealGrid({ initialDeals }: { initialDeals: Deal[] }) {
   // Sort logic
   filteredDeals.sort((a, b) => {
     if (sort === 'Expiring soon') {
-      const dateA = a.end_date === 'N/A' ? Infinity : new Date(a.end_date).getTime();
-      const dateB = b.end_date === 'N/A' ? Infinity : new Date(b.end_date).getTime();
-      return dateA - dateB;
+      return 0;
     }
     if (sort === 'Newest') {
       return new Date(b.published_date).getTime() - new Date(a.published_date).getTime();
@@ -38,6 +37,9 @@ export function DealGrid({ initialDeals }: { initialDeals: Deal[] }) {
     }
     return 0;
   });
+  if (sort === 'Expiring soon') {
+    filteredDeals = sortDealsByExpiryAsc(filteredDeals);
+  }
 
   return (
     <div>

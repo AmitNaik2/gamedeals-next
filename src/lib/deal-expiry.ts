@@ -37,15 +37,10 @@ export function getDealExpiryBadge(deal: Pick<GameDeal, "end_date">, now = Date.
   const expiryTime = getDealExpiryTime(deal.end_date);
   if (!Number.isFinite(expiryTime) || expiryTime <= now) return null;
 
-  const expiry = new Date(expiryTime);
-  const current = new Date(now);
-  const expiresToday =
-    expiry.getUTCFullYear() === current.getUTCFullYear() &&
-    expiry.getUTCMonth() === current.getUTCMonth() &&
-    expiry.getUTCDate() === current.getUTCDate();
+  const msUntilExpiry = expiryTime - now;
 
-  if (expiresToday) return "today";
-  if (expiryTime - now <= SOON_WINDOW_MS) return "soon";
+  if (msUntilExpiry <= ONE_DAY_MS) return "today";
+  if (msUntilExpiry <= SOON_WINDOW_MS) return "soon";
   return null;
 }
 

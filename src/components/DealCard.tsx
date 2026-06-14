@@ -133,12 +133,12 @@ export function DealCard({ deal, index = 0, onShare = () => {}, onRemind, priori
             ) : null}
             {expiryBadge === "today" && (
               <span className="px-2 py-1 rounded bg-[#EF4444]/25 backdrop-blur-md border border-[#EF4444]/60 text-[#FCA5A5] text-[10px] font-bold uppercase tracking-widest">
-                Expiring Today
+                EXPIRED TODAY
               </span>
             )}
             {expiryBadge === "soon" && (
               <span className="px-2 py-1 rounded bg-[#F59E0B]/20 backdrop-blur-md border border-[#F59E0B]/60 text-[#FBBF24] text-[10px] font-bold uppercase tracking-widest">
-                Expiring Soon
+                EXPIRING SOON
               </span>
             )}
           </div>
