@@ -61,15 +61,20 @@ export function formatUtcExpiry(endDate?: string | null): string | null {
   const expiryTime = getDealExpiryTime(endDate);
   if (!Number.isFinite(expiryTime)) return null;
 
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
+  const expiry = new Date(expiryTime);
+  const date = new Intl.DateTimeFormat("en-US", {
+    month: "long",
     day: "numeric",
     year: "numeric",
-    hour: "2-digit",
+    timeZone: "UTC",
+  }).format(expiry);
+  const time = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
     minute: "2-digit",
     timeZone: "UTC",
-    timeZoneName: "short",
-  }).format(new Date(expiryTime));
+  }).format(expiry);
+
+  return `${date} at ${time} UTC`;
 }
 
 export function formatLastApiFetch(date: Date | null, now = Date.now()): string {

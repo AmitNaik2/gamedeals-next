@@ -72,12 +72,7 @@ export function FeaturedDeal({ deal }: { deal: GameDeal }) {
             </Link>
             {expiryDate && (
               <span className={`text-[10px] font-orbitron font-bold uppercase tracking-widest ${isUrgent ? "text-[#EF4444]" : "text-[#F59E0B]"}`}>
-                Expires {expiryDate}
-              </span>
-            )}
-            {isUrgent && (
-              <span className="text-[10px] font-orbitron font-bold uppercase tracking-widest text-[#FCA5A5]">
-                Less than 24h remaining
+                Expires: {expiryDate}
               </span>
             )}
           </div>
