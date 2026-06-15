@@ -150,6 +150,7 @@ const safeAutoFixTypes = new Set<SystemHealthIssueType>([
 const storedIssues: SystemHealthIssue[] = [];
 const fixSnapshots: FixSnapshot[] = [];
 const fixResults: Array<{ success: boolean; createdAt: string }> = [];
+let summaryOverrides: Partial<Pick<SystemHealthSummary, "apiHealth" | "databaseHealth" | "cacheHealth">> = {};
 let lastScanAt: string | null = null;
 
 function stableHash(value: string) {
@@ -595,10 +596,14 @@ export function summarizeSystemHealth(): SystemHealthSummary {
     autoFixedToday: fixResults.filter((result) => result.success && result.createdAt.startsWith(today)).length,
     failedFixes: fixResults.filter((result) => !result.success).length,
     lastSystemScan: lastScanAt,
-    apiHealth: healthFromIssues("failed_api_request", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["apiHealth"],
-    databaseHealth: healthFromIssues("database_error", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["databaseHealth"],
-    cacheHealth: healthFromIssues("cache_revalidation_failure", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["cacheHealth"],
+    apiHealth: summaryOverrides.apiHealth ?? healthFromIssues("failed_api_request", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["apiHealth"],
+    databaseHealth: summaryOverrides.databaseHealth ?? healthFromIssues("database_error", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["databaseHealth"],
+    cacheHealth: summaryOverrides.cacheHealth ?? healthFromIssues("cache_revalidation_failure", lastScanAt ? "Healthy" : "Not checked") as SystemHealthSummary["cacheHealth"],
   };
+}
+
+export function setSystemHealthSummaryOverrides(overrides: typeof summaryOverrides) {
+  summaryOverrides = overrides;
 }
 
 function getDealSnapshot(deal: MutableGameDeal) {
@@ -815,5 +820,6 @@ export function resetSystemHealthForTests() {
   storedIssues.length = 0;
   fixSnapshots.length = 0;
   fixResults.length = 0;
+  summaryOverrides = {};
   lastScanAt = null;
 }

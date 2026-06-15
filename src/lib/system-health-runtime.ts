@@ -1,9 +1,11 @@
 import { revalidatePath } from "next/cache";
 import { Redis } from "@upstash/redis";
 import { gamingArticles, siteUrl as defaultSiteUrl } from "./articles";
+import { filterActiveDeals, sortDealsByExpiryAsc } from "./deal-expiry";
 import {
   getSystemHealthIssues,
   scanSystemHealth,
+  setSystemHealthSummaryOverrides,
   storeSystemHealthIssues,
   summarizeSystemHealth,
   type ApiHealthCheck,
@@ -26,15 +28,25 @@ function timeoutSignal(ms = REQUEST_TIMEOUT_MS) {
 }
 
 function requiredEnvNames() {
-  return [
+  const missing = [
     "ADMIN_EMAIL",
     "ADMIN_PASSWORD",
-    "NEXT_PUBLIC_SITE_URL",
     "REVALIDATE_SECRET",
-    "CRON_SECRET",
-    "UPSTASH_REDIS_REST_URL",
-    "UPSTASH_REDIS_REST_TOKEN",
   ].filter((name) => !process.env[name]);
+
+  if (process.env.VERCEL_ENV === "production" && !process.env.CRON_SECRET) {
+    missing.push("CRON_SECRET");
+  }
+
+  if (process.env.UPSTASH_REDIS_REST_URL && !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    missing.push("UPSTASH_REDIS_REST_TOKEN");
+  }
+
+  if (process.env.UPSTASH_REDIS_REST_TOKEN && !process.env.UPSTASH_REDIS_REST_URL) {
+    missing.push("UPSTASH_REDIS_REST_URL");
+  }
+
+  return missing;
 }
 
 function toMutableDeals(data: unknown): MutableGameDeal[] {
@@ -72,7 +84,8 @@ async function fetchRawDeals() {
     if (!response.ok) return { deals: [], apiCheck };
 
     const data = await response.json();
-    return { deals: toMutableDeals(data), apiCheck };
+    const activeDeals = sortDealsByExpiryAsc(filterActiveDeals(toMutableDeals(data)));
+    return { deals: activeDeals, apiCheck };
   } catch (error) {
     apiCheck.responseTimeMs = Date.now() - started;
     apiCheck.message = error instanceof Error ? error.message : "GamerPower API request failed.";
@@ -113,6 +126,16 @@ async function checkUrl(name: string, url: string): Promise<NamedHealthCheck> {
 }
 
 async function checkDatabase(): Promise<NamedHealthCheck> {
+  if (!process.env.UPSTASH_REDIS_REST_URL && !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    return {
+      name: "Upstash Redis",
+      affected: "database:optional-disconnected",
+      ok: true,
+      severity: "Info",
+      message: "Upstash Redis is not connected; database-backed monitoring persistence is disabled.",
+    };
+  }
+
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     return {
       name: "Upstash Redis",
@@ -229,6 +252,9 @@ export async function runSystemHealthScan() {
   const brokenClaimLinks = await checkClaimLinks(deals);
 
   lastScannedDeals = deals;
+  setSystemHealthSummaryOverrides({
+    databaseHealth: databaseCheck.affected === "database:optional-disconnected" ? "Not connected" : undefined,
+  });
 
   const issues = scanSystemHealth({
     deals,

@@ -108,6 +108,6 @@ export function authorizeSystemHealthRequest(request: Request, action: SystemHea
 
 export function isAuthorizedCronRequest(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return false;
+  if (!secret) return process.env.VERCEL_ENV !== "production";
   return request.headers.get("authorization") === `Bearer ${secret}`;
 }
